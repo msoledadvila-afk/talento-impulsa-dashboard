@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="es" data-brand="talento">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Talento Impulsa | Dashboard Operativo</title>
+    
+    <!-- Tipografía del Design System -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Iconos de Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* ============================================================
+           TOKENS DEL DESIGN SYSTEM
+           ============================================================ */
+        :root {
+            --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
+            --text-md: 1.125rem; --text-lg: 1.25rem; --text-xl: 1.5rem; --text-2xl: 2rem;
+            --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+            --space-4: 1rem; --space-6: 1.5rem; --space-8: 2rem;
+            --radius-sm: 0.25rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-pill: 9999px;
+            --shadow-sm: 0 2px 8px rgba(26,24,20,0.06);
+            --shadow-md: 0 8px 20px rgba(26,24,20,0.08);
+            --shadow-lg: 0 16px 32px rgba(26,24,20,0.10);
+            --duration-base: 300ms;
+            --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Status Colors */
+            --alert-warning: #B38000;
+            --alert-warning-bg: #FFF3CD;
+            --alert-danger: #842029;
+            --alert-danger-bg: #F8D7DA;
+        }
+
+        [data-brand="talento"] {
+            --brand-primary: #9A7B3D;
+            --brand-primary-soft: #B59A5F;
+            --brand-primary-deep: #7D612B;
+            --brand-primary-glow: rgba(154,123,61,0.12);
+            --bg: #EFE9DB;             
+            --border-light: #D6CDB8;   
+            --border: #D6CDB8;
+            --text-dim: #918671;       
+            --text: #684B45;           
+            --bg-card: #FFFFFF;        
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            --radius: var(--radius-md);
+        }
+
+        /* ============================================================
+           BASE STYLES
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-body); background-color: var(--bg); color: var(--text);
+            line-height: 1.5; -webkit-font-smoothing: antialiased; display: flex;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); font-weight: 600; color: var(--text); }
+        a { color: var(--brand-primary); text-decoration: none; transition: color var(--duration-base); }
+        a:hover { color: var(--brand-primary-deep); }
+        button, select, input, textarea { font-family: inherit; outline: none; border: none; }
+        
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+        /* ============================================================
+           COMPONENTES
+           ============================================================ */
+        .card {
+            background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius);
+            padding: var(--space-4); box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+            gap: var(--space-4); width: 100%;
+        }
+        @media (min-width: 768px) { .card { padding: var(--space-6); } }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-3);
+        }
+        .card-title { font-size: var(--text-md); display: flex; align-items: center; gap: var(--space-2); }
+
+        .badge {
+            display: inline-flex; align-items: center; padding: 0.125rem 0.5rem;
+            border-radius: var(--radius-pill); font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+        }
+        .badge.active { background: #D1E7DD; color: #0F5132; }
+        .badge.pending { background: #FFF3CD; color: #664D03; }
+        .badge.paused { background: #F8D7DA; color: #842029; }
+        .badge.info { background: #CFE2FF; color: #084298; }
+        .badge.brand { background: var(--brand-primary-glow); color: var(--brand-primary); }
+
+        .btn-primary {
+            background: var(--brand-primary); color: #FFFFFF; padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius); font-weight: 600; width: 100%; transition: background var(--duration-base);
+            display: flex; align-items: center; justify-content: center; gap: var(--space-2); cursor: pointer;
+        }
+        .btn-primary:hover { background: var(--brand-primary-deep); }
+        .btn-small { padding: var(--space-2) var(--space-4); width: auto; font-size: var(--text-sm); }
+        
+        .btn-icon { background: transparent; color: var(--text-dim); padding: var(--space-1); border-radius: var(--radius-sm); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s;}
+        .btn-icon:hover { background: var(--bg); color: var(--brand-primary); }
+
+        .form-control {
+            width: 100%; padding: var(--space-2) var(--space-3); border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm); background: var(--bg); color: var(--text); font-size: var(--text-sm);
+        }
+        .form-control:focus { border-color: var(--brand-primary); background: var(--bg-card); }
+        .form-group { margin-bottom: var(--space-3); }
+        .form-group label { display: block; font-size: 0.7rem; font-weight: 500; margin-bottom: 2px; color: var(--text-dim); }
+
+        /* ============================================================
+           MODALES (LOGIN, DATA ENTRY & SUMMARY)
+           ============================================================ */
+        .overlay-fullscreen {
+            position: fixed; inset: 0; background-color: rgba(239, 233, 219, 0.95); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 9999; padding: var(--space-4);
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-card {
+            background: var(--bg-card); padding: var(--space-6); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg); width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--border-light);
+        }
+
+        .data-entry-modal, .summary-modal {
+            background: var(--bg-card); width: 100%; max-width: 800px; max-height: 90vh;
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--border-light);
+            display: flex; flex-direction: column; overflow: hidden; transform: translateY(20px); transition: transform 0.3s ease;
+        }
+        .summary-modal { max-width: 700px; }
+        
+        .data-entry-header {
+            padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-light);
+            display: flex; justify-content: space-between; align-items: center; background: var(--bg);
+        }
+        .data-entry-tabs {
+            display: flex; gap: var(--space-4); padding: 0 var(--space-6); border-bottom: 1px solid var(--border-light);
+            background: var(--bg-card); overflow-x: auto; -webkit-overflow-scrolling: touch;
+        }
+        .entry-tab {
+            padding: var(--space-3) 0; font-size: var(--text-sm); font-weight: 600; color: var(--text-dim);
+            cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap;
+        }
+        .entry-tab.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
+        .data-entry-body { padding: var(--space-6); overflow-y: auto; flex-grow: 1;}
+        
+        .form-section { display: none; }
+        .form-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ============================================================
+           LAYOUT RESPONSIVO
+           ============================================================ */
+        #app-layout { display: none; width: 100%; position: relative; }
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 40;
+            backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        .sidebar {
+            width: 260px; background: var(--bg-card); border-right: 1px solid var(--border-light);
+            display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 50;
+            transition: transform 0.3s var(--ease-standard);
+        }
+        .sidebar-header { padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;}
+        .logo { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 800; color: var(--brand-primary); display: flex; align-items: center; gap: var(--space-2); }
+        .btn-close-sidebar { display: none; }
+
+        .nav-menu { padding: var(--space-4) 0; flex-grow: 1; overflow-y: auto; }
+        .nav-item { padding: var(--space-3) var(--space-6); display: flex; align-items: center; gap: var(--space-3); color: var(--text-dim); font-weight: 500; border-left: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: var(--brand-primary-glow); color: var(--brand-primary); border-left-color: var(--brand-primary); }
+
+        .user-profile-nav { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: var(--space-3); }
+        .avatar { width: 32px; height: 32px; background: var(--brand-primary); color: white; border-radius: var(--radius-pill); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-sm); flex-shrink: 0;}
+
+        .main-content {
+            margin-left: 260px; flex-grow: 1; padding: var(--space-6); display: flex;
+            flex-direction: column; gap: var(--space-6); width: calc(100% - 260px);
+        }
+        .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .greeting h1 { font-size: var(--text-xl); color: var(--text); }
+        .greeting p { color: var(--text-dim); font-size: var(--text-xs); }
+        .mobile-menu-btn { display: none; }
+
+        /* ============================================================
+           BUSCADOR GLOBAL
+           ============================================================ */
+        .search-container {
+            position: relative; flex-grow: 1; max-width: 400px;
+        }
+        .search-input {
+            width: 100%; padding: var(--space-2) var(--space-4); padding-left: 36px;
+            border: 1px solid var(--border-light); border-radius: var(--radius-pill);
+            background: var(--bg-card); color: var(--text); font-size: var(--text-sm);
+            transition: all 0.3s;
+        }
+        .search-input:focus { border-color: var(--brand-primary); outline: none; box-shadow: var(--shadow-sm); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+        
+        .search-results-dropdown {
+            display: none; position: absolute; top: 110%; left: 0; right: 0;
+            background: var(--bg-card); border: 1px solid var(--border-light);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-md);
+            max-height: 300px; overflow-y: auto; z-index: 100;
+        }
+        .search-result-item {
+            padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--bg);
+            cursor: pointer; display: flex; flex-direction: column; gap: 2px;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: var(--brand-primary-glow); }
+        .search-result-title { font-weight: 600; font-size: var(--text-sm); color: var(--text); }
+        .search-result-meta { font-size: 0.7rem; color: var(--text-dim); }
+
+        /* ============================================================
+           GRID REORDENAMIENTO (MOBILE VS DESKTOP)
+           ============================================================ */
+        .dashboard-grid { display: flex; flex-direction: column; gap: var(--space-6); }
+        .col-side { order: 1; display: flex; flex-direction: column; gap: var(--space-6); }
+        .col-main { order: 2; display: flex; flex-direction: column; gap: var(--space-6); }
+
+        /* --- Tablas --- */
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { color: var(--text-dim); font-size: var(--text-xs); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-light); text-align: left; }
+        td { padding: var(--space-3) var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--bg); font-size: var(--text-sm); vertical-align: middle; }
+        .progress-bar { height: 6px; background: var(--bg); border-radius: var(--radius-pill); width: 100%; }
+        .progress-fill { height: 100%; background: var(--brand-primary); border-radius: var(--radius-pill); }
+
+        .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
+        .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
+        .date-badge.warning { background: var(--alert-warning-bg); color: var(--alert-warning); font-weight: 700; border: 1px solid #FFE69C;}
+        .date-badge.danger { background: var(--alert-danger-bg); color: var(--alert-danger); font-weight: 700; border: 1px solid #F5C2C7; animation: pulse 2s infinite;}
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* --- Calendario & Listas --- */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
+        .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+        .calendar-day-name { font-size: 0.65rem; color: var(--text-dim); font-weight: 600; padding-bottom: 4px; }
+        .calendar-day { font-size: var(--text-sm); padding: 6px 0; border-radius: var(--radius-sm); color: var(--text); }
+        .calendar-day.empty { visibility: hidden; }
+        .calendar-day.active { background: var(--brand-primary); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
+        .calendar-day.standard:hover { background: var(--brand-primary-glow); color: var(--brand-primary); cursor: default;}
+
+        .notes-list { display: flex; flex-direction: column; gap: var(--space-3); max-height: 250px; overflow-y: auto; padding-right: 4px;}
+        .note-item { background: var(--bg); padding: var(--space-3); border-left: 3px solid var(--brand-primary); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; position: relative;}
+        .note-item p { color: var(--text); font-size: var(--text-sm); margin-bottom: 4px; padding-right: 20px;}
+        .note-meta { font-size: 0.7rem; color: var(--text-dim); }
+        .note-delete { position: absolute; top: 8px; right: 8px; color: var(--border-light); cursor: pointer; }
+        .note-delete:hover { color: var(--alert-danger); }
+
+        .data-list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 350px; overflow-y: auto; }
+        .data-row { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); }
+        .data-row-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .data-info { display: flex; align-items: flex-start; gap: var(--space-3); overflow: hidden; }
+        .data-icon { padding: 8px; background: var(--brand-primary-glow); color: var(--brand-primary); border-radius: var(--radius-sm); flex-shrink: 0; }
+        .data-details { display: flex; flex-direction: column; overflow: hidden; }
+        .data-title { font-weight: 600; font-size: var(--text-sm); word-break: break-word; }
+        .data-subtitle { font-size: 0.75rem; color: var(--text-dim); }
+        .data-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-light); padding-top: var(--space-2); margin-top: var(--space-1); }
+        .data-meta { font-size: 0.7rem; color: var(--text-dim); }
+
+        /* Enlaces Internos (Talento) */
+        .internal-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--border-light); }
+        .internal-link:last-child { border: none; }
+        .internal-link-icon { color: var(--brand-primary); }
+        .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; }
+
+        @media (max-width: 768px) {
+            .greeting { display: none; }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; width: 100%; padding: var(--space-4); }
+            .mobile-menu-btn { display: flex; align-items: center; gap: var(--space-2); background: transparent; border: none; cursor: pointer; color: var(--brand-primary); }
+            .btn-close-sidebar { display: block; }
+        }
+
+        @media (min-width: 768px) {
+            .data-row { flex-direction: row; justify-content: space-between; align-items: center; }
+            .data-row-top { flex-grow: 1; align-items: center; }
+            .data-footer { border-top: none; padding-top: 0; margin-top: 0; gap: var(--space-4); }
+            .greeting h1 { font-size: var(--text-2xl); }
+        }
+
+        @media (min-width: 1025px) {
+            .dashboard-grid { display: grid; grid-template-columns: repeat(12, 1fr); }
+            .col-main { grid-column: span 8; order: 1; }
+            .col-side { grid-column: span 4; order: 2; }
+            .main-content { padding: var(--space-8); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================
+         GATEWAY (LOGIN)
+         ========================================== -->
+    <div id="login-overlay" class="overlay-fullscreen">
+        <div class="login-card">
+            <div class="logo" style="justify-content: center; font-size: var(--text-2xl); margin-bottom: var(--space-2);">
+                <i data-lucide="sparkles"></i> Talento Impulsa
+            </div>
+            <p style="color: var(--text-dim); font-size: var(--text-sm); margin-bottom: var(--space-6);">Dashboard Operativo</p>
+            
+            <div id="login-error" style="color: var(--alert-danger); background: var(--alert-danger-bg); padding: var(--space-2); border-radius: var(--radius-sm); font-size: var(--text-sm); margin-bottom: var(--space-4); display: none;"></div>
+
+            <form id="login-form">
+                <div class="form-group" style="text-align: left;">
+                    <label>Usuario</label>
+                    <select id="user-select" class="form-control" required>
+                        <option value="" disabled selected>Selecciona tu perfil...</option>
+                        <option value="Soledad">Soledad</option>
+                        <option value="Gabriel">Gabriel</option>
+                    </select>
+                </div>
+                <div class="form-group" style="text-align: left; margin-bottom: var(--space-6);">
+                    <label>Contraseña</label>
+                    <input type="password" id="password-input" class="form-control" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i data-lucide="log-in" size="18"></i> Ingresar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL DE INGRESO DE DATOS ("NUEVA PESTAÑA")
+         ========================================== -->
+    <div id="data-entry-overlay" class="overlay-fullscreen" style="display: none; opacity: 0;">
+        <div class="data-entry-modal" id="data-entry-modal">
+            <div class="data-entry-header">
+                <h2 style="font-size: var(--text-lg); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="plus-circle" color="var(--brand-primary)"></i> Nuevo Registro
+                </h2>
+                <button class="btn-icon" onclick="closeEntryModal()"><i data-lucide="x" size="24"></i></button>
+            </div>
+            
+            <div class="data-entry-tabs">
+                <div class="entry-tab active" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
+                <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
+                <div class="entry-tab" data-tab="tab-recurso" onclick="switchTab('tab-recurso')">Recurso Proyecto</div>
+                <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento / Interno</div>
+            </div>
+
+            <div class="data-entry-body">
+                
+                <!-- TAB: PROYECTO -->
+                <form id="form-add-project" class="form-section active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group">
+                            <label>Nombre del Proyecto</label>
+                            <input type="text" id="proj-name" class="form-control" placeholder="Ej: Rediseño Web" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado Actual</label>
+                            <select id="proj-status" class="form-control" required>
+                                <option value="active">En progreso</option>
+                                <option value="pending">Pendiente / Pausado</option>
+                                <option value="info">Completado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Progreso (%)</label>
+                            <input type="number" id="proj-progress" class="form-control" placeholder="0" min="0" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i data-lucide="flag" size="12" style="display:inline;"></i> Kickoff / Inicio</label>
+                            <input type="date" id="proj-kickoff" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i data-lucide="eye" size="12" style="display:inline;"></i> Fecha de Revisión</label>
+                            <input type="date" id="proj-review" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i data-lucide="rocket" size="12" style="display:inline;"></i> Entrega Final</label>
+                            <input type="date" id="proj-delivery" class="form-control" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small"><i data-lucide="save" size="16"></i> Guardar Proyecto</button>
+                    </div>
+                </form>
+
+                <!-- TAB: CLIENTE -->
+                <form id="form-add-client" class="form-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group">
+                            <label>Empresa / Organización</label>
+                            <input type="text" id="client-company" class="form-control" placeholder="Ej: TechCorp S.A." required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contacto Principal</label>
+                            <input type="text" id="client-name" class="form-control" placeholder="Ej: Laura Martínez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email o Teléfono</label>
+                            <input type="text" id="client-contact" class="form-control" placeholder="laura@tech.com" required>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small"><i data-lucide="save" size="16"></i> Guardar Cliente</button>
+                    </div>
+                </form>
+
+                <!-- TAB: RECURSO ASOCIADO -->
+                <form id="form-add-link" class="form-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Asociar a (Proyecto o Cliente)</label>
+                            <select id="link-relation" class="form-control" required>
+                                <option value="">Selecciona a dónde pertenece...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Recurso</label>
+                            <select id="link-type" class="form-control" required>
+                                <option value="imagen">Imagen / Diseño</option>
+                                <option value="documento">Documento / PDF</option>
+                                <option value="enlace" selected>Enlace / Script</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Archivo/Link</label>
+                            <input type="text" id="link-title" class="form-control" placeholder="Ej: Post Carrusel 1" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>URL (Canva, Drive, Web)</label>
+                            <input type="url" id="link-url" class="form-control" placeholder="https://..." required>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small"><i data-lucide="upload-cloud" size="16"></i> Subir Recurso</button>
+                    </div>
+                </form>
+
+                <!-- TAB: RECURSO INTERNO (NUEVO) -->
+                <form id="form-add-internal" class="form-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group">
+                            <label>Tipo (Talento / Vibe Coder)</label>
+                            <select id="internal-type" class="form-control" required>
+                                <option value="social">Redes Sociales / LinkedIn</option>
+                                <option value="repo">Repositorio / GitHub</option>
+                                <option value="web">Sitio Web / Figma</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre del Recurso</label>
+                            <input type="text" id="internal-title" class="form-control" placeholder="Ej: LinkedIn Talento Impulsa" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>URL</label>
+                            <input type="url" id="internal-url" class="form-control" placeholder="https://..." required>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small"><i data-lucide="link" size="16"></i> Guardar Enlace Propio</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MODAL DE RESUMEN / FICHA (SUMMARY)
+         ========================================== -->
+    <div id="summary-overlay" class="overlay-fullscreen" style="display: none; opacity: 0;">
+        <div class="summary-modal" id="summary-modal">
+            <div class="data-entry-header">
+                <div>
+                    <span class="badge info" id="summary-badge" style="margin-bottom: 4px;">Proyecto</span>
+                    <h2 id="summary-title" style="font-size: var(--text-lg); color: var(--brand-primary);">Nombre</h2>
+                </div>
+                <button class="btn-icon" onclick="closeSummaryModal()"><i data-lucide="x" size="24"></i></button>
+            </div>
+            <div class="data-entry-body" style="background: var(--bg); display: flex; flex-direction: column; gap: var(--space-4);">
+                
+                <div class="card">
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Recursos Asociados</h3>
+                    <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
+                </div>
+
+                <div class="card">
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Notas Asociadas</h3>
+                    <div class="notes-list" id="summary-notes-list" style="max-height: 150px;"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         APP PRINCIPAL (DASHBOARD LECTURA)
+         ========================================== -->
+    <div id="app-layout">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><i data-lucide="sparkles"></i> Talento</div>
+                <button class="btn-icon btn-close-sidebar" id="btn-close-sidebar"><i data-lucide="x"></i></button>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> Inicio</a>
+                <a href="#proyectos" class="nav-item"><i data-lucide="folder-kanban"></i> Proyectos</a>
+                <a href="#clientes" class="nav-item"><i data-lucide="users"></i> Clientes</a>
+                <a href="#recursos" class="nav-item"><i data-lucide="cloud"></i> Recursos</a>
+            </nav>
+            <div class="user-profile-nav">
+                <div class="avatar" id="nav-avatar">S</div>
+                <div style="flex-grow: 1; overflow: hidden;">
+                    <div style="font-weight: 600; font-size: var(--text-sm);" id="nav-username">Usuario</div>
+                    <div style="font-size: 0.7rem; color: var(--text-dim); white-space: nowrap;">Admin Hub</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            
+            <header class="topbar">
+                <div style="display: flex; align-items: center; gap: var(--space-3);">
+                    <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
+                    <!-- Bloque de Saludo Reintegrado -->
+                    <div class="greeting" id="greeting-container">
+                        <h1 id="greeting-text">Buen día</h1>
+                        <p id="current-date">Fecha</p>
+                    </div>
+                </div>
+                
+                <!-- BUSCADOR GLOBAL -->
+                <div class="search-container">
+                    <i data-lucide="search" class="search-icon" size="18"></i>
+                    <input type="search" id="global-search" class="search-input" placeholder="Buscar proyecto o cliente para ver resumen..." autocomplete="off">
+                    <div id="search-results" class="search-results-dropdown"></div>
+                </div>
+
+                <div style="display: flex; gap: var(--space-2); align-items: center;">
+                    <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto')">
+                        <i data-lucide="plus" size="18"></i> <span style="display:none; @media(min-width:768px){display:inline;}">Nuevo</span>
+                    </button>
+                    <button class="btn-icon" id="btn-logout-top" title="Cerrar sesión"><i data-lucide="log-out"></i></button>
+                </div>
+            </header>
+
+            <!-- GRID PRINCIPAL -->
+            <div class="dashboard-grid">
+
+                <!-- COLUMNA SIDE (Derecha) -->
+                <div class="col-side">
+                    
+                    <!-- ENLACES INTERNOS (Talento Impulsa) -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i data-lucide="link"></i> Enlaces Propios</h2>
+                            <button class="btn-icon" onclick="openEntryModal('tab-interno')"><i data-lucide="plus" size="16"></i></button>
+                        </div>
+                        <div id="firebase-internal-links" style="display: flex; flex-direction: column;">
+                            <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces.</div>
+                        </div>
+                    </div>
+
+                    <!-- CALENDARIO -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title"><i data-lucide="calendar"></i> Calendario</h2>
+                        </div>
+                        <div>
+                            <div class="calendar-header">
+                                <span class="calendar-title" id="cal-month-year">Mayo 2026</span>
+                                <div style="display: flex; gap: 4px;">
+                                    <button class="btn-icon" id="cal-prev" title="Anterior"><i data-lucide="chevron-left" size="18"></i></button>
+                                    <button class="btn-icon" id="cal-next" title="Siguiente"><i data-lucide="chevron-right" size="18"></i></button>
+                                </div>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-day-name">Do</div><div class="calendar-day-name">Lu</div>
+                                <div class="calendar-day-name">Ma</div><div class="calendar-day-name">Mi</div>
+                                <div class="calendar-day-name">Ju</div><div class="calendar-day-name">Vi</div>
+                                <div class="calendar-day-name">Sa</div>
+                            </div>
+                            <div class="calendar-grid" id="calendar-days-grid"></div>
+                        </div>
+                    </div>
+
+                    <!-- NOTAS COMPARTIDAS -->
+                    <div class="card" style="flex-grow: 1;">
+                        <div class="card-header">
+                            <h2 class="card-title"><i data-lucide="sticky-note"></i> Notas Rápidas</h2>
+                        </div>
+                        <div class="notes-list" id="firebase-notes-list">
+                            <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando notas...</div>
+                        </div>
+                        
+                        <form id="form-add-note" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: auto; padding-top: var(--space-3);">
+                            <select id="note-relation" class="form-control" style="font-size: 0.75rem; padding: 4px 8px;">
+                                <option value="">General (Sin asociar)</option>
+                            </select>
+                            <div style="display: flex; gap: var(--space-2);">
+                                <input type="text" id="note-input" class="form-control" placeholder="Escribe una nota..." required autocomplete="off">
+                                <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="14"></i></button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- COLUMNA MAIN (Izquierda) -->
+                <div class="col-main">
+                    
+                    <!-- PROYECTOS -->
+                    <div class="card" id="proyectos">
+                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                            <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                <h2 class="card-title"><i data-lucide="kanban"></i> Tablero de Proyectos</h2>
+                            </div>
+                        </div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Proyecto</th>
+                                        <th style="width: 100px;">Estado</th>
+                                        <th style="width: 130px;">Progreso</th>
+                                        <th>Cronograma</th>
+                                        <th style="width: 40px; text-align: center;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="firebase-projects-list">
+                                    <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CLIENTES -->
+                    <div class="card" id="clientes">
+                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                            <h2 class="card-title"><i data-lucide="users"></i> Base de Clientes</h2>
+                        </div>
+                        <div class="data-list" id="firebase-clients-list"></div>
+                    </div>
+
+                    <!-- RECURSOS -->
+                    <div class="card" id="recursos">
+                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                            <h2 class="card-title"><i data-lucide="cloud"></i> Repositorio General de Clientes</h2>
+                        </div>
+                        <div class="data-list" id="firebase-links-list"></div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- TOAST NOTIFICACIÓN -->
+    <div id="toast-notification" style="position: fixed; bottom: 20px; right: 20px; background: #D1E7DD; color: #0F5132; padding: 12px 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); transform: translateY(100px); opacity: 0; transition: all 0.3s var(--ease-standard); z-index: 10000; display: flex; align-items: center; gap: 8px; border: 1px solid #BADBCC; pointer-events: none;">
+        <i data-lucide="check-circle" size="18"></i> <span id="toast-message" style="font-weight: 600; font-size: var(--text-sm);">Guardado</span>
+    </div>
+
+    <!-- ==========================================
+         LÓGICA DE LA APLICACIÓN
+         ========================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        lucide.createIcons();
+
+        // 1. CONFIGURACIÓN FIREBASE
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let firebaseUser = null;
+        let localUser = null;
+        
+        // ESTADO GLOBAL EN MEMORIA (Para buscadores y relaciones)
+        let allProjects = [];
+        let allClients = [];
+        let allLinks = [];
+        let allNotes = [];
+        let allInternalLinks = [];
+
+        let unsubscribers = [];
+
+        const initFirebaseAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) { console.error("Error Auth:", err); }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                firebaseUser = user;
+                if (localUser) startRealtimeListeners();
+            }
+        });
+
+        initFirebaseAuth();
+
+        // 2. LÓGICA DE UX: MENU Y LOGIN
+        const toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebar-overlay').classList.toggle('active');
+        };
+        document.getElementById('btn-open-sidebar').addEventListener('click', toggleSidebar);
+        document.getElementById('btn-close-sidebar').addEventListener('click', toggleSidebar);
+        document.getElementById('sidebar-overlay').addEventListener('click', toggleSidebar);
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => { if (window.innerWidth <= 1024) toggleSidebar(); });
+        });
+
+        const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
+        
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('user-select').value;
+            const pass = document.getElementById('password-input').value;
+
+            if (credentials[user] === pass) {
+                localUser = user;
+                document.getElementById('login-error').style.display = 'none';
+                document.getElementById('login-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('login-overlay').style.display = 'none';
+                    document.getElementById('app-layout').style.display = 'block';
+                    initDashboardUI();
+                    initCalendar();
+                    if (firebaseUser) startRealtimeListeners();
+                }, 300);
+            } else {
+                document.getElementById('login-error').textContent = "Contraseña incorrecta. (Usa sole123 o gaby123)";
+                document.getElementById('login-error').style.display = 'block';
+            }
+        });
+
+        const handleLogout = () => {
+            localUser = null;
+            unsubscribers.forEach(unsub => unsub());
+            unsubscribers = [];
+            document.getElementById('app-layout').style.display = 'none';
+            const overlay = document.getElementById('login-overlay');
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 50);
+            document.getElementById('password-input').value = '';
+        };
+
+        if(document.getElementById('btn-logout-top')) document.getElementById('btn-logout-top').addEventListener('click', handleLogout);
+
+        // --- Lógica de Modales ---
+        window.openEntryModal = (tabId) => {
+            const modal = document.getElementById('data-entry-overlay');
+            modal.style.display = 'flex';
+            setTimeout(() => { modal.style.opacity = '1'; document.getElementById('data-entry-modal').style.transform = 'translateY(0)'; }, 10);
+            if(tabId) window.switchTab(tabId);
+        };
+
+        window.closeEntryModal = () => {
+            const modal = document.getElementById('data-entry-overlay');
+            modal.style.opacity = '0';
+            document.getElementById('data-entry-modal').style.transform = 'translateY(20px)';
+            setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        window.switchTab = (tabId) => {
+            const formIdMap = {
+                'tab-proyecto': 'form-add-project',
+                'tab-cliente': 'form-add-client',
+                'tab-recurso': 'form-add-link',
+                'tab-interno': 'form-add-internal'
+            };
+            
+            document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            
+            const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
+            const formEl = document.getElementById(formIdMap[tabId]);
+            if (tabEl) tabEl.classList.add('active');
+            if (formEl) formEl.classList.add('active');
+        };
+
+        window.closeSummaryModal = () => {
+            const modal = document.getElementById('summary-overlay');
+            modal.style.opacity = '0';
+            document.getElementById('summary-modal').style.transform = 'translateY(20px)';
+            setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        window.showToast = (message) => {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
+        };
+
+        // 3. BASE DE DATOS Y ESTADO GLOBAL
+        function startRealtimeListeners() {
+            if (!firebaseUser) return;
+            
+            // Proyectos
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
+                allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
+                allProjects.sort((a, b) => b.createdAt - a.createdAt);
+                renderProjects(allProjects);
+                updateDropdowns(); // Actualizar selects
+            }));
+
+            // Clientes
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'clientes')), (snapshot) => {
+                allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
+                allClients.sort((a, b) => b.createdAt - a.createdAt);
+                renderClients(allClients);
+                updateDropdowns(); // Actualizar selects
+            }));
+
+            // Recursos
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos')), (snapshot) => {
+                allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
+                allLinks.sort((a, b) => b.createdAt - a.createdAt);
+                renderLinks(allLinks);
+            }));
+
+            // Notas
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
+                allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
+                allNotes.sort((a, b) => a.createdAt - b.createdAt);
+                renderNotes(allNotes);
+            }));
+
+            // Enlaces Internos
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
+                allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
+                allInternalLinks.sort((a, b) => b.createdAt - a.createdAt);
+                renderInternalLinks(allInternalLinks);
+            }));
+        }
+
+        // Llenar Selects Relacionales
+        function updateDropdowns() {
+            let optionsHTML = '<option value="">Ninguno / General</option>';
+            
+            if(allProjects.length > 0) {
+                optionsHTML += '<optgroup label="Proyectos">';
+                allProjects.forEach(p => optionsHTML += `<option value="P_${p.id}">${p.name}</option>`);
+                optionsHTML += '</optgroup>';
+            }
+            if(allClients.length > 0) {
+                optionsHTML += '<optgroup label="Clientes">';
+                allClients.forEach(c => optionsHTML += `<option value="C_${c.id}">${c.company} (${c.name})</option>`);
+                optionsHTML += '</optgroup>';
+            }
+
+            const linkSelect = document.getElementById('link-relation');
+            const noteSelect = document.getElementById('note-relation');
+            if(linkSelect) linkSelect.innerHTML = optionsHTML;
+            if(noteSelect) noteSelect.innerHTML = optionsHTML;
+        }
+
+        // Función para resolver nombre de relación desde el ID
+        function getRelationName(relationId) {
+            if(!relationId) return 'General';
+            const [type, id] = relationId.split('_');
+            if(type === 'P') {
+                const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido';
+            }
+            if(type === 'C') {
+                const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido';
+            }
+            return 'General';
+        }
+
+        // BUSCADOR GLOBAL
+        const searchInput = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const queryText = e.target.value.toLowerCase().trim();
+                if(!queryText) { searchResults.style.display = 'none'; return; }
+
+                const matchedProjects = allProjects.filter(p => p.name.toLowerCase().includes(queryText));
+                const matchedClients = allClients.filter(c => c.company.toLowerCase().includes(queryText) || c.name.toLowerCase().includes(queryText));
+
+                if(matchedProjects.length === 0 && matchedClients.length === 0) {
+                    searchResults.innerHTML = '<div style="padding: 12px; color: var(--text-dim); text-align: center; font-size: 0.8rem;">Sin resultados</div>';
+                } else {
+                    let html = '';
+                    matchedProjects.forEach(p => {
+                        html += `<div class="search-result-item" onclick="openSummary('P_${p.id}')">
+                                    <span class="search-result-title">${p.name}</span>
+                                    <span class="search-result-meta"><span class="badge info">Proyecto</span></span>
+                                 </div>`;
+                    });
+                    matchedClients.forEach(c => {
+                        html += `<div class="search-result-item" onclick="openSummary('C_${c.id}')">
+                                    <span class="search-result-title">${c.company}</span>
+                                    <span class="search-result-meta"><span class="badge info" style="background:#EFE9DB; color:#684B45;">Cliente</span> Contacto: ${c.name}</span>
+                                 </div>`;
+                    });
+                    searchResults.innerHTML = html;
+                }
+                searchResults.style.display = 'block';
+            });
+        }
+
+        // Ocultar buscador al hacer click fuera
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-container') && searchResults) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // ABRIR FICHA DE RESUMEN
+        window.openSummary = (relationId) => {
+            if (searchResults) searchResults.style.display = 'none';
+            if (searchInput) searchInput.value = '';
+
+            const [type, id] = relationId.split('_');
+            let entityName = '';
+            let entityBadge = '';
+
+            if(type === 'P') {
+                const p = allProjects.find(x => x.id === id);
+                if(p) { entityName = p.name; entityBadge = 'Proyecto'; }
+            } else {
+                const c = allClients.find(x => x.id === id);
+                if(c) { entityName = c.company; entityBadge = 'Cliente'; }
+            }
+
+            const summaryTitle = document.getElementById('summary-title');
+            if (summaryTitle) summaryTitle.textContent = entityName;
+            
+            const summaryBadge = document.getElementById('summary-badge');
+            if (summaryBadge) {
+                summaryBadge.textContent = entityBadge;
+                if(type === 'C') {
+                    summaryBadge.style.background = '#EFE9DB';
+                    summaryBadge.style.color = '#684B45';
+                } else {
+                    summaryBadge.style.background = '#CFE2FF';
+                    summaryBadge.style.color = '#084298';
+                }
+            }
+
+            // Filtrar Recursos y Notas por este RelationId
+            const filteredLinks = allLinks.filter(l => l.relationId === relationId);
+            const filteredNotes = allNotes.filter(n => n.relationId === relationId);
+
+            // Renderizar Recursos en Resumen
+            const linksContainer = document.getElementById('summary-links-list');
+            if (linksContainer) {
+                if(filteredLinks.length === 0) {
+                    linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
+                } else {
+                    linksContainer.innerHTML = '';
+                    filteredLinks.forEach(link => {
+                        const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
+                        div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir</a></div></div>`;
+                        linksContainer.appendChild(div);
+                    });
+                }
+            }
+
+            // Renderizar Notas en Resumen
+            const notesContainer = document.getElementById('summary-notes-list');
+            if (notesContainer) {
+                if(filteredNotes.length === 0) {
+                    notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas asociadas.</div>';
+                } else {
+                    notesContainer.innerHTML = '';
+                    filteredNotes.forEach(note => {
+                        const div = document.createElement('div'); div.className = 'note-item'; div.style.padding = '8px';
+                        div.innerHTML = `<p style="font-size:0.8rem;"><strong>${note.addedBy}:</strong> ${note.text}</p>`;
+                        notesContainer.appendChild(div);
+                    });
+                }
+            }
+
+            lucide.createIcons();
+            const modal = document.getElementById('summary-overlay');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => { 
+                    modal.style.opacity = '1'; 
+                    const summaryModalContent = document.getElementById('summary-modal');
+                    if (summaryModalContent) summaryModalContent.style.transform = 'translateY(0)'; 
+                }, 10);
+            }
+        };
+
+
+        // --- Envío de Formularios ---
+        
+        // Submit Proyecto
+        document.getElementById('form-add-project').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseUser || !localUser) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), { 
+                    name: document.getElementById('proj-name').value.trim(), 
+                    status: document.getElementById('proj-status').value, 
+                    progress: parseInt(document.getElementById('proj-progress').value) || 0, 
+                    dates: { 
+                        kickoff: document.getElementById('proj-kickoff').value, 
+                        review: document.getElementById('proj-review').value, 
+                        delivery: document.getElementById('proj-delivery').value 
+                    }, 
+                    addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('form-add-project').reset(); window.closeEntryModal(); window.showToast('Proyecto guardado');
+            } catch (err) { console.error(err); }
+        });
+
+        // Submit Cliente
+        document.getElementById('form-add-client').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseUser || !localUser) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), { 
+                    company: document.getElementById('client-company').value.trim(), 
+                    name: document.getElementById('client-name').value.trim(), 
+                    contact: document.getElementById('client-contact').value.trim(), 
+                    addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('form-add-client').reset(); window.closeEntryModal(); window.showToast('Cliente registrado');
+            } catch (err) { console.error(err); }
+        });
+
+        // Submit Recurso (con Relación)
+        document.getElementById('form-add-link').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseUser || !localUser) return;
+            try {
+                const relationId = document.getElementById('link-relation').value;
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), { 
+                    relationId: relationId,
+                    relationName: getRelationName(relationId),
+                    type: document.getElementById('link-type').value, 
+                    title: document.getElementById('link-title').value.trim(), 
+                    url: document.getElementById('link-url').value.trim(), 
+                    addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('form-add-link').reset(); window.closeEntryModal(); window.showToast('Recurso subido');
+            } catch (err) { console.error(err); }
+        });
+
+        // Submit Enlace Interno (Talento)
+        document.getElementById('form-add-internal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseUser || !localUser) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), { 
+                    type: document.getElementById('internal-type').value, 
+                    title: document.getElementById('internal-title').value.trim(), 
+                    url: document.getElementById('internal-url').value.trim(), 
+                    addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('form-add-internal').reset(); window.closeEntryModal(); window.showToast('Enlace interno guardado');
+            } catch (err) { console.error(err); }
+        });
+
+        // Submit Nota (con Relación opcional)
+        document.getElementById('form-add-note').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!firebaseUser || !localUser) return;
+            const text = document.getElementById('note-input').value.trim();
+            if (!text) return;
+            try {
+                const relationId = document.getElementById('note-relation').value;
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { 
+                    relationId: relationId,
+                    text: text, addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('note-input').value = '';
+            } catch (err) { console.error(err); }
+        });
+
+        window.deleteDocument = async (collectionName, docId) => {
+            if(!firebaseUser) return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) {}
+        };
+
+        // --- Renderizadores del Dashboard ---
+
+        function getDeliveryAlertData(dateString) {
+            if (!dateString) return { class: '', text: '--/--' };
+            const deliveryDate = new Date(dateString + 'T12:00:00');
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diffTime = deliveryDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const formattedDate = deliveryDate.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+            if (diffDays < 0) return { class: 'danger', text: formattedDate + ' (Vencido)' };
+            if (diffDays <= 7) return { class: 'warning', text: formattedDate + ` (${diffDays}d)` };
+            return { class: '', text: formattedDate };
+        }
+
+        function formatStageDate(dateString) {
+            if (!dateString) return '--/--';
+            return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+        }
+
+        function renderProjects(projects) {
+            const tbody = document.getElementById('firebase-projects-list');
+            if (!tbody) return;
+            if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
+            const statusMap = { 'active': { label: 'En progreso', class: 'active' }, 'pending': { label: 'Pausado', class: 'pending' }, 'info': { label: 'Completado', class: 'info' } };
+            tbody.innerHTML = '';
+            projects.forEach(p => {
+                const s = statusMap[p.status] || statusMap['pending'];
+                const deliveryAlert = getDeliveryAlertData(p.dates?.delivery);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer;" onclick="openSummary('P_${p.id}')" title="Ver Ficha">${p.name} <i data-lucide="external-link" size="10"></i></div>
+                    </td>
+                    <td><span class="badge ${s.class}">${s.label}</span></td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 0.75rem; width: 30px; font-weight: 600;">${p.progress}%</span>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress === 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="stage-dates">
+                            <div class="date-badge"><i data-lucide="flag" size="10" style="display:inline;"></i> ${formatStageDate(p.dates?.kickoff)}</div>
+                            <div class="date-badge ${deliveryAlert.class}"><i data-lucide="rocket" size="10" style="display:inline;"></i> ${deliveryAlert.text}</div>
+                        </div>
+                    </td>
+                    <td style="text-align: center;">
+                        <button class="btn-icon" title="Eliminar Proyecto" onclick="deleteDocument('proyectos', '${p.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function renderClients(clients) {
+            const list = document.getElementById('firebase-clients-list');
+            if (!list) return;
+            if (clients.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Sin clientes registrados.</div>`; return; }
+            list.innerHTML = '';
+            clients.forEach(client => {
+                const div = document.createElement('div'); div.className = 'data-row';
+                div.innerHTML = `
+                    <div class="data-row-top">
+                        <div class="data-info">
+                            <div class="data-icon" style="color: #684B45; background: #EFE9DB;"><i data-lucide="building-2" size="20"></i></div>
+                            <div class="data-details" style="cursor:pointer;" onclick="openSummary('C_${client.id}')">
+                                <span class="data-title">${client.company} <i data-lucide="external-link" size="10" style="color:var(--text-dim);"></i></span>
+                                <span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline;"></i> ${client.name}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-footer">
+                        <div class="data-meta">Por ${client.addedBy}</div>
+                        <button class="btn-icon" onclick="deleteDocument('clientes', '${client.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="18"></i></button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function renderLinks(links) {
+            const list = document.getElementById('firebase-links-list');
+            if (!list) return;
+            if (links.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Sin recursos guardados.</div>`; return; }
+            list.innerHTML = '';
+            const typeConfig = { 'imagen': { icon: 'image', color: '#9A7B3D', bg: 'rgba(154,123,61,0.12)' }, 'documento': { icon: 'file-text', color: '#684B45', bg: '#EFE9DB' }, 'enlace': { icon: 'link', color: '#918671', bg: '#F8F9FA' } };
+
+            links.forEach(link => {
+                const config = typeConfig[link.type] || typeConfig['enlace'];
+                const relationName = getRelationName(link.relationId);
+                const isProject = link.relationId?.startsWith('P');
+
+                const div = document.createElement('div'); div.className = 'data-row';
+                div.innerHTML = `
+                    <div class="data-row-top">
+                        <div class="data-info">
+                            <div class="data-icon" style="color: ${config.color}; background: ${config.bg};"><i data-lucide="${config.icon}" size="20"></i></div>
+                            <div class="data-details">
+                                <span class="badge info" style="width: max-content; margin-bottom: 4px; ${isProject ? '' : 'background:#EFE9DB; color:#684B45;'}">${relationName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span>
+                                <span class="data-title">${link.title}</span>
+                                <a href="${link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary)">Abrir Recurso &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-footer">
+                        <button class="btn-icon" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="18"></i></button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function renderInternalLinks(links) {
+            const list = document.getElementById('firebase-internal-links');
+            if (!list) return;
+            if (links.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces cargados.</div>`; return; }
+            list.innerHTML = '';
+            
+            const iconMap = { 'social': 'share-2', 'repo': 'github', 'web': 'globe', 'otro': 'link' };
+
+            links.forEach(link => {
+                const iconName = iconMap[link.type] || 'link';
+                const div = document.createElement('div'); div.className = 'internal-link';
+                div.innerHTML = `
+                    <i data-lucide="${iconName}" class="internal-link-icon" size="18"></i>
+                    <a href="${link.url}" target="_blank" class="internal-link-title">${link.title}</a>
+                    <button class="btn-icon" style="padding:0; color:var(--border-light);" onclick="deleteDocument('enlaces_internos', '${link.id}')"><i data-lucide="x" size="14"></i></button>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function renderNotes(notes) {
+            const list = document.getElementById('firebase-notes-list');
+            if (!list) return;
+            if (notes.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Sin notas aún.</div>`; return; }
+            list.innerHTML = '';
+            notes.forEach(note => {
+                const date = new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+                const isMe = note.addedBy === localUser;
+                const relationBadge = note.relationId ? `<span style="font-size: 0.6rem; background: var(--border-light); padding: 1px 4px; border-radius: 4px; color: var(--text); margin-bottom: 2px; display: inline-block;">${getRelationName(note.relationId).replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
+
+                const div = document.createElement('div'); div.className = 'note-item';
+                div.innerHTML = `
+                    <p>${relationBadge}<strong>${isMe ? 'Tú' : note.addedBy}:</strong> ${note.text}</p>
+                    <span class="note-meta">${date}</span>
+                    <i data-lucide="x" class="note-delete" size="14" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // 4. INIT UI & CALENDAR
+        function initDashboardUI() {
+            const dateEl = document.getElementById('current-date');
+            if (dateEl) {
+                const today = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                dateEl.textContent = today.charAt(0).toUpperCase() + today.slice(1);
+            }
+            
+            const greetingEl = document.getElementById('greeting-text');
+            if (greetingEl) {
+                const hour = new Date().getHours(); 
+                let greeting = hour < 12 ? 'Buen día' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
+                greetingEl.textContent = `${greeting}, ${localUser}`;
+            }
+
+            const userEl = document.getElementById('nav-username');
+            if (userEl) userEl.textContent = localUser;
+            
+            const avatarEl = document.getElementById('nav-avatar');
+            if (avatarEl && localUser) avatarEl.textContent = localUser.charAt(0);
+        }
+
+        let currentDate = new Date();
+        function initCalendar() {
+            const calMonthYear = document.getElementById('cal-month-year');
+            const grid = document.getElementById('calendar-days-grid');
+            if (!calMonthYear || !grid) return;
+            
+            renderCalendar(currentDate);
+            
+            const btnPrev = document.getElementById('cal-prev');
+            if (btnPrev) btnPrev.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(currentDate); });
+            
+            const btnNext = document.getElementById('cal-next');
+            if (btnNext) btnNext.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(currentDate); });
+        }
+
+        function renderCalendar(date) {
+            const year = date.getFullYear(); const month = date.getMonth(); const today = new Date();
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            
+            const calMonthYear = document.getElementById('cal-month-year');
+            if (calMonthYear) calMonthYear.textContent = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const grid = document.getElementById('calendar-days-grid'); 
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            for (let i = 0; i < firstDay; i++) { const emptyDiv = document.createElement('div'); emptyDiv.className = 'calendar-day empty'; grid.appendChild(emptyDiv); }
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDiv = document.createElement('div'); dayDiv.textContent = i;
+                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dayDiv.className = 'calendar-day active'; else dayDiv.className = 'calendar-day standard';
+                grid.appendChild(dayDiv);
+            }
+        }
+    </script>
+</body>
+</html>
