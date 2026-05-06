@@ -238,7 +238,7 @@
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { color: var(--text-dim); font-size: var(--text-xs); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-light); text-align: left; }
-        td { padding: var(--space-3) var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--bg); font-size: var(--text-sm); vertical-align: top; }
+        td { padding: var(--space-3) var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--bg); font-size: var(--text-sm); vertical-align: middle; }
         .progress-bar { height: 6px; background: var(--bg); border-radius: var(--radius-pill); width: 100%; }
         .progress-fill { height: 100%; background: var(--brand-primary); border-radius: var(--radius-pill); transition: width 0.3s ease; }
 
@@ -277,14 +277,14 @@
         .data-details { display: flex; flex-direction: column; overflow: hidden; }
         .data-title { font-weight: 600; font-size: var(--text-sm); word-break: break-word; }
         .data-subtitle { font-size: 0.75rem; color: var(--text-dim); }
-        .data-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-light); padding-top: var(--space-2); margin-top: var(--space-1); }
-        .data-meta { font-size: 0.7rem; color: var(--text-dim); }
+        .data-footer { display: flex; justify-content: flex-end; align-items: center; border-top: 1px dashed var(--border-light); padding-top: var(--space-2); margin-top: var(--space-1); gap: 4px; }
+        .data-meta { font-size: 0.7rem; color: var(--text-dim); margin-right: auto;}
 
         /* Enlaces Internos (Talento) */
         .internal-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--border-light); }
         .internal-link:last-child { border: none; }
         .internal-link-icon { color: var(--brand-primary); }
-        .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; }
+        .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
         @media (max-width: 768px) { .greeting { display: none; } }
         @media (max-width: 1024px) {
@@ -297,7 +297,7 @@
         @media (min-width: 768px) {
             .data-row { flex-direction: row; justify-content: space-between; align-items: center; }
             .data-row-top { flex-grow: 1; align-items: center; }
-            .data-footer { border-top: none; padding-top: 0; margin-top: 0; gap: var(--space-4); }
+            .data-footer { border-top: none; padding-top: 0; margin-top: 0; }
             .greeting h1 { font-size: var(--text-2xl); }
         }
         @media (min-width: 1025px) {
@@ -390,9 +390,6 @@
                 
                 <!-- TAB: PROYECTO -->
                 <form id="form-add-project" class="form-section active">
-                    <!-- Campo oculto para saber si editamos o creamos -->
-                    <input type="hidden" id="proj-id" value="">
-                    
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
                             <label>Nombre del Proyecto *</label>
@@ -452,12 +449,20 @@
                             <input type="text" id="client-name" class="form-control" placeholder="Ej: Laura Martínez">
                         </div>
                         <div class="form-group">
-                            <label>Email o Teléfono</label>
-                            <input type="text" id="client-contact" class="form-control" placeholder="laura@tech.com">
+                            <label>Email</label>
+                            <input type="email" id="client-email" class="form-control" placeholder="laura@tech.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Celular / Teléfono</label>
+                            <input type="text" id="client-phone" class="form-control" placeholder="+54 9 11 1234-5678">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Sitio Web de la Organización</label>
+                            <input type="url" id="client-web" class="form-control" placeholder="https://www...">
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small"><i data-lucide="save" size="16"></i> Guardar Cliente</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-client"><i data-lucide="save" size="16"></i> Guardar Cliente</button>
                     </div>
                 </form>
 
@@ -488,7 +493,7 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small"><i data-lucide="upload-cloud" size="16"></i> Subir Recurso</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-link"><i data-lucide="upload-cloud" size="16"></i> Subir Recurso</button>
                     </div>
                 </form>
 
@@ -514,7 +519,7 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small"><i data-lucide="link" size="16"></i> Guardar Enlace Propio</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-internal"><i data-lucide="link" size="16"></i> Guardar Enlace Propio</button>
                     </div>
                 </form>
 
@@ -749,7 +754,12 @@
         // ESTADO GLOBAL EN MEMORIA
         let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [];
         let unsubscribers = [];
-        let idProyectoEnEdicion = null; // Para saber si creamos o editamos
+        
+        // IDs para saber si creamos o editamos en cada pestaña
+        let idProyectoEnEdicion = null;
+        let idClienteEnEdicion = null;
+        let idRecursoEnEdicion = null;
+        let idInternoEnEdicion = null;
 
         // --- SISTEMA INTELIGENTE DE ERRORES ---
         window.showToast = (message) => {
@@ -872,10 +882,10 @@
             unsubscribers = [];
             const appLayout = document.getElementById('app-layout');
             if(appLayout) appLayout.style.display = 'none';
-            const overlay = document.getElementById('login-overlay');
-            if(overlay) {
-                overlay.style.display = 'flex';
-                setTimeout(() => overlay.style.opacity = '1', 50);
+            const loginOverlay = document.getElementById('login-overlay');
+            if(loginOverlay) {
+                loginOverlay.style.display = 'flex';
+                setTimeout(() => loginOverlay.style.opacity = '1', 50);
             }
             const passInput = document.getElementById('password-input');
             if(passInput) passInput.value = '';
@@ -887,12 +897,22 @@
         window.openEntryModal = (tabId, isEditing = false) => {
             if (!isEditing) {
                 idProyectoEnEdicion = null;
-                const formP = document.getElementById('form-add-project');
-                if(formP) formP.reset();
+                idClienteEnEdicion = null;
+                idRecursoEnEdicion = null;
+                idInternoEnEdicion = null;
+                
+                const formP = document.getElementById('form-add-project'); if(formP) formP.reset();
+                const formC = document.getElementById('form-add-client'); if(formC) formC.reset();
+                const formL = document.getElementById('form-add-link'); if(formL) formL.reset();
+                const formI = document.getElementById('form-add-internal'); if(formI) formI.reset();
+                
                 const titleText = document.getElementById('modal-title-text');
                 if(titleText) titleText.textContent = 'Nuevo Registro';
-                const btnSubmit = document.getElementById('btn-submit-project');
-                if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
+                
+                const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
+                const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
+                const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
+                const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
                 lucide.createIcons();
             }
 
@@ -914,7 +934,10 @@
             modal.style.opacity = '0';
             const modalEl = document.getElementById('data-entry-modal');
             if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; }, 300);
+            setTimeout(() => { 
+                modal.style.display = 'none'; 
+                idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; 
+            }, 300);
         };
 
         window.switchTab = (tabId) => {
@@ -938,30 +961,73 @@
             setTimeout(() => modal.style.display = 'none', 300);
         };
 
-        // LÓGICA DE EDICIÓN DE PROYECTO
+        // --- LÓGICA DE EDICIÓN ---
         window.editarProyecto = (projectId) => {
-            const proyecto = allProjects.find(p => p.id === projectId);
-            if(!proyecto) return;
-
+            const p = allProjects.find(x => x.id === projectId);
+            if(!p) return;
             idProyectoEnEdicion = projectId;
             
-            document.getElementById('proj-name').value = proyecto.name || '';
-            document.getElementById('proj-client').value = proyecto.client || '';
-            document.getElementById('proj-status').value = proyecto.status || 'active';
-            document.getElementById('proj-progress').value = proyecto.progress || 0;
-            
-            document.getElementById('proj-kickoff').value = proyecto.dates?.kickoff || '';
-            document.getElementById('proj-review').value = proyecto.dates?.review || '';
-            document.getElementById('proj-delivery').value = proyecto.dates?.delivery || '';
-            document.getElementById('proj-notes').value = proyecto.notes || '';
+            document.getElementById('proj-name').value = p.name || '';
+            document.getElementById('proj-client').value = p.client || '';
+            document.getElementById('proj-status').value = p.status || 'active';
+            document.getElementById('proj-progress').value = p.progress || 0;
+            document.getElementById('proj-kickoff').value = p.dates?.kickoff || '';
+            document.getElementById('proj-review').value = p.dates?.review || '';
+            document.getElementById('proj-delivery').value = p.dates?.delivery || '';
+            document.getElementById('proj-notes').value = p.notes || '';
 
-            const titleText = document.getElementById('modal-title-text');
-            if(titleText) titleText.textContent = 'Editar Proyecto';
-            const btnSubmit = document.getElementById('btn-submit-project');
-            if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Proyecto';
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Proyecto';
+            const btnSubmit = document.getElementById('btn-submit-project'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Proyecto';
             lucide.createIcons();
-
             window.openEntryModal('tab-proyecto', true);
+        };
+
+        window.editarCliente = (clientId) => {
+            const c = allClients.find(x => x.id === clientId);
+            if(!c) return;
+            idClienteEnEdicion = clientId;
+            
+            document.getElementById('client-company').value = c.company || '';
+            document.getElementById('client-name').value = c.name || '';
+            document.getElementById('client-email').value = c.email || '';
+            document.getElementById('client-phone').value = c.phone || '';
+            document.getElementById('client-web').value = c.web || '';
+
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Cliente';
+            const btnSubmit = document.getElementById('btn-submit-client'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Cliente';
+            lucide.createIcons();
+            window.openEntryModal('tab-cliente', true);
+        };
+
+        window.editarRecurso = (linkId) => {
+            const l = allLinks.find(x => x.id === linkId);
+            if(!l) return;
+            idRecursoEnEdicion = linkId;
+            
+            document.getElementById('link-relation').value = l.relationId || '';
+            document.getElementById('link-type').value = l.type || 'enlace';
+            document.getElementById('link-title').value = l.title || '';
+            document.getElementById('link-url').value = l.url || '';
+
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Recurso';
+            const btnSubmit = document.getElementById('btn-submit-link'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Recurso';
+            lucide.createIcons();
+            window.openEntryModal('tab-recurso', true);
+        };
+
+        window.editarEnlaceInterno = (internalId) => {
+            const i = allInternalLinks.find(x => x.id === internalId);
+            if(!i) return;
+            idInternoEnEdicion = internalId;
+            
+            document.getElementById('internal-type').value = i.type || 'otro';
+            document.getElementById('internal-title').value = i.title || '';
+            document.getElementById('internal-url').value = i.url || '';
+
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Enlace Propio';
+            const btnSubmit = document.getElementById('btn-submit-internal'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Enlace';
+            lucide.createIcons();
+            window.openEntryModal('tab-interno', true);
         };
 
         // 3. BASE DE DATOS FIREBASE
@@ -1165,9 +1231,9 @@
         document.getElementById('form-add-project').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
             
-            const projectData = { 
+            const data = { 
                 name: document.getElementById('proj-name').value.trim(), 
                 client: document.getElementById('proj-client').value.trim() || '',
                 status: document.getElementById('proj-status').value, 
@@ -1178,19 +1244,16 @@
                     delivery: document.getElementById('proj-delivery').value || null
                 },
                 notes: document.getElementById('proj-notes').value.trim() || '',
-                lastUpdatedBy: localUser,
-                lastUpdatedAt: Date.now()
+                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
             };
 
             try {
                 if (idProyectoEnEdicion) {
-                    const refDoc = doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion);
-                    await updateDoc(refDoc, projectData);
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion), data);
                     window.showToast('Proyecto actualizado exitosamente');
                 } else {
-                    projectData.addedBy = localUser;
-                    projectData.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), projectData);
+                    data.addedBy = localUser; data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), data);
                     window.showToast('Proyecto guardado');
                 }
                 document.getElementById('form-add-project').reset(); window.closeEntryModal(); 
@@ -1200,55 +1263,87 @@
         document.getElementById('form-add-client').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            
+            const data = { 
+                company: document.getElementById('client-company').value.trim(), 
+                name: document.getElementById('client-name').value.trim() || '', 
+                email: document.getElementById('client-email').value.trim() || '', 
+                phone: document.getElementById('client-phone').value.trim() || '',
+                web: document.getElementById('client-web').value.trim() || '',
+                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
+            };
+
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), { 
-                    company: document.getElementById('client-company').value.trim(), 
-                    name: document.getElementById('client-name').value.trim(), 
-                    contact: document.getElementById('client-contact').value.trim(), 
-                    addedBy: localUser, createdAt: Date.now() 
-                });
-                document.getElementById('form-add-client').reset(); window.closeEntryModal(); window.showToast('Cliente registrado');
+                if (idClienteEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "clientes", idClienteEnEdicion), data);
+                    window.showToast('Cliente actualizado');
+                } else {
+                    data.addedBy = localUser; data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), data);
+                    window.showToast('Cliente registrado');
+                }
+                document.getElementById('form-add-client').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-link').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            
+            const relationId = document.getElementById('link-relation').value;
+            const data = { 
+                relationId: relationId,
+                relationName: getRelationName(relationId),
+                type: document.getElementById('link-type').value, 
+                title: document.getElementById('link-title').value.trim(), 
+                url: document.getElementById('link-url').value.trim(), 
+                lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
+            };
+
             try {
-                const relationId = document.getElementById('link-relation').value;
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), { 
-                    relationId: relationId,
-                    relationName: getRelationName(relationId),
-                    type: document.getElementById('link-type').value, 
-                    title: document.getElementById('link-title').value.trim(), 
-                    url: document.getElementById('link-url').value.trim(), 
-                    addedBy: localUser, createdAt: Date.now() 
-                });
-                document.getElementById('form-add-link').reset(); window.closeEntryModal(); window.showToast('Recurso subido');
+                if (idRecursoEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "recursos_compartidos", idRecursoEnEdicion), data);
+                    window.showToast('Recurso actualizado');
+                } else {
+                    data.addedBy = localUser; data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), data);
+                    window.showToast('Recurso subido');
+                }
+                document.getElementById('form-add-link').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-internal').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            
+            const data = { 
+                type: document.getElementById('internal-type').value, 
+                title: document.getElementById('internal-title').value.trim(), 
+                url: document.getElementById('internal-url').value.trim(), 
+                lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
+            };
+
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), { 
-                    type: document.getElementById('internal-type').value, 
-                    title: document.getElementById('internal-title').value.trim(), 
-                    url: document.getElementById('internal-url').value.trim(), 
-                    addedBy: localUser, createdAt: Date.now() 
-                });
-                document.getElementById('form-add-internal').reset(); window.closeEntryModal(); window.showToast('Enlace interno guardado');
+                if(idInternoEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "enlaces_internos", idInternoEnEdicion), data);
+                    window.showToast('Enlace actualizado');
+                } else {
+                    data.addedBy = localUser; data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), data);
+                    window.showToast('Enlace interno guardado');
+                }
+                document.getElementById('form-add-internal').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-note').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
             const text = document.getElementById('note-input').value.trim();
             if (!text) return;
             try {
@@ -1262,8 +1357,8 @@
 
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
-            if(confirm("¿Estás seguro de eliminar este registro?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado');} 
+            if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado correctamente');} 
                 catch (err) { window.handleFirebaseError(err); }
             }
         };
@@ -1344,19 +1439,26 @@
             list.innerHTML = '';
             clients.forEach(client => {
                 const div = document.createElement('div'); div.className = 'data-row';
+                
+                let contactInfo = '';
+                if(client.name) contactInfo += `<span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline; margin-right:2px;"></i> ${client.name}</span>`;
+                if(client.email) contactInfo += `<span class="data-subtitle"><i data-lucide="mail" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.email}</span>`;
+                if(client.phone) contactInfo += `<span class="data-subtitle"><i data-lucide="phone" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.phone}</span>`;
+                if(client.web) contactInfo += `<a href="${client.web}" target="_blank" class="data-subtitle" style="color:var(--brand-primary); margin-left: 6px;"><i data-lucide="globe" size="12" style="display:inline; margin-right:2px;"></i> Sitio</a>`;
+
                 div.innerHTML = `
                     <div class="data-row-top">
                         <div class="data-info">
                             <div class="data-icon" style="color: #684B45; background: #EFE9DB;"><i data-lucide="building-2" size="20"></i></div>
-                            <div class="data-details" style="cursor:pointer;" onclick="openSummary('C_${client.id}')">
-                                <span class="data-title">${client.company} <i data-lucide="external-link" size="10" style="color:var(--text-dim);"></i></span>
-                                <span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline;"></i> ${client.name}</span>
+                            <div class="data-details">
+                                <span class="data-title" style="cursor:pointer; color: var(--text);" onclick="openSummary('C_${client.id}')" title="Ver Ficha">${client.company} <i data-lucide="external-link" size="10" style="color:var(--text-dim);"></i></span>
+                                <div style="display:flex; flex-wrap:wrap;">${contactInfo}</div>
                             </div>
                         </div>
                     </div>
-                    <div class="data-footer">
-                        <div class="data-meta">Por ${client.addedBy}</div>
-                        <button class="btn-icon" onclick="deleteDocument('clientes', '${client.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="18"></i></button>
+                    <div class="data-footer" style="justify-content: flex-end;">
+                        <button class="btn-icon" title="Editar" onclick="editarCliente('${client.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
+                        <button class="btn-icon" title="Eliminar" onclick="deleteDocument('clientes', '${client.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1388,8 +1490,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="data-footer">
-                        <button class="btn-icon" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="18"></i></button>
+                    <div class="data-footer" style="justify-content: flex-end;">
+                        <button class="btn-icon" title="Editar" onclick="editarRecurso('${link.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
+                        <button class="btn-icon" title="Eliminar" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
                     </div>
                 `;
                 list.appendChild(div);
@@ -1411,7 +1514,8 @@
                 div.innerHTML = `
                     <i data-lucide="${iconName}" class="internal-link-icon" size="18"></i>
                     <a href="${link.url}" target="_blank" class="internal-link-title">${link.title}</a>
-                    <button class="btn-icon" style="padding:0; color:var(--border-light);" onclick="deleteDocument('enlaces_internos', '${link.id}')"><i data-lucide="x" size="14"></i></button>
+                    <button class="btn-icon" style="padding:0; color:var(--brand-primary);" onclick="editarEnlaceInterno('${link.id}')" title="Editar"><i data-lucide="pencil" size="14"></i></button>
+                    <button class="btn-icon" style="padding:0; color:var(--alert-danger); margin-left:4px;" onclick="deleteDocument('enlaces_internos', '${link.id}')" title="Eliminar"><i data-lucide="trash-2" size="14"></i></button>
                 `;
                 list.appendChild(div);
             });
