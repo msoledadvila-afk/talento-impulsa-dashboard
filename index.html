@@ -335,11 +335,6 @@
         linkManifest.rel = 'manifest';
         linkManifest.href = URL.createObjectURL(manifestBlob);
         document.head.appendChild(linkManifest);
-
-        // NOTA: Se ha removido el registro explícito del ServiceWorker a través de blob: 
-        // ya que los navegadores modernos (y el entorno de preview) bloquean este tipo
-        // de protocolo en workers por razones de seguridad.
-        // El manifest inyectado arriba es suficiente para invocar "Add to Homescreen" en dispositivos móviles.
     </script>
 
     <!-- ==========================================
@@ -576,6 +571,7 @@
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-3);">
                     <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
+                    <!-- Bloque de Saludo Reintegrado -->
                     <div class="greeting" id="greeting-container">
                         <h1 id="greeting-text">Buen día</h1>
                         <p id="current-date">Fecha</p>
@@ -723,43 +719,62 @@
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // 1. CONFIGURACIÓN FIREBASE SEGURA (Evita fallos al salir del entorno original)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+        let app, auth, db;
         let firebaseUser = null;
         let localUser = null;
         
-        // ESTADO GLOBAL EN MEMORIA (Para buscadores y relaciones)
-        let allProjects = [];
-        let allClients = [];
-        let allLinks = [];
-        let allNotes = [];
-        let allInternalLinks = [];
-
+        // ESTADO GLOBAL EN MEMORIA
+        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [];
         let unsubscribers = [];
 
-        const initFirebaseAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) { console.error("Error Auth:", err); }
-        };
+        try {
+            // 👇 ACÁ PEGÁ TUS CREDENCIALES DE FIREBASE 👇
+            // Como la app está en tu GitHub, necesita su propia base de datos real.
+            const miConfiguracionFirebase = {
+                apiKey: "TU_API_KEY",
+                authDomain: "TU_AUTH_DOMAIN",
+                projectId: "TU_PROJECT_ID",
+                storageBucket: "TU_STORAGE_BUCKET",
+                messagingSenderId: "TU_MESSAGING_SENDER_ID",
+                appId: "TU_APP_ID"
+            };
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                firebaseUser = user;
-                if (localUser) startRealtimeListeners();
+            const firebaseConfig = typeof __firebase_config !== 'undefined' 
+                ? JSON.parse(__firebase_config) 
+                : miConfiguracionFirebase;
+            
+            // Verificamos que al menos haya una configuración válida antes de intentar inicializar
+            if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId !== "TU_PROJECT_ID") {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initFirebaseAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (err) { console.error("Error Auth:", err); }
+                };
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        firebaseUser = user;
+                        if (localUser) startRealtimeListeners();
+                    }
+                });
+
+                initFirebaseAuth();
+            } else {
+                console.warn("Faltan las credenciales de Firebase en el código. La app funcionará visualmente pero no se guardarán los datos.");
             }
-        });
-
-        initFirebaseAuth();
+        } catch (error) {
+            console.error("Error al iniciar Firebase:", error);
+        }
 
         // 2. LÓGICA DE UX: MENU Y LOGIN
         const toggleSidebar = () => {
@@ -790,6 +805,7 @@
                     document.getElementById('app-layout').style.display = 'block';
                     initDashboardUI();
                     initCalendar();
+                    // Si Firebase se inicializó bien, cargamos datos
                     if (firebaseUser) startRealtimeListeners();
                 }, 300);
             } else {
@@ -857,16 +873,16 @@
             setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
         };
 
-        // 3. BASE DE DATOS Y ESTADO GLOBAL
+        // 3. BASE DE DATOS FIREBASE
         function startRealtimeListeners() {
-            if (!firebaseUser) return;
+            if (!firebaseUser || !db) return;
             
             // Proyectos
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
                 allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
                 allProjects.sort((a, b) => b.createdAt - a.createdAt);
                 renderProjects(allProjects);
-                updateDropdowns(); // Actualizar selects
+                updateDropdowns();
             }));
 
             // Clientes
@@ -874,7 +890,7 @@
                 allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
                 allClients.sort((a, b) => b.createdAt - a.createdAt);
                 renderClients(allClients);
-                updateDropdowns(); // Actualizar selects
+                updateDropdowns();
             }));
 
             // Recursos
@@ -920,16 +936,11 @@
             if(noteSelect) noteSelect.innerHTML = optionsHTML;
         }
 
-        // Función para resolver nombre de relación desde el ID
         function getRelationName(relationId) {
             if(!relationId) return 'General';
             const [type, id] = relationId.split('_');
-            if(type === 'P') {
-                const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido';
-            }
-            if(type === 'C') {
-                const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido';
-            }
+            if(type === 'P') { const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido'; }
+            if(type === 'C') { const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido'; }
             return 'General';
         }
 
@@ -967,11 +978,8 @@
             });
         }
 
-        // Ocultar buscador al hacer click fuera
         document.addEventListener('click', (e) => {
-            if(!e.target.closest('.search-container') && searchResults) {
-                searchResults.style.display = 'none';
-            }
+            if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
         });
 
         // ABRIR FICHA DE RESUMEN
@@ -1006,11 +1014,9 @@
                 }
             }
 
-            // Filtrar Recursos y Notas por este RelationId
             const filteredLinks = allLinks.filter(l => l.relationId === relationId);
             const filteredNotes = allNotes.filter(n => n.relationId === relationId);
 
-            // Renderizar Recursos en Resumen
             const linksContainer = document.getElementById('summary-links-list');
             if (linksContainer) {
                 if(filteredLinks.length === 0) {
@@ -1025,7 +1031,6 @@
                 }
             }
 
-            // Renderizar Notas en Resumen
             const notesContainer = document.getElementById('summary-notes-list');
             if (notesContainer) {
                 if(filteredNotes.length === 0) {
@@ -1052,12 +1057,11 @@
             }
         };
 
-
         // --- Envío de Formularios ---
         
-        // Submit Proyecto
         document.getElementById('form-add-project').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
             if (!firebaseUser || !localUser) return;
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), { 
@@ -1075,9 +1079,9 @@
             } catch (err) { console.error(err); }
         });
 
-        // Submit Cliente
         document.getElementById('form-add-client').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
             if (!firebaseUser || !localUser) return;
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), { 
@@ -1090,9 +1094,9 @@
             } catch (err) { console.error(err); }
         });
 
-        // Submit Recurso (con Relación)
         document.getElementById('form-add-link').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
             if (!firebaseUser || !localUser) return;
             try {
                 const relationId = document.getElementById('link-relation').value;
@@ -1108,9 +1112,9 @@
             } catch (err) { console.error(err); }
         });
 
-        // Submit Enlace Interno (Talento)
         document.getElementById('form-add-internal').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
             if (!firebaseUser || !localUser) return;
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), { 
@@ -1123,24 +1127,23 @@
             } catch (err) { console.error(err); }
         });
 
-        // Submit Nota (con Relación opcional)
         document.getElementById('form-add-note').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
             if (!firebaseUser || !localUser) return;
             const text = document.getElementById('note-input').value.trim();
             if (!text) return;
             try {
                 const relationId = document.getElementById('note-relation').value;
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { 
-                    relationId: relationId,
-                    text: text, addedBy: localUser, createdAt: Date.now() 
+                    relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('note-input').value = '';
             } catch (err) { console.error(err); }
         });
 
         window.deleteDocument = async (collectionName, docId) => {
-            if(!firebaseUser) return;
+            if(!db || !firebaseUser) return;
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) {}
         };
 
