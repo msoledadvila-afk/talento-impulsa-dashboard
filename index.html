@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Talento Impulsa | Dashboard Operativo</title>
     
+    <!-- Metatags para PWA / Mobile App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#EFE9DB">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E">
+
     <!-- Tipografía del Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -307,6 +313,36 @@
 <body>
 
     <!-- ==========================================
+         PWA MAGIC INJECTION (Evita archivos separados)
+         ========================================== -->
+    <script>
+        const manifestData = {
+            "name": "Talento Impulsa Dashboard",
+            "short_name": "Talento",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#EFE9DB",
+            "theme_color": "#9A7B3D",
+            "icons": [{
+                "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E",
+                "sizes": "512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        const linkManifest = document.createElement('link');
+        linkManifest.rel = 'manifest';
+        linkManifest.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(linkManifest);
+
+        // NOTA: Se ha removido el registro explícito del ServiceWorker a través de blob: 
+        // ya que los navegadores modernos (y el entorno de preview) bloquean este tipo
+        // de protocolo en workers por razones de seguridad.
+        // El manifest inyectado arriba es suficiente para invocar "Add to Homescreen" en dispositivos móviles.
+    </script>
+
+    <!-- ==========================================
          GATEWAY (LOGIN)
          ========================================== -->
     <div id="login-overlay" class="overlay-fullscreen">
@@ -540,7 +576,6 @@
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-3);">
                     <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
-                    <!-- Bloque de Saludo Reintegrado -->
                     <div class="greeting" id="greeting-container">
                         <h1 id="greeting-text">Buen día</h1>
                         <p id="current-date">Fecha</p>
