@@ -747,7 +747,7 @@
             toast.style.color = '#842029';
             toast.style.borderColor = '#F5C2C7';
             toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
-            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 5000);
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 8000); // 8 segundos para que lo puedan leer bien
         };
 
         window.handleFirebaseError = (err) => {
@@ -758,9 +758,9 @@
             if (err.code === 'permission-denied') {
                 msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
             } else if (err.code === 'auth/unauthorized-domain') {
-                msg = '⚠️ Dominio bloqueado: Autoriza tu link de GitHub en Firebase Auth.';
+                msg = '⚠️ Dominio bloqueado: Autoriza msoledadvila-afk.github.io en Firebase Auth.';
             } else if (err.code === 'auth/operation-not-allowed') {
-                msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
+                msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase Authentication.';
             } else if (err.code === 'unavailable') {
                 msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
             }
@@ -831,12 +831,23 @@
 
         const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
         
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = document.getElementById('user-select').value;
             const pass = document.getElementById('password-input').value;
 
             if (credentials[user] === pass) {
+                
+                // Validación forzada de Firebase ANTES de dejarte entrar al dashboard
+                if (!firebaseUser && auth) {
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (err) {
+                        window.handleFirebaseError(err);
+                        return; // Frena el inicio de sesión si Firebase está mal configurado
+                    }
+                }
+
                 localUser = user;
                 document.getElementById('login-error').style.display = 'none';
                 document.getElementById('login-overlay').style.opacity = '0';
