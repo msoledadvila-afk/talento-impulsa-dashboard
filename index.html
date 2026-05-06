@@ -40,6 +40,8 @@
             --alert-warning-bg: #FFF3CD;
             --alert-danger: #842029;
             --alert-danger-bg: #F8D7DA;
+            --alert-success: #0F5132;
+            --alert-success-bg: #D1E7DD;
         }
 
         [data-brand="talento"] {
@@ -200,9 +202,7 @@
         /* ============================================================
            BUSCADOR GLOBAL
            ============================================================ */
-        .search-container {
-            position: relative; flex-grow: 1; max-width: 400px;
-        }
+        .search-container { position: relative; flex-grow: 1; max-width: 400px; }
         .search-input {
             width: 100%; padding: var(--space-2) var(--space-4); padding-left: 36px;
             border: 1px solid var(--border-light); border-radius: var(--radius-pill);
@@ -238,14 +238,17 @@
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { color: var(--text-dim); font-size: var(--text-xs); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-light); text-align: left; }
-        td { padding: var(--space-3) var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--bg); font-size: var(--text-sm); vertical-align: middle; }
+        td { padding: var(--space-3) var(--space-2) var(--space-3) 0; border-bottom: 1px solid var(--bg); font-size: var(--text-sm); vertical-align: top; }
         .progress-bar { height: 6px; background: var(--bg); border-radius: var(--radius-pill); width: 100%; }
-        .progress-fill { height: 100%; background: var(--brand-primary); border-radius: var(--radius-pill); }
+        .progress-fill { height: 100%; background: var(--brand-primary); border-radius: var(--radius-pill); transition: width 0.3s ease; }
 
         .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
         .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
+        
+        .date-badge.success { background: var(--alert-success-bg); color: var(--alert-success); font-weight: 700; border: 1px solid #BADBCC; }
         .date-badge.warning { background: var(--alert-warning-bg); color: var(--alert-warning); font-weight: 700; border: 1px solid #FFE69C;}
         .date-badge.danger { background: var(--alert-danger-bg); color: var(--alert-danger); font-weight: 700; border: 1px solid #F5C2C7; animation: pulse 2s infinite;}
+        .date-badge.neutral { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); }
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
@@ -283,10 +286,7 @@
         .internal-link-icon { color: var(--brand-primary); }
         .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; }
 
-        @media (max-width: 768px) {
-            .greeting { display: none; }
-        }
-
+        @media (max-width: 768px) { .greeting { display: none; } }
         @media (max-width: 1024px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
@@ -294,14 +294,12 @@
             .mobile-menu-btn { display: flex; align-items: center; gap: var(--space-2); background: transparent; border: none; cursor: pointer; color: var(--brand-primary); }
             .btn-close-sidebar { display: block; }
         }
-
         @media (min-width: 768px) {
             .data-row { flex-direction: row; justify-content: space-between; align-items: center; }
             .data-row-top { flex-grow: 1; align-items: center; }
             .data-footer { border-top: none; padding-top: 0; margin-top: 0; gap: var(--space-4); }
             .greeting h1 { font-size: var(--text-2xl); }
         }
-
         @media (min-width: 1025px) {
             .dashboard-grid { display: grid; grid-template-columns: repeat(12, 1fr); }
             .col-main { grid-column: span 8; order: 1; }
@@ -375,13 +373,13 @@
     <div id="data-entry-overlay" class="overlay-fullscreen" style="display: none; opacity: 0;">
         <div class="data-entry-modal" id="data-entry-modal">
             <div class="data-entry-header">
-                <h2 style="font-size: var(--text-lg); display: flex; align-items: center; gap: 8px;">
-                    <i data-lucide="plus-circle" color="var(--brand-primary)"></i> Nuevo Registro
+                <h2 id="modal-main-title" style="font-size: var(--text-lg); display: flex; align-items: center; gap: 8px;">
+                    <i data-lucide="plus-circle" color="var(--brand-primary)"></i> <span id="modal-title-text">Nuevo Registro</span>
                 </h2>
                 <button class="btn-icon" onclick="closeEntryModal()"><i data-lucide="x" size="24"></i></button>
             </div>
             
-            <div class="data-entry-tabs">
+            <div class="data-entry-tabs" id="data-entry-tabs-container">
                 <div class="entry-tab active" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
                 <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
                 <div class="entry-tab" data-tab="tab-recurso" onclick="switchTab('tab-recurso')">Recurso Proyecto</div>
@@ -392,10 +390,17 @@
                 
                 <!-- TAB: PROYECTO -->
                 <form id="form-add-project" class="form-section active">
+                    <!-- Campo oculto para saber si editamos o creamos -->
+                    <input type="hidden" id="proj-id" value="">
+                    
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
-                            <label>Nombre del Proyecto</label>
+                            <label>Nombre del Proyecto *</label>
                             <input type="text" id="proj-name" class="form-control" placeholder="Ej: Rediseño Web" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cliente</label>
+                            <input type="text" id="proj-client" class="form-control" placeholder="Ej: TechCorp S.A.">
                         </div>
                         <div class="form-group">
                             <label>Estado Actual</label>
@@ -409,21 +414,29 @@
                             <label>Progreso (%)</label>
                             <input type="number" id="proj-progress" class="form-control" placeholder="0" min="0" max="100" required>
                         </div>
+                        
+                        <!-- Fechas opcionales -->
                         <div class="form-group">
-                            <label><i data-lucide="flag" size="12" style="display:inline;"></i> Kickoff / Inicio</label>
-                            <input type="date" id="proj-kickoff" class="form-control" required>
+                            <label><i data-lucide="flag" size="12" style="display:inline;"></i> Kickoff / Inicio (Opcional)</label>
+                            <input type="date" id="proj-kickoff" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label><i data-lucide="eye" size="12" style="display:inline;"></i> Fecha de Revisión</label>
-                            <input type="date" id="proj-review" class="form-control" required>
+                            <label><i data-lucide="eye" size="12" style="display:inline;"></i> Fecha de Revisión (Opcional)</label>
+                            <input type="date" id="proj-review" class="form-control">
                         </div>
                         <div class="form-group">
-                            <label><i data-lucide="rocket" size="12" style="display:inline;"></i> Entrega Final</label>
-                            <input type="date" id="proj-delivery" class="form-control" required>
+                            <label><i data-lucide="rocket" size="12" style="display:inline;"></i> Entrega Final (Opcional)</label>
+                            <input type="date" id="proj-delivery" class="form-control">
+                        </div>
+
+                        <!-- Notas del Proyecto -->
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas del Proyecto (Opcional)</label>
+                            <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, particularidades del código, links de acceso directo, etc."></textarea>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small"><i data-lucide="save" size="16"></i> Guardar Proyecto</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-project"><i data-lucide="save" size="16"></i> Guardar Proyecto</button>
                     </div>
                 </form>
 
@@ -431,16 +444,16 @@
                 <form id="form-add-client" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
-                            <label>Empresa / Organización</label>
+                            <label>Empresa / Organización *</label>
                             <input type="text" id="client-company" class="form-control" placeholder="Ej: TechCorp S.A." required>
                         </div>
                         <div class="form-group">
                             <label>Contacto Principal</label>
-                            <input type="text" id="client-name" class="form-control" placeholder="Ej: Laura Martínez" required>
+                            <input type="text" id="client-name" class="form-control" placeholder="Ej: Laura Martínez">
                         </div>
                         <div class="form-group">
                             <label>Email o Teléfono</label>
-                            <input type="text" id="client-contact" class="form-control" placeholder="laura@tech.com" required>
+                            <input type="text" id="client-contact" class="form-control" placeholder="laura@tech.com">
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -452,7 +465,7 @@
                 <form id="form-add-link" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Asociar a (Proyecto o Cliente)</label>
+                            <label>Asociar a (Proyecto o Cliente) *</label>
                             <select id="link-relation" class="form-control" required>
                                 <option value="">Selecciona a dónde pertenece...</option>
                             </select>
@@ -466,11 +479,11 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Nombre del Archivo/Link</label>
+                            <label>Nombre del Archivo/Link *</label>
                             <input type="text" id="link-title" class="form-control" placeholder="Ej: Post Carrusel 1" required>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>URL (Canva, Drive, Web)</label>
+                            <label>URL (Canva, Drive, Web) *</label>
                             <input type="url" id="link-url" class="form-control" placeholder="https://..." required>
                         </div>
                     </div>
@@ -479,7 +492,7 @@
                     </div>
                 </form>
 
-                <!-- TAB: RECURSO INTERNO (NUEVO) -->
+                <!-- TAB: RECURSO INTERNO -->
                 <form id="form-add-internal" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -492,11 +505,11 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Nombre del Recurso</label>
+                            <label>Nombre del Recurso *</label>
                             <input type="text" id="internal-title" class="form-control" placeholder="Ej: LinkedIn Talento Impulsa" required>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>URL</label>
+                            <label>URL *</label>
                             <input type="url" id="internal-url" class="form-control" placeholder="https://..." required>
                         </div>
                     </div>
@@ -523,14 +536,22 @@
             </div>
             <div class="data-entry-body" style="background: var(--bg); display: flex; flex-direction: column; gap: var(--space-4);">
                 
+                <!-- Panel destacado para las notas internas del proyecto -->
+                <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
+                    <h3 style="font-size: var(--text-sm); color: var(--brand-primary-deep); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
+                        <i data-lucide="align-left" size="16"></i> Detalles y Notas del Proyecto
+                    </h3>
+                    <div id="summary-internal-notes-text" style="font-size: var(--text-sm); color: var(--text); white-space: pre-wrap; line-height: 1.6;"></div>
+                </div>
+
                 <div class="card">
                     <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Recursos Asociados</h3>
                     <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
                 </div>
 
                 <div class="card">
-                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Notas Asociadas</h3>
-                    <div class="notes-list" id="summary-notes-list" style="max-height: 150px;"></div>
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Notas de Actividad</h3>
+                    <div class="notes-list" id="summary-notes-list" style="max-height: 250px; padding: 0;"></div>
                 </div>
 
             </div>
@@ -586,7 +607,7 @@
                 </div>
 
                 <div style="display: flex; gap: var(--space-2); align-items: center;">
-                    <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto')">
+                    <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto', false)">
                         <i data-lucide="plus" size="18"></i> <span style="display:none; @media(min-width:768px){display:inline;}">Nuevo</span>
                     </button>
                     <button class="btn-icon" id="btn-logout-top" title="Cerrar sesión"><i data-lucide="log-out"></i></button>
@@ -603,7 +624,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title"><i data-lucide="link"></i> Enlaces Propios</h2>
-                            <button class="btn-icon" onclick="openEntryModal('tab-interno')"><i data-lucide="plus" size="16"></i></button>
+                            <button class="btn-icon" onclick="openEntryModal('tab-interno', false)"><i data-lucide="plus" size="16"></i></button>
                         </div>
                         <div id="firebase-internal-links" style="display: flex; flex-direction: column;">
                             <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces.</div>
@@ -633,10 +654,10 @@
                         </div>
                     </div>
 
-                    <!-- NOTAS COMPARTIDAS -->
+                    <!-- NOTAS COMPARTIDAS (GENERALES) -->
                     <div class="card" style="flex-grow: 1;">
                         <div class="card-header">
-                            <h2 class="card-title"><i data-lucide="sticky-note"></i> Notas Rápidas</h2>
+                            <h2 class="card-title"><i data-lucide="sticky-note"></i> Chat & Notas Rápidas</h2>
                         </div>
                         <div class="notes-list" id="firebase-notes-list">
                             <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando notas...</div>
@@ -669,11 +690,11 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Proyecto</th>
+                                        <th>Proyecto & Detalles</th>
                                         <th style="width: 100px;">Estado</th>
                                         <th style="width: 130px;">Progreso</th>
                                         <th>Cronograma</th>
-                                        <th style="width: 40px; text-align: center;"></th>
+                                        <th style="width: 70px; text-align: center;">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="firebase-projects-list">
@@ -715,11 +736,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, updateDoc, doc, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE
+        // 1. CONFIGURACIÓN FIREBASE SEGURA
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
@@ -728,47 +749,38 @@
         // ESTADO GLOBAL EN MEMORIA
         let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [];
         let unsubscribers = [];
+        let idProyectoEnEdicion = null; // Para saber si creamos o editamos
 
         // --- SISTEMA INTELIGENTE DE ERRORES ---
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
+            if(!toast) return;
             document.getElementById('toast-message').textContent = message;
-            toast.style.background = '#D1E7DD'; 
-            toast.style.color = '#0F5132';
-            toast.style.borderColor = '#BADBCC';
+            toast.style.background = '#D1E7DD'; toast.style.color = '#0F5132'; toast.style.borderColor = '#BADBCC';
             toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
             setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
         };
 
         window.showErrorToast = (message) => {
             const toast = document.getElementById('toast-notification');
+            if(!toast) return;
             document.getElementById('toast-message').textContent = message;
-            toast.style.background = '#F8D7DA'; 
-            toast.style.color = '#842029';
-            toast.style.borderColor = '#F5C2C7';
+            toast.style.background = '#F8D7DA'; toast.style.color = '#842029'; toast.style.borderColor = '#F5C2C7';
             toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
-            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 8000); // 8 segundos para que lo puedan leer bien
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 8000); 
         };
 
         window.handleFirebaseError = (err) => {
             console.error("Firebase Error detallado:", err);
             let msg = '❌ Error: ' + (err.message || 'Desconocido');
-            
-            // Traducción de errores comunes para el usuario
-            if (err.code === 'permission-denied') {
-                msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
-            } else if (err.code === 'auth/unauthorized-domain') {
-                msg = '⚠️ Dominio bloqueado: Autoriza msoledadvila-afk.github.io en Firebase Auth.';
-            } else if (err.code === 'auth/operation-not-allowed') {
-                msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase Authentication.';
-            } else if (err.code === 'unavailable') {
-                msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
-            }
+            if (err.code === 'permission-denied') msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
+            else if (err.code === 'auth/unauthorized-domain') msg = '⚠️ Dominio bloqueado: Autoriza la URL en Firebase Auth.';
+            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
+            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
             window.showErrorToast(msg);
         };
 
         try {
-            // TUS CREDENCIALES
             const miConfiguracionFirebase = {
                 apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
                 authDomain: "talento-impulsa.firebaseapp.com",
@@ -789,41 +801,33 @@
 
                 const initFirebaseAuth = async () => {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            await signInAnonymously(auth);
-                        }
-                    } catch (err) { 
-                        window.handleFirebaseError(err);
-                    }
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                        else await signInAnonymously(auth);
+                    } catch (err) { window.handleFirebaseError(err); }
                 };
 
                 onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        firebaseUser = user;
-                        if (localUser) startRealtimeListeners();
-                    } else {
-                        firebaseUser = null;
-                    }
+                    if (user) { firebaseUser = user; if (localUser) startRealtimeListeners(); } 
+                    else { firebaseUser = null; }
                 });
 
                 initFirebaseAuth();
-            } else {
-                console.warn("Faltan credenciales de Firebase.");
-            }
-        } catch (error) {
-            console.error("Error al iniciar Firebase:", error);
-        }
+            } else { console.warn("Faltan credenciales de Firebase."); }
+        } catch (error) { console.error("Error al iniciar Firebase:", error); }
 
         // 2. LÓGICA DE UX: MENU Y LOGIN
         const toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('sidebar-overlay').classList.toggle('active');
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sb) sb.classList.toggle('open');
+            if(overlay) overlay.classList.toggle('active');
         };
-        document.getElementById('btn-open-sidebar').addEventListener('click', toggleSidebar);
-        document.getElementById('btn-close-sidebar').addEventListener('click', toggleSidebar);
-        document.getElementById('sidebar-overlay').addEventListener('click', toggleSidebar);
+        const btnOpen = document.getElementById('btn-open-sidebar');
+        const btnClose = document.getElementById('btn-close-sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        if(btnOpen) btnOpen.addEventListener('click', toggleSidebar);
+        if(btnClose) btnClose.addEventListener('click', toggleSidebar);
+        if(overlay) overlay.addEventListener('click', toggleSidebar);
 
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => { if (window.innerWidth <= 1024) toggleSidebar(); });
@@ -831,74 +835,90 @@
 
         const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
         
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const user = document.getElementById('user-select').value;
-            const pass = document.getElementById('password-input').value;
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const user = document.getElementById('user-select').value;
+                const pass = document.getElementById('password-input').value;
 
-            if (credentials[user] === pass) {
-                
-                // Validación forzada de Firebase ANTES de dejarte entrar al dashboard
-                if (!firebaseUser && auth) {
-                    try {
-                        await signInAnonymously(auth);
-                    } catch (err) {
-                        window.handleFirebaseError(err);
-                        return; // Frena el inicio de sesión si Firebase está mal configurado
+                if (credentials[user] === pass) {
+                    if (!firebaseUser && auth) {
+                        try { await signInAnonymously(auth); } 
+                        catch (err) { window.handleFirebaseError(err); return; }
                     }
-                }
 
-                localUser = user;
-                document.getElementById('login-error').style.display = 'none';
-                document.getElementById('login-overlay').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('login-overlay').style.display = 'none';
-                    document.getElementById('app-layout').style.display = 'block';
-                    initDashboardUI();
-                    initCalendar();
-                    if (firebaseUser) startRealtimeListeners();
-                }, 300);
-            } else {
-                document.getElementById('login-error').textContent = "Contraseña incorrecta. (Usa sole123 o gaby123)";
-                document.getElementById('login-error').style.display = 'block';
-            }
-        });
+                    localUser = user;
+                    document.getElementById('login-error').style.display = 'none';
+                    document.getElementById('login-overlay').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('login-overlay').style.display = 'none';
+                        const appLayout = document.getElementById('app-layout');
+                        if(appLayout) appLayout.style.display = 'block';
+                        initDashboardUI();
+                        initCalendar();
+                        if (firebaseUser) startRealtimeListeners();
+                    }, 300);
+                } else {
+                    const errEl = document.getElementById('login-error');
+                    if(errEl) { errEl.textContent = "Contraseña incorrecta. (Usa sole123 o gaby123)"; errEl.style.display = 'block'; }
+                }
+            });
+        }
 
         const handleLogout = () => {
             localUser = null;
             unsubscribers.forEach(unsub => unsub());
             unsubscribers = [];
-            document.getElementById('app-layout').style.display = 'none';
+            const appLayout = document.getElementById('app-layout');
+            if(appLayout) appLayout.style.display = 'none';
             const overlay = document.getElementById('login-overlay');
-            overlay.style.display = 'flex';
-            setTimeout(() => overlay.style.opacity = '1', 50);
-            document.getElementById('password-input').value = '';
+            if(overlay) {
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.style.opacity = '1', 50);
+            }
+            const passInput = document.getElementById('password-input');
+            if(passInput) passInput.value = '';
         };
 
         if(document.getElementById('btn-logout-top')) document.getElementById('btn-logout-top').addEventListener('click', handleLogout);
 
         // --- Lógica de Modales ---
-        window.openEntryModal = (tabId) => {
+        window.openEntryModal = (tabId, isEditing = false) => {
+            if (!isEditing) {
+                idProyectoEnEdicion = null;
+                const formP = document.getElementById('form-add-project');
+                if(formP) formP.reset();
+                const titleText = document.getElementById('modal-title-text');
+                if(titleText) titleText.textContent = 'Nuevo Registro';
+                const btnSubmit = document.getElementById('btn-submit-project');
+                if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
+                lucide.createIcons();
+            }
+
             const modal = document.getElementById('data-entry-overlay');
-            modal.style.display = 'flex';
-            setTimeout(() => { modal.style.opacity = '1'; document.getElementById('data-entry-modal').style.transform = 'translateY(0)'; }, 10);
+            if(modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
+            }
+            
+            const tabsContainer = document.getElementById('data-entry-tabs-container');
+            if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
+            
             if(tabId) window.switchTab(tabId);
         };
 
         window.closeEntryModal = () => {
             const modal = document.getElementById('data-entry-overlay');
+            if(!modal) return;
             modal.style.opacity = '0';
-            document.getElementById('data-entry-modal').style.transform = 'translateY(20px)';
-            setTimeout(() => modal.style.display = 'none', 300);
+            const modalEl = document.getElementById('data-entry-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; }, 300);
         };
 
         window.switchTab = (tabId) => {
-            const formIdMap = {
-                'tab-proyecto': 'form-add-project',
-                'tab-cliente': 'form-add-client',
-                'tab-recurso': 'form-add-link',
-                'tab-interno': 'form-add-internal'
-            };
+            const formIdMap = { 'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 'tab-interno': 'form-add-internal' };
             
             document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
@@ -911,46 +931,67 @@
 
         window.closeSummaryModal = () => {
             const modal = document.getElementById('summary-overlay');
+            if(!modal) return;
             modal.style.opacity = '0';
-            document.getElementById('summary-modal').style.transform = 'translateY(20px)';
+            const modalEl = document.getElementById('summary-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
             setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        // LÓGICA DE EDICIÓN DE PROYECTO
+        window.editarProyecto = (projectId) => {
+            const proyecto = allProjects.find(p => p.id === projectId);
+            if(!proyecto) return;
+
+            idProyectoEnEdicion = projectId;
+            
+            document.getElementById('proj-name').value = proyecto.name || '';
+            document.getElementById('proj-client').value = proyecto.client || '';
+            document.getElementById('proj-status').value = proyecto.status || 'active';
+            document.getElementById('proj-progress').value = proyecto.progress || 0;
+            
+            document.getElementById('proj-kickoff').value = proyecto.dates?.kickoff || '';
+            document.getElementById('proj-review').value = proyecto.dates?.review || '';
+            document.getElementById('proj-delivery').value = proyecto.dates?.delivery || '';
+            document.getElementById('proj-notes').value = proyecto.notes || '';
+
+            const titleText = document.getElementById('modal-title-text');
+            if(titleText) titleText.textContent = 'Editar Proyecto';
+            const btnSubmit = document.getElementById('btn-submit-project');
+            if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Proyecto';
+            lucide.createIcons();
+
+            window.openEntryModal('tab-proyecto', true);
         };
 
         // 3. BASE DE DATOS FIREBASE
         function startRealtimeListeners() {
             if (!firebaseUser || !db) return;
             
-            // Proyectos
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
                 allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
                 allProjects.sort((a, b) => b.createdAt - a.createdAt);
-                renderProjects(allProjects);
-                updateDropdowns();
+                renderProjects(allProjects); updateDropdowns();
             }));
 
-            // Clientes
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'clientes')), (snapshot) => {
                 allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
                 allClients.sort((a, b) => b.createdAt - a.createdAt);
-                renderClients(allClients);
-                updateDropdowns();
+                renderClients(allClients); updateDropdowns();
             }));
 
-            // Recursos
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos')), (snapshot) => {
                 allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
                 allLinks.sort((a, b) => b.createdAt - a.createdAt);
                 renderLinks(allLinks);
             }));
 
-            // Notas
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
                 allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
                 allNotes.sort((a, b) => a.createdAt - b.createdAt);
                 renderNotes(allNotes);
             }));
 
-            // Enlaces Internos
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
                 allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
                 allInternalLinks.sort((a, b) => b.createdAt - a.createdAt);
@@ -960,7 +1001,6 @@
 
         function updateDropdowns() {
             let optionsHTML = '<option value="">Ninguno / General</option>';
-            
             if(allProjects.length > 0) {
                 optionsHTML += '<optgroup label="Proyectos">';
                 allProjects.forEach(p => optionsHTML += `<option value="P_${p.id}">${p.name}</option>`);
@@ -1030,12 +1070,11 @@
             if (searchInput) searchInput.value = '';
 
             const [type, id] = relationId.split('_');
-            let entityName = '';
-            let entityBadge = '';
+            let entityName = '', entityBadge = '', entityNotes = '';
 
             if(type === 'P') {
                 const p = allProjects.find(x => x.id === id);
-                if(p) { entityName = p.name; entityBadge = 'Proyecto'; }
+                if(p) { entityName = p.name; entityBadge = 'Proyecto'; entityNotes = p.notes || ''; }
             } else {
                 const c = allClients.find(x => x.id === id);
                 if(c) { entityName = c.company; entityBadge = 'Cliente'; }
@@ -1048,11 +1087,21 @@
             if (summaryBadge) {
                 summaryBadge.textContent = entityBadge;
                 if(type === 'C') {
-                    summaryBadge.style.background = '#EFE9DB';
-                    summaryBadge.style.color = '#684B45';
+                    summaryBadge.style.background = '#EFE9DB'; summaryBadge.style.color = '#684B45';
                 } else {
-                    summaryBadge.style.background = '#CFE2FF';
-                    summaryBadge.style.color = '#084298';
+                    summaryBadge.style.background = '#CFE2FF'; summaryBadge.style.color = '#084298';
+                }
+            }
+
+            // Mostrar notas de proyecto
+            const internalNotesContainer = document.getElementById('summary-internal-notes-container');
+            const internalNotesText = document.getElementById('summary-internal-notes-text');
+            if (internalNotesContainer && internalNotesText) {
+                if (entityNotes.trim() !== '') {
+                    internalNotesText.textContent = entityNotes;
+                    internalNotesContainer.style.display = 'flex';
+                } else {
+                    internalNotesContainer.style.display = 'none';
                 }
             }
 
@@ -1061,9 +1110,8 @@
 
             const linksContainer = document.getElementById('summary-links-list');
             if (linksContainer) {
-                if(filteredLinks.length === 0) {
-                    linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
-                } else {
+                if(filteredLinks.length === 0) linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
+                else {
                     linksContainer.innerHTML = '';
                     filteredLinks.forEach(link => {
                         const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
@@ -1073,15 +1121,28 @@
                 }
             }
 
+            // Diseño de Burbuja de chat para notas asociadas
             const notesContainer = document.getElementById('summary-notes-list');
             if (notesContainer) {
-                if(filteredNotes.length === 0) {
-                    notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas asociadas.</div>';
-                } else {
+                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas de actividad.</div>';
+                else {
                     notesContainer.innerHTML = '';
                     filteredNotes.forEach(note => {
-                        const div = document.createElement('div'); div.className = 'note-item'; div.style.padding = '8px';
-                        div.innerHTML = `<p style="font-size:0.8rem;"><strong>${note.addedBy}:</strong> ${note.text}</p>`;
+                        const dateFormatted = new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'});
+                        const div = document.createElement('div'); 
+                        div.style.cssText = 'display: flex; gap: 8px; margin-bottom: 12px;';
+                        div.innerHTML = `
+                            <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
+                                ${note.addedBy.charAt(0).toUpperCase()}
+                            </div>
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-light); padding: 10px 12px; border-radius: 0 8px 8px 8px; flex-grow: 1; box-shadow: var(--shadow-sm);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                    <span style="font-size: 0.7rem; font-weight: 600; color: var(--brand-primary-deep);">${note.addedBy}</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
+                                </div>
+                                <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4;">${note.text}</p>
+                            </div>
+                        `;
                         notesContainer.appendChild(div);
                     });
                 }
@@ -1099,26 +1160,40 @@
             }
         };
 
-
         // --- Envío de Formularios ---
         
         document.getElementById('form-add-project').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
+            
+            const projectData = { 
+                name: document.getElementById('proj-name').value.trim(), 
+                client: document.getElementById('proj-client').value.trim() || '',
+                status: document.getElementById('proj-status').value, 
+                progress: parseInt(document.getElementById('proj-progress').value) || 0, 
+                dates: { 
+                    kickoff: document.getElementById('proj-kickoff').value || null, 
+                    review: document.getElementById('proj-review').value || null, 
+                    delivery: document.getElementById('proj-delivery').value || null
+                },
+                notes: document.getElementById('proj-notes').value.trim() || '',
+                lastUpdatedBy: localUser,
+                lastUpdatedAt: Date.now()
+            };
+
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), { 
-                    name: document.getElementById('proj-name').value.trim(), 
-                    status: document.getElementById('proj-status').value, 
-                    progress: parseInt(document.getElementById('proj-progress').value) || 0, 
-                    dates: { 
-                        kickoff: document.getElementById('proj-kickoff').value, 
-                        review: document.getElementById('proj-review').value, 
-                        delivery: document.getElementById('proj-delivery').value 
-                    }, 
-                    addedBy: localUser, createdAt: Date.now() 
-                });
-                document.getElementById('form-add-project').reset(); window.closeEntryModal(); window.showToast('Proyecto guardado');
+                if (idProyectoEnEdicion) {
+                    const refDoc = doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion);
+                    await updateDoc(refDoc, projectData);
+                    window.showToast('Proyecto actualizado exitosamente');
+                } else {
+                    projectData.addedBy = localUser;
+                    projectData.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), projectData);
+                    window.showToast('Proyecto guardado');
+                }
+                document.getElementById('form-add-project').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
@@ -1187,26 +1262,33 @@
 
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) { window.handleFirebaseError(err); }
+            if(confirm("¿Estás seguro de eliminar este registro?")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado');} 
+                catch (err) { window.handleFirebaseError(err); }
+            }
         };
 
         // --- Renderizadores del Dashboard ---
 
-        function getDeliveryAlertData(dateString) {
-            if (!dateString) return { class: '', text: '--/--' };
+        function formatStageDate(dateString) {
+            if (!dateString) return '';
+            return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+        }
+
+        function getDeliveryAlertData(dateString, status, progress) {
+            const isCompleted = (status === 'info' || parseInt(progress) === 100);
+            if (isCompleted) return { class: 'success', text: dateString ? `🏁 ${formatStageDate(dateString)} (Terminado)` : '🏁 Terminado' };
+            if (!dateString) return { class: 'neutral', text: '⚪ Sin fecha' };
+
             const deliveryDate = new Date(dateString + 'T12:00:00');
             const today = new Date(); today.setHours(0,0,0,0);
             const diffTime = deliveryDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const formattedDate = deliveryDate.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
-            if (diffDays < 0) return { class: 'danger', text: formattedDate + ' (Vencido)' };
-            if (diffDays <= 7) return { class: 'warning', text: formattedDate + ` (${diffDays}d)` };
-            return { class: '', text: formattedDate };
-        }
+            const formattedDate = formatStageDate(dateString);
 
-        function formatStageDate(dateString) {
-            if (!dateString) return '--/--';
-            return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+            if (diffDays < 0) return { class: 'danger', text: `🔥 ${formattedDate} (Vencido)` };
+            if (diffDays <= 7) return { class: 'warning', text: `⏳ ${formattedDate} (${diffDays}d)` };
+            return { class: 'neutral', text: `📅 ${formattedDate}` };
         }
 
         function renderProjects(projects) {
@@ -1215,28 +1297,38 @@
             if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
             const statusMap = { 'active': { label: 'En progreso', class: 'active' }, 'pending': { label: 'Pausado', class: 'pending' }, 'info': { label: 'Completado', class: 'info' } };
             tbody.innerHTML = '';
+            
             projects.forEach(p => {
                 const s = statusMap[p.status] || statusMap['pending'];
-                const deliveryAlert = getDeliveryAlertData(p.dates?.delivery);
+                const deliveryAlert = getDeliveryAlertData(p.dates?.delivery, p.status, p.progress);
+                const kickoffHtml = p.dates?.kickoff ? `<div class="date-badge neutral" style="margin-bottom:2px;"><i data-lucide="flag" size="10" style="display:inline;"></i> ${formatStageDate(p.dates.kickoff)}</div>` : '';
+                
+                const notasIcon = p.notes ? `<i data-lucide="align-left" size="14" style="color: var(--brand-primary); margin-left: 6px; display: inline;" title="Tiene notas detalladas"></i>` : '';
+                const clientHtml = p.client ? `<div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;"><i data-lucide="user" size="10" style="display:inline; margin-right:2px;"></i> ${p.client}</div>` : '';
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer;" onclick="openSummary('P_${p.id}')" title="Ver Ficha">${p.name} <i data-lucide="external-link" size="10"></i></div>
+                        <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('P_${p.id}')" title="Ver Ficha de Proyecto">
+                            ${p.name} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${notasIcon}
+                        </div>
+                        ${clientHtml}
                     </td>
                     <td><span class="badge ${s.class}">${s.label}</span></td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="font-size: 0.75rem; width: 30px; font-weight: 600;">${p.progress}%</span>
-                            <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress === 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress == 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
                         </div>
                     </td>
                     <td>
                         <div class="stage-dates">
-                            <div class="date-badge"><i data-lucide="flag" size="10" style="display:inline;"></i> ${formatStageDate(p.dates?.kickoff)}</div>
+                            ${kickoffHtml}
                             <div class="date-badge ${deliveryAlert.class}"><i data-lucide="rocket" size="10" style="display:inline;"></i> ${deliveryAlert.text}</div>
                         </div>
                     </td>
-                    <td style="text-align: center;">
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button class="btn-icon" title="Editar Proyecto" onclick="editarProyecto('${p.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
                         <button class="btn-icon" title="Eliminar Proyecto" onclick="deleteDocument('proyectos', '${p.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
                     </td>
                 `;
