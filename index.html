@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Talento Impulsa | Dashboard Operativo</title>
     
+    <!-- Metatags para PWA / Mobile App -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#EFE9DB">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E">
+
     <!-- Tipografía del Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -305,6 +311,31 @@
     </style>
 </head>
 <body>
+
+    <!-- ==========================================
+         PWA MAGIC INJECTION (Evita archivos separados)
+         ========================================== -->
+    <script>
+        const manifestData = {
+            "name": "Talento Impulsa Dashboard",
+            "short_name": "Talento",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#EFE9DB",
+            "theme_color": "#9A7B3D",
+            "icons": [{
+                "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E",
+                "sizes": "512x512",
+                "type": "image/svg+xml",
+                "purpose": "any maskable"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+        const linkManifest = document.createElement('link');
+        linkManifest.rel = 'manifest';
+        linkManifest.href = URL.createObjectURL(manifestBlob);
+        document.head.appendChild(linkManifest);
+    </script>
 
     <!-- ==========================================
          GATEWAY (LOGIN)
@@ -725,13 +756,18 @@
                         } else {
                             await signInAnonymously(auth);
                         }
-                    } catch (err) { console.error("Error Auth:", err); }
+                    } catch (err) { 
+                        console.error("Error Auth:", err); 
+                        window.showToast("⚠️ Error de conexión Auth: " + err.code);
+                    }
                 };
 
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         firebaseUser = user;
                         if (localUser) startRealtimeListeners();
+                    } else {
+                        firebaseUser = null;
                     }
                 });
 
@@ -835,8 +871,21 @@
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             document.getElementById('toast-message').textContent = message;
+            toast.style.background = '#D1E7DD'; // Reseteo visual por si viene de un error
+            toast.style.color = '#0F5132';
+            toast.style.borderColor = '#BADBCC';
             toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
             setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
+        };
+
+        window.showErrorToast = (message) => {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.background = '#F8D7DA'; 
+            toast.style.color = '#842029';
+            toast.style.borderColor = '#F5C2C7';
+            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 4000);
         };
 
         // 3. BASE DE DATOS FIREBASE
@@ -1028,8 +1077,8 @@
         
         document.getElementById('form-add-project').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
-            if (!firebaseUser || !localUser) return;
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), { 
                     name: document.getElementById('proj-name').value.trim(), 
@@ -1043,13 +1092,13 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-project').reset(); window.closeEntryModal(); window.showToast('Proyecto guardado');
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
         });
 
         document.getElementById('form-add-client').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
-            if (!firebaseUser || !localUser) return;
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), { 
                     company: document.getElementById('client-company').value.trim(), 
@@ -1058,13 +1107,13 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-client').reset(); window.closeEntryModal(); window.showToast('Cliente registrado');
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
         });
 
         document.getElementById('form-add-link').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
-            if (!firebaseUser || !localUser) return;
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
             try {
                 const relationId = document.getElementById('link-relation').value;
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), { 
@@ -1076,13 +1125,13 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-link').reset(); window.closeEntryModal(); window.showToast('Recurso subido');
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
         });
 
         document.getElementById('form-add-internal').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
-            if (!firebaseUser || !localUser) return;
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), { 
                     type: document.getElementById('internal-type').value, 
@@ -1091,13 +1140,13 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-internal').reset(); window.closeEntryModal(); window.showToast('Enlace interno guardado');
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
         });
 
         document.getElementById('form-add-note').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showToast('⚠️ Debes configurar Firebase en el código para guardar'); return; }
-            if (!firebaseUser || !localUser) return;
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado (Revisa Auth Anónimo)'); return; }
             const text = document.getElementById('note-input').value.trim();
             if (!text) return;
             try {
@@ -1106,12 +1155,12 @@
                     relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('note-input').value = '';
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
         });
 
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) {}
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) { window.showErrorToast('❌ Error al borrar: ' + err.message); }
         };
 
         // --- Renderizadores del Dashboard ---
