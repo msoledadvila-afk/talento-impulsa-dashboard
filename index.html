@@ -719,7 +719,7 @@
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE SEGURA
+        // 1. CONFIGURACIÓN FIREBASE
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
@@ -729,8 +729,46 @@
         let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [];
         let unsubscribers = [];
 
+        // --- SISTEMA INTELIGENTE DE ERRORES ---
+        window.showToast = (message) => {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.background = '#D1E7DD'; 
+            toast.style.color = '#0F5132';
+            toast.style.borderColor = '#BADBCC';
+            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
+        };
+
+        window.showErrorToast = (message) => {
+            const toast = document.getElementById('toast-notification');
+            document.getElementById('toast-message').textContent = message;
+            toast.style.background = '#F8D7DA'; 
+            toast.style.color = '#842029';
+            toast.style.borderColor = '#F5C2C7';
+            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
+            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 5000);
+        };
+
+        window.handleFirebaseError = (err) => {
+            console.error("Firebase Error detallado:", err);
+            let msg = '❌ Error: ' + (err.message || 'Desconocido');
+            
+            // Traducción de errores comunes para el usuario
+            if (err.code === 'permission-denied') {
+                msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
+            } else if (err.code === 'auth/unauthorized-domain') {
+                msg = '⚠️ Dominio bloqueado: Autoriza tu link de GitHub en Firebase Auth.';
+            } else if (err.code === 'auth/operation-not-allowed') {
+                msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
+            } else if (err.code === 'unavailable') {
+                msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
+            }
+            window.showErrorToast(msg);
+        };
+
         try {
-            // 👇 ACÁ PEGÁ TUS CREDENCIALES DE FIREBASE 👇
+            // TUS CREDENCIALES
             const miConfiguracionFirebase = {
                 apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
                 authDomain: "talento-impulsa.firebaseapp.com",
@@ -757,8 +795,7 @@
                             await signInAnonymously(auth);
                         }
                     } catch (err) { 
-                        console.error("Error Auth:", err); 
-                        window.showToast("⚠️ Error de conexión Auth: " + err.code);
+                        window.handleFirebaseError(err);
                     }
                 };
 
@@ -773,7 +810,7 @@
 
                 initFirebaseAuth();
             } else {
-                console.warn("Faltan las credenciales de Firebase en el código. La app funcionará visualmente pero no se guardarán los datos.");
+                console.warn("Faltan credenciales de Firebase.");
             }
         } catch (error) {
             console.error("Error al iniciar Firebase:", error);
@@ -868,26 +905,6 @@
             setTimeout(() => modal.style.display = 'none', 300);
         };
 
-        window.showToast = (message) => {
-            const toast = document.getElementById('toast-notification');
-            document.getElementById('toast-message').textContent = message;
-            toast.style.background = '#D1E7DD'; // Reseteo visual por si viene de un error
-            toast.style.color = '#0F5132';
-            toast.style.borderColor = '#BADBCC';
-            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
-            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 3000);
-        };
-
-        window.showErrorToast = (message) => {
-            const toast = document.getElementById('toast-notification');
-            document.getElementById('toast-message').textContent = message;
-            toast.style.background = '#F8D7DA'; 
-            toast.style.color = '#842029';
-            toast.style.borderColor = '#F5C2C7';
-            toast.style.transform = 'translateY(0)'; toast.style.opacity = '1';
-            setTimeout(() => { toast.style.transform = 'translateY(100px)'; toast.style.opacity = '0'; }, 4000);
-        };
-
         // 3. BASE DE DATOS FIREBASE
         function startRealtimeListeners() {
             if (!firebaseUser || !db) return;
@@ -930,7 +947,6 @@
             }));
         }
 
-        // Llenar Selects Relacionales
         function updateDropdowns() {
             let optionsHTML = '<option value="">Ninguno / General</option>';
             
@@ -1092,7 +1108,7 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-project').reset(); window.closeEntryModal(); window.showToast('Proyecto guardado');
-            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
+            } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-client').addEventListener('submit', async (e) => {
@@ -1107,7 +1123,7 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-client').reset(); window.closeEntryModal(); window.showToast('Cliente registrado');
-            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
+            } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-link').addEventListener('submit', async (e) => {
@@ -1125,7 +1141,7 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-link').reset(); window.closeEntryModal(); window.showToast('Recurso subido');
-            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
+            } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-internal').addEventListener('submit', async (e) => {
@@ -1140,7 +1156,7 @@
                     addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('form-add-internal').reset(); window.closeEntryModal(); window.showToast('Enlace interno guardado');
-            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
+            } catch (err) { window.handleFirebaseError(err); }
         });
 
         document.getElementById('form-add-note').addEventListener('submit', async (e) => {
@@ -1155,12 +1171,12 @@
                     relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() 
                 });
                 document.getElementById('note-input').value = '';
-            } catch (err) { console.error(err); window.showErrorToast('❌ Error de Base de Datos: ' + err.message); }
+            } catch (err) { window.handleFirebaseError(err); }
         });
 
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) { window.showErrorToast('❌ Error al borrar: ' + err.message); }
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); } catch (err) { window.handleFirebaseError(err); }
         };
 
         // --- Renderizadores del Dashboard ---
