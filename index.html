@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Talento Impulsa | Dashboard Operativo</title>
     
-    <!-- Metatags para PWA / Mobile App -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#EFE9DB">
-    <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E">
-
     <!-- Tipografía del Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,31 +307,6 @@
 <body>
 
     <!-- ==========================================
-         PWA MAGIC INJECTION (Evita archivos separados)
-         ========================================== -->
-    <script>
-        const manifestData = {
-            "name": "Talento Impulsa Dashboard",
-            "short_name": "Talento",
-            "start_url": "./",
-            "display": "standalone",
-            "background_color": "#EFE9DB",
-            "theme_color": "#9A7B3D",
-            "icons": [{
-                "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23EFE9DB' rx='112'/%3E%3Cpath d='M256 120 L150 256 L256 392 L362 256 Z' fill='%239A7B3D'/%3E%3C/svg%3E",
-                "sizes": "512x512",
-                "type": "image/svg+xml",
-                "purpose": "any maskable"
-            }]
-        };
-        const manifestBlob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-        const linkManifest = document.createElement('link');
-        linkManifest.rel = 'manifest';
-        linkManifest.href = URL.createObjectURL(manifestBlob);
-        document.head.appendChild(linkManifest);
-    </script>
-
-    <!-- ==========================================
          GATEWAY (LOGIN)
          ========================================== -->
     <div id="login-overlay" class="overlay-fullscreen">
@@ -571,7 +540,7 @@
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-3);">
                     <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
-                    <!-- Bloque de Saludo Reintegrado -->
+                    <!-- Bloque de Saludo -->
                     <div class="greeting" id="greeting-container">
                         <h1 id="greeting-text">Buen día</h1>
                         <p id="current-date">Fecha</p>
@@ -719,7 +688,7 @@
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE SEGURA (Evita fallos al salir del entorno original)
+        // 1. CONFIGURACIÓN FIREBASE SEGURA
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
@@ -731,21 +700,19 @@
 
         try {
             // 👇 ACÁ PEGÁ TUS CREDENCIALES DE FIREBASE 👇
-            // Como la app está en tu GitHub, necesita su propia base de datos real.
             const miConfiguracionFirebase = {
-  apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
-  authDomain: "talento-impulsa.firebaseapp.com",
-  projectId: "talento-impulsa",
-  storageBucket: "talento-impulsa.firebasestorage.app",
-  messagingSenderId: "634847680772",
-  appId: "1:634847680772:web:fe093eab8b12dbaea5d851"
-};
+                apiKey: "TU_API_KEY",
+                authDomain: "TU_AUTH_DOMAIN",
+                projectId: "TU_PROJECT_ID",
+                storageBucket: "TU_STORAGE_BUCKET",
+                messagingSenderId: "TU_MESSAGING_SENDER_ID",
+                appId: "TU_APP_ID"
+            };
 
             const firebaseConfig = typeof __firebase_config !== 'undefined' 
                 ? JSON.parse(__firebase_config) 
                 : miConfiguracionFirebase;
             
-            // Verificamos que al menos haya una configuración válida antes de intentar inicializar
             if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId !== "TU_PROJECT_ID") {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -805,7 +772,6 @@
                     document.getElementById('app-layout').style.display = 'block';
                     initDashboardUI();
                     initCalendar();
-                    // Si Firebase se inicializó bien, cargamos datos
                     if (firebaseUser) startRealtimeListeners();
                 }, 300);
             } else {
@@ -1056,6 +1022,7 @@
                 }, 10);
             }
         };
+
 
         // --- Envío de Formularios ---
         
