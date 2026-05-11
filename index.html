@@ -94,14 +94,14 @@
 
         .card-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--border-light); padding-bottom: var(--space-3); margin-bottom: var(--space-2);
         }
         .card-title { font-size: var(--text-md); display: flex; align-items: center; gap: var(--space-2); }
 
         .badge {
             display: inline-flex; align-items: center; padding: 0.125rem 0.5rem;
             border-radius: var(--radius-pill); font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
-            transition: all 0.2s;
+            transition: all 0.2s; white-space: nowrap;
         }
         .badge.active { background: #D1E7DD; color: #0F5132; }
         .badge.pending { background: #FFF3CD; color: #664D03; }
@@ -174,7 +174,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ============================================================
-           LAYOUT RESPONSIVO
+           LAYOUT RESPONSIVO & SPA VIEWS
            ============================================================ */
         #app-layout { display: none; width: 100%; position: relative; }
         .sidebar-overlay {
@@ -193,7 +193,7 @@
         .btn-close-sidebar { display: none; }
 
         .nav-menu { padding: var(--space-4) 0; flex-grow: 1; overflow-y: auto; }
-        .nav-item { padding: var(--space-3) var(--space-6); display: flex; align-items: center; gap: var(--space-3); color: var(--text-dim); font-weight: 500; border-left: 3px solid transparent; }
+        .nav-item { padding: var(--space-3) var(--space-6); display: flex; align-items: center; gap: var(--space-3); color: var(--text-dim); font-weight: 500; border-left: 3px solid transparent; cursor: pointer; transition: all 0.2s; }
         .nav-item:hover, .nav-item.active { background: var(--brand-primary-glow); color: var(--brand-primary); border-left-color: var(--brand-primary); }
 
         .user-profile-nav { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: var(--space-3); }
@@ -203,10 +203,14 @@
             margin-left: 260px; flex-grow: 1; padding: var(--space-6); display: flex;
             flex-direction: column; gap: var(--space-6); width: calc(100% - 260px);
         }
-        .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: var(--space-2); }
         .greeting h1 { font-size: var(--text-xl); color: var(--text); }
         .greeting p { color: var(--text-dim); font-size: var(--text-xs); }
         .mobile-menu-btn { display: none; }
+
+        /* Views SPA */
+        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
 
         /* ============================================================
            BUSCADOR GLOBAL
@@ -254,13 +258,6 @@
         .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
         .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
         
-        .date-badge.success { background: var(--alert-success-bg); color: var(--alert-success); font-weight: 700; border: 1px solid #BADBCC; }
-        .date-badge.warning { background: var(--alert-warning-bg); color: var(--alert-warning); font-weight: 700; border: 1px solid #FFE69C;}
-        .date-badge.danger { background: var(--alert-danger-bg); color: var(--alert-danger); font-weight: 700; border: 1px solid #F5C2C7; animation: pulse 2s infinite;}
-        .date-badge.neutral { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
         /* --- Calendario & Listas --- */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
         .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
@@ -273,7 +270,7 @@
 
         .notes-list { display: flex; flex-direction: column; gap: var(--space-3); overflow-y: auto; padding-right: 4px; overflow-x: hidden;}
         
-        .data-list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 350px; overflow-y: auto; overflow-x: hidden; }
+        .data-list { display: flex; flex-direction: column; gap: var(--space-2); max-height: 500px; overflow-y: auto; overflow-x: hidden; }
         .data-row { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); }
         .data-row-top { display: flex; justify-content: space-between; align-items: center; }
         .data-info { display: flex; align-items: flex-start; gap: var(--space-3); overflow: hidden; flex-grow:1;}
@@ -391,7 +388,7 @@
 
             <div class="data-entry-body">
 
-                <!-- TAB: MARKETING (NUEVO) -->
+                <!-- TAB: MARKETING -->
                 <form id="form-add-marketing" class="form-section active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -425,11 +422,11 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small" id="btn-submit-marketing"><i data-lucide="save" size="16"></i> Guardar Pieza de Marketing</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-marketing"><i data-lucide="save" size="16"></i> Guardar Pieza</button>
                     </div>
                 </form>
                 
-                <!-- TAB: PROYECTO -->
+                <!-- TAB: PROYECTO (Simplificado sin Cronograma ni Estado Inicial) -->
                 <form id="form-add-project" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -444,36 +441,14 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Estado Actual</label>
-                            <select id="proj-status" class="form-control" required>
-                                <option value="active">En progreso</option>
-                                <option value="pending">Pendiente / Pausado</option>
-                                <option value="info">Completado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label>Progreso (%)</label>
                             <input type="number" id="proj-progress" class="form-control" placeholder="0" min="0" max="100" required>
                         </div>
                         
-                        <!-- Fechas opcionales -->
-                        <div class="form-group">
-                            <label><i data-lucide="flag" size="12" style="display:inline;"></i> Kickoff / Inicio (Opcional)</label>
-                            <input type="date" id="proj-kickoff" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label><i data-lucide="eye" size="12" style="display:inline;"></i> Fecha de Revisión (Opcional)</label>
-                            <input type="date" id="proj-review" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label><i data-lucide="rocket" size="12" style="display:inline;"></i> Entrega Final (Opcional)</label>
-                            <input type="date" id="proj-delivery" class="form-control">
-                        </div>
-
                         <!-- Notas del Proyecto -->
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas del Proyecto (Opcional)</label>
-                            <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, particularidades del código, links de acceso directo, etc."></textarea>
+                            <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas Generales (Opcional)</label>
+                            <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, links o información fija del proyecto..."></textarea>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -589,12 +564,40 @@
                 <!-- Panel: Proyectos de este cliente -->
                 <div id="summary-projects-list-container" class="card" style="display: none;"></div>
 
-                <!-- Panel: Notas internas del proyecto -->
+                <!-- Panel: Notas fijas del proyecto -->
                 <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
                     <h3 style="font-size: var(--text-sm); color: var(--brand-primary-deep); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
-                        <i data-lucide="align-left" size="16"></i> Detalles y Notas del Proyecto
+                        <i data-lucide="align-left" size="16"></i> Notas Fijas / Accesos
                     </h3>
                     <div id="summary-internal-notes-text" style="font-size: var(--text-sm); color: var(--text); white-space: pre-wrap; line-height: 1.6;"></div>
+                </div>
+
+                <!-- Bitácora del Proyecto -->
+                <div id="summary-bitacora-container" class="card" style="display: none;">
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
+                        <i data-lucide="book-open" size="16"></i> Bitácora de Novedades
+                    </h3>
+                    
+                    <form id="form-add-bitacora" style="display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-start; flex-wrap: wrap;">
+                        <input type="date" id="bit-date" class="form-control" style="width: auto;" required>
+                        <input type="text" id="bit-detail" class="form-control" placeholder="¿Qué avance se hizo hoy?" style="flex-grow: 1; min-width: 200px;" required>
+                        <select id="bit-status" class="form-control" style="width: auto;" required>
+                            <option value="Trabajando">Trabajando</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="A confirmar">A confirmar</option>
+                            <option value="Bloqueado">Bloqueado</option>
+                            <option value="Resuelto">Resuelto</option>
+                        </select>
+                        <button type="submit" class="btn-primary btn-small" style="width: auto; padding: 8px 12px;" title="Agregar a bitácora"><i data-lucide="plus" size="18"></i></button>
+                    </form>
+
+                    <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
+                        <table style="width: 100%; min-width: 400px; border-collapse: collapse;">
+                            <tbody id="summary-bitacora-list">
+                                <!-- JS inyecta la bitacora aqui -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -613,18 +616,18 @@
     <div id="app-layout">
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- SIDEBAR -->
+        <!-- SIDEBAR NAVEGACIÓN -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo"><i data-lucide="sparkles"></i> Talento</div>
                 <button class="btn-icon btn-close-sidebar" id="btn-close-sidebar"><i data-lucide="x"></i></button>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-item active"><i data-lucide="layout-dashboard"></i> Inicio</a>
-                <a href="#marketing" class="nav-item"><i data-lucide="megaphone"></i> Marketing</a>
-                <a href="#proyectos" class="nav-item"><i data-lucide="folder-kanban"></i> Proyectos</a>
-                <a href="#clientes" class="nav-item"><i data-lucide="users"></i> Clientes</a>
-                <a href="#recursos" class="nav-item"><i data-lucide="cloud"></i> Recursos</a>
+                <a href="javascript:void(0)" class="nav-item active" data-view="inicio" onclick="navigateTo('inicio')"><i data-lucide="layout-dashboard"></i> Inicio</a>
+                <a href="javascript:void(0)" class="nav-item" data-view="marketing" onclick="navigateTo('marketing')"><i data-lucide="megaphone"></i> Marketing</a>
+                <a href="javascript:void(0)" class="nav-item" data-view="proyectos" onclick="navigateTo('proyectos')"><i data-lucide="folder-kanban"></i> Proyectos</a>
+                <a href="javascript:void(0)" class="nav-item" data-view="clientes" onclick="navigateTo('clientes')"><i data-lucide="users"></i> Clientes</a>
+                <a href="javascript:void(0)" class="nav-item" data-view="recursos" onclick="navigateTo('recursos')"><i data-lucide="cloud"></i> Recursos</a>
             </nav>
             <div class="user-profile-nav">
                 <div class="avatar" id="nav-avatar">S</div>
@@ -651,163 +654,169 @@
                 <!-- BUSCADOR GLOBAL -->
                 <div class="search-container">
                     <i data-lucide="search" class="search-icon" size="18"></i>
-                    <input type="search" id="global-search" class="search-input" placeholder="Buscar proyecto o cliente para ver resumen..." autocomplete="off">
+                    <input type="search" id="global-search" class="search-input" placeholder="Buscar proyecto o cliente..." autocomplete="off">
                     <div id="search-results" class="search-results-dropdown"></div>
                 </div>
 
                 <div style="display: flex; gap: var(--space-2); align-items: center;">
-                    <button class="btn-primary btn-small" onclick="openEntryModal('tab-marketing', false)">
+                    <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto', false)">
                         <i data-lucide="plus" size="18"></i> <span style="display:none; @media(min-width:768px){display:inline;}">Nuevo</span>
                     </button>
                     <button class="btn-icon" id="btn-logout-top" title="Cerrar sesión"><i data-lucide="log-out"></i></button>
                 </div>
             </header>
 
-            <!-- GRID PRINCIPAL -->
-            <div class="dashboard-grid">
-
-                <!-- COLUMNA MAIN (Izquierda, más ancha) -->
-                <div class="col-main">
-                    
-                    <!-- CHAT AMPLIO AL INICIO -->
-                    <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary);">
-                        <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
-                            <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
+            <!-- VISTAS SPA (Una por cada sección del menú) -->
+            
+            <!-- 1. VISTA: INICIO -->
+            <div id="view-inicio" class="view-section active">
+                <div class="dashboard-grid">
+                    <!-- Columna Principal -->
+                    <div class="col-main">
+                        <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary); height: 100%;">
+                            <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+                                <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
+                            </div>
+                            <div class="notes-list" id="firebase-notes-list" style="max-height: 400px; padding: 10px; background: #FAFAFA; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-grow: 1;">
+                                <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando mensajes...</div>
+                            </div>
+                            
+                            <form id="form-add-note" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2);">
+                                <div style="display: flex; gap: var(--space-2); align-items: center;">
+                                    <select id="note-relation" class="form-control" style="font-size: 0.75rem; width: 30%; max-width: 200px;">
+                                        <option value="">General</option>
+                                    </select>
+                                    <input type="text" id="note-input" class="form-control" placeholder="Escribe un mensaje..." required autocomplete="off" style="flex-grow: 1;">
+                                    <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="16"></i></button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="notes-list" id="firebase-notes-list" style="max-height: 300px; padding: 10px; background: #FAFAFA; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-                            <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando mensajes...</div>
+                    </div>
+
+                    <!-- Columna Lateral -->
+                    <div class="col-side">
+                        
+                        <!-- ENLACES INTERNOS -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title"><i data-lucide="link"></i> Enlaces Propios</h2>
+                                <button class="btn-icon" onclick="openEntryModal('tab-interno', false)"><i data-lucide="plus" size="16"></i></button>
+                            </div>
+                            <div id="firebase-internal-links" style="display: flex; flex-direction: column;">
+                                <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces.</div>
+                            </div>
                         </div>
                         
-                        <form id="form-add-note" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2);">
-                            <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                <select id="note-relation" class="form-control" style="font-size: 0.75rem; width: 30%; max-width: 200px;">
-                                    <option value="">General</option>
-                                </select>
-                                <input type="text" id="note-input" class="form-control" placeholder="Escribe un mensaje..." required autocomplete="off" style="flex-grow: 1;">
-                                <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="16"></i></button>
+                        <!-- CALENDARIO -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title"><i data-lucide="calendar"></i> Calendario</h2>
                             </div>
-                        </form>
-                    </div>
-
-                    <!-- MÓDULO MARKETING -->
-                    <div class="card" id="marketing">
-                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
-                            <div style="display: flex; align-items: center; gap: var(--space-3);">
-                                <h2 class="card-title" style="color: #BE185D;"><i data-lucide="megaphone"></i> Estrategia de Marketing</h2>
-                            </div>
-                        </div>
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th style="width:30px;"></th>
-                                        <th style="width: 120px;">Fecha</th>
-                                        <th>Pieza & Copy / Detalle</th>
-                                        <th style="width: 220px;">Status Visual</th>
-                                        <th style="width: 70px; text-align: center;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="firebase-marketing-list">
-                                    <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- PROYECTOS -->
-                    <div class="card" id="proyectos">
-                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
-                            <div style="display: flex; align-items: center; gap: var(--space-3);">
-                                <h2 class="card-title"><i data-lucide="kanban"></i> Tablero de Proyectos</h2>
-                            </div>
-                        </div>
-                        <div class="table-wrapper">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th style="width:30px;"></th>
-                                        <th>Proyecto & Detalles</th>
-                                        <th style="width: 100px;">Estado</th>
-                                        <th style="width: 130px;">Progreso</th>
-                                        <th>Cronograma</th>
-                                        <th style="width: 70px; text-align: center;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="firebase-projects-list">
-                                    <tr><td colspan="6" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- CLIENTES -->
-                    <div class="card" id="clientes">
-                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
-                            <h2 class="card-title"><i data-lucide="users"></i> Base de Clientes</h2>
-                        </div>
-                        <div class="data-list" id="firebase-clients-list"></div>
-                    </div>
-
-                    <!-- RECURSOS -->
-                    <div class="card" id="recursos">
-                        <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
-                            <h2 class="card-title"><i data-lucide="cloud"></i> Repositorio General de Clientes</h2>
-                        </div>
-                        <div class="data-list" id="firebase-links-list"></div>
-                    </div>
-
-                </div>
-
-                <!-- COLUMNA SIDE (Derecha, más angosta) -->
-                <div class="col-side">
-                    
-                    <!-- CALENDARIO -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title"><i data-lucide="calendar"></i> Calendario</h2>
-                        </div>
-                        <div>
-                            <div class="calendar-header">
-                                <span class="calendar-title" id="cal-month-year">Mayo 2026</span>
-                                <div style="display: flex; gap: 4px;">
-                                    <button class="btn-icon" id="cal-prev" title="Anterior"><i data-lucide="chevron-left" size="18"></i></button>
-                                    <button class="btn-icon" id="cal-next" title="Siguiente"><i data-lucide="chevron-right" size="18"></i></button>
+                            <div>
+                                <div class="calendar-header">
+                                    <span class="calendar-title" id="cal-month-year">Mayo 2026</span>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button class="btn-icon" id="cal-prev" title="Anterior"><i data-lucide="chevron-left" size="18"></i></button>
+                                        <button class="btn-icon" id="cal-next" title="Siguiente"><i data-lucide="chevron-right" size="18"></i></button>
+                                    </div>
                                 </div>
+                                <div class="calendar-grid">
+                                    <div class="calendar-day-name">Do</div><div class="calendar-day-name">Lu</div>
+                                    <div class="calendar-day-name">Ma</div><div class="calendar-day-name">Mi</div>
+                                    <div class="calendar-day-name">Ju</div><div class="calendar-day-name">Vi</div>
+                                    <div class="calendar-day-name">Sa</div>
+                                </div>
+                                <div class="calendar-grid" id="calendar-days-grid"></div>
                             </div>
-                            <div class="calendar-grid">
-                                <div class="calendar-day-name">Do</div><div class="calendar-day-name">Lu</div>
-                                <div class="calendar-day-name">Ma</div><div class="calendar-day-name">Mi</div>
-                                <div class="calendar-day-name">Ju</div><div class="calendar-day-name">Vi</div>
-                                <div class="calendar-day-name">Sa</div>
-                            </div>
-                            <div class="calendar-grid" id="calendar-days-grid"></div>
                         </div>
+                        
                     </div>
-
-                    <!-- ENLACES INTERNOS (Talento Impulsa) -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title"><i data-lucide="link"></i> Enlaces Propios</h2>
-                            <button class="btn-icon" onclick="openEntryModal('tab-interno', false)"><i data-lucide="plus" size="16"></i></button>
-                        </div>
-                        <div id="firebase-internal-links" style="display: flex; flex-direction: column;">
-                            <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces.</div>
-                        </div>
-                    </div>
-
                 </div>
-
             </div>
+
+            <!-- 2. VISTA: MARKETING -->
+            <div id="view-marketing" class="view-section">
+                <div class="card" id="marketing">
+                    <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                        <div style="display: flex; align-items: center; gap: var(--space-3);">
+                            <h2 class="card-title" style="color: #BE185D;"><i data-lucide="megaphone"></i> Estrategia de Marketing</h2>
+                        </div>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-marketing', false)"><i data-lucide="plus" size="16"></i> Nueva Pieza</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;"></th>
+                                    <th style="width: 120px;">Fecha</th>
+                                    <th>Pieza & Copy / Detalle</th>
+                                    <th style="width: 220px;">Status Visual</th>
+                                    <th style="width: 70px; text-align: center;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="firebase-marketing-list">
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. VISTA: PROYECTOS -->
+            <div id="view-proyectos" class="view-section">
+                <div class="card" id="proyectos">
+                    <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                        <div style="display: flex; align-items: center; gap: var(--space-3);">
+                            <h2 class="card-title"><i data-lucide="kanban"></i> Tablero de Proyectos</h2>
+                        </div>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto', false)"><i data-lucide="plus" size="16"></i> Nuevo Proyecto</button>
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:30px;"></th>
+                                    <th>Proyecto & Detalles</th>
+                                    <th style="width: 130px; text-align: center;">Estado (Bitácora)</th>
+                                    <th style="width: 130px;">Progreso Global</th>
+                                    <th style="width: 70px; text-align: center;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="firebase-projects-list">
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. VISTA: CLIENTES -->
+            <div id="view-clientes" class="view-section">
+                <div class="card" id="clientes">
+                    <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                        <h2 class="card-title"><i data-lucide="users"></i> Base de Clientes</h2>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-cliente', false)"><i data-lucide="plus" size="16"></i> Nuevo Cliente</button>
+                    </div>
+                    <div class="data-list" id="firebase-clients-list"></div>
+                </div>
+            </div>
+
+            <!-- 5. VISTA: RECURSOS -->
+            <div id="view-recursos" class="view-section">
+                <div class="card" id="recursos">
+                    <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
+                        <h2 class="card-title"><i data-lucide="cloud"></i> Repositorio General</h2>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-recurso', false)"><i data-lucide="plus" size="16"></i> Subir Recurso</button>
+                    </div>
+                    <div class="data-list" id="firebase-links-list"></div>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- TOAST NOTIFICACIÓN -->
-    <div id="toast-notification" style="position: fixed; bottom: 20px; right: 20px; background: #D1E7DD; color: #0F5132; padding: 12px 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); transform: translateY(100px); opacity: 0; transition: all 0.3s var(--ease-standard); z-index: 10000; display: flex; align-items: center; gap: 8px; border: 1px solid #BADBCC; pointer-events: none;">
-        <i data-lucide="check-circle" size="18"></i> <span id="toast-message" style="font-weight: 600; font-size: var(--text-sm);">Guardado</span>
-    </div>
-
     <!-- ==========================================
-         LÓGICA DE LA APLICACIÓN
+         LÓGICA DE LA APLICACIÓN JAVASCRIPT
          ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -816,14 +825,13 @@
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE SEGURA
+        // --- ESTADO GLOBAL ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
         let localUser = null;
         
-        // ESTADO GLOBAL EN MEMORIA
-        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [];
+        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [];
         let unsubscribers = [];
         
         // IDs para saber si creamos o editamos
@@ -833,8 +841,9 @@
         let idInternoEnEdicion = null;
         let idNotaEnEdicion = null;
         let idMarketingEnEdicion = null;
+        let currentSummaryProjectId = null; 
 
-        // --- SISTEMA INTELIGENTE DE ERRORES ---
+        // --- SISTEMA DE TOASTS & ERRORES ---
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             if(!toast) return;
@@ -854,168 +863,22 @@
         };
 
         window.handleFirebaseError = (err) => {
-            console.error("Firebase Error detallado:", err);
+            console.error("Firebase Error:", err);
             let msg = '❌ Error: ' + (err.message || 'Desconocido');
             if (err.code === 'permission-denied') msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
             else if (err.code === 'auth/unauthorized-domain') msg = '⚠️ Dominio bloqueado: Autoriza la URL en Firebase Auth.';
-            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
-            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
+            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita "Anónimo" en Firebase.';
+            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet.';
             window.showErrorToast(msg);
         };
 
-        // --- LÓGICA DE COLORES (Usuarios, Marketing y Etiquetas) ---
-        const userColors = {
-            'Soledad': { bg: '#FCE7F3', text: '#BE185D' }, // Rosa
-            'Gabriel': { bg: '#E0F2FE', text: '#0369A1' }, // Azul
-            'default': { bg: 'var(--brand-primary)', text: '#FFFFFF' }
-        };
-        
-        function getUserColor(userName) {
-            return userColors[userName] || userColors['default'];
-        }
-
-        const mktColors = {
-            'Reel': { bg: '#FCE7F3', text: '#DB2777', border: '#FBCFE8' },
-            'Post': { bg: '#DBEAFE', text: '#2563EB', border: '#BFDBFE' },
-            'Story': { bg: '#FEF3C7', text: '#D97706', border: '#FDE68A' },
-            'Carrusel': { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' },
-            'WhatsApp': { bg: '#DCFCE7', text: '#16A34A', border: '#BBF7D0' },
-            'Otro': { bg: '#F3F4F6', text: '#4B5563', border: '#E5E7EB' }
-        };
-
-        function getMktColor(type) {
-            return mktColors[type] || mktColors['Otro'];
-        }
-
-        function getColorForString(str) {
-            const colors = [
-                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' },
-                { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
-                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' },
-                { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
-                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' },
-                { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
-                { bg: '#CCFBF1', text: '#0F766E', border: '#99F6E4' } 
-            ];
-            if(!str || str === 'General' || str.trim() === '') return { bg: '#EFE9DB', text: '#684B45', border: '#D6CDB8' };
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            return colors[Math.abs(hash) % colors.length];
-        }
-
-        try {
-            const miConfiguracionFirebase = {
-                apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
-                authDomain: "talento-impulsa.firebaseapp.com",
-                projectId: "talento-impulsa",
-                storageBucket: "talento-impulsa.firebasestorage.app",
-                messagingSenderId: "634847680772",
-                appId: "1:634847680772:web:fe093eab8b12dbaea5d851"
-            };
-
-            const firebaseConfig = typeof __firebase_config !== 'undefined' 
-                ? JSON.parse(__firebase_config) 
-                : miConfiguracionFirebase;
-            
-            if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId !== "TU_PROJECT_ID") {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-
-                const initFirebaseAuth = async () => {
-                    try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
-                        else await signInAnonymously(auth);
-                    } catch (err) { window.handleFirebaseError(err); }
-                };
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) { firebaseUser = user; if (localUser) startRealtimeListeners(); } 
-                    else { firebaseUser = null; }
-                });
-
-                initFirebaseAuth();
-            } else { console.warn("Faltan credenciales de Firebase."); }
-        } catch (error) { console.error("Error al iniciar Firebase:", error); }
-
-        // 2. LÓGICA DE UX: MENU Y LOGIN
-        const toggleSidebar = () => {
-            const sb = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            if(sb) sb.classList.toggle('open');
-            if(overlay) overlay.classList.toggle('active');
-        };
-        const btnOpen = document.getElementById('btn-open-sidebar');
-        const btnClose = document.getElementById('btn-close-sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
-        if(btnOpen) btnOpen.addEventListener('click', toggleSidebar);
-        if(btnClose) btnClose.addEventListener('click', toggleSidebar);
-        if(overlay) overlay.addEventListener('click', toggleSidebar);
-
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => { if (window.innerWidth <= 1024) toggleSidebar(); });
-        });
-
-        const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
-        
-        const loginForm = document.getElementById('login-form');
-        if (loginForm) {
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const user = document.getElementById('user-select').value;
-                const pass = document.getElementById('password-input').value;
-
-                if (credentials[user] === pass) {
-                    if (!firebaseUser && auth) {
-                        try { await signInAnonymously(auth); } 
-                        catch (err) { window.handleFirebaseError(err); return; }
-                    }
-
-                    localUser = user;
-                    document.getElementById('login-error').style.display = 'none';
-                    document.getElementById('login-overlay').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('login-overlay').style.display = 'none';
-                        const appLayout = document.getElementById('app-layout');
-                        if(appLayout) appLayout.style.display = 'block';
-                        initDashboardUI();
-                        initCalendar();
-                        if (firebaseUser) startRealtimeListeners();
-                    }, 300);
-                } else {
-                    const errEl = document.getElementById('login-error');
-                    if(errEl) { errEl.textContent = "Contraseña incorrecta. (Usa sole123 o gaby123)"; errEl.style.display = 'block'; }
-                }
-            });
-        }
-
-        const handleLogout = () => {
-            localUser = null;
-            unsubscribers.forEach(unsub => unsub());
-            unsubscribers = [];
-            const appLayout = document.getElementById('app-layout');
-            if(appLayout) appLayout.style.display = 'none';
-            const loginOverlay = document.getElementById('login-overlay');
-            if(loginOverlay) {
-                loginOverlay.style.display = 'flex';
-                setTimeout(() => loginOverlay.style.opacity = '1', 50);
-            }
-            const passInput = document.getElementById('password-input');
-            if(passInput) passInput.value = '';
-        };
-
-        if(document.getElementById('btn-logout-top')) document.getElementById('btn-logout-top').addEventListener('click', handleLogout);
-
-        // --- Lógica de Modales ---
+        // --- FUNCIONES DE MODALES GLOBALES ---
         window.openEntryModal = (tabId, isEditing = false) => {
             if (!isEditing) {
                 idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null;
                 
-                const formP = document.getElementById('form-add-project'); if(formP) formP.reset();
-                const formC = document.getElementById('form-add-client'); if(formC) formC.reset();
-                const formL = document.getElementById('form-add-link'); if(formL) formL.reset();
-                const formI = document.getElementById('form-add-internal'); if(formI) formI.reset();
-                const formM = document.getElementById('form-add-marketing'); if(formM) formM.reset();
+                const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing'];
+                forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
                 
                 const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Nuevo Registro';
                 const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
@@ -1049,11 +912,8 @@
 
         window.switchTab = (tabId) => {
             const formIdMap = { 
-                'tab-proyecto': 'form-add-project', 
-                'tab-cliente': 'form-add-client', 
-                'tab-recurso': 'form-add-link', 
-                'tab-interno': 'form-add-internal',
-                'tab-marketing': 'form-add-marketing'
+                'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
+                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing'
             };
             document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
@@ -1071,15 +931,165 @@
             const modalEl = document.getElementById('summary-modal');
             if(modalEl) modalEl.style.transform = 'translateY(20px)';
             setTimeout(() => modal.style.display = 'none', 300);
+            currentSummaryProjectId = null;
         };
 
-        // --- LÓGICA DE DRAG & DROP (SORTABLE) ---
+        // --- LÓGICA DE NAVEGACIÓN SPA ---
+        window.navigateTo = (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
+            const targetView = document.getElementById('view-' + viewId);
+            if(targetView) { targetView.classList.add('active'); targetView.style.display = 'block'; }
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            const targetNav = document.querySelector(`.nav-item[data-view="${viewId}"]`);
+            if(targetNav) targetNav.classList.add('active');
+            if (window.innerWidth <= 1024) toggleSidebar();
+        }
+
+        // --- LÓGICA DE COLORES & BADGES ---
+        const userColors = {
+            'Soledad': { bg: '#FCE7F3', text: '#BE185D' },
+            'Gabriel': { bg: '#E0F2FE', text: '#0369A1' },
+            'default': { bg: 'var(--brand-primary)', text: '#FFFFFF' }
+        };
+        function getUserColor(userName) { return userColors[userName] || userColors['default']; }
+
+        const mktColors = {
+            'Reel': { bg: '#FCE7F3', text: '#DB2777', border: '#FBCFE8' },
+            'Post': { bg: '#DBEAFE', text: '#2563EB', border: '#BFDBFE' },
+            'Story': { bg: '#FEF3C7', text: '#D97706', border: '#FDE68A' },
+            'Carrusel': { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' },
+            'WhatsApp': { bg: '#DCFCE7', text: '#16A34A', border: '#BBF7D0' },
+            'Otro': { bg: '#F3F4F6', text: '#4B5563', border: '#E5E7EB' }
+        };
+        function getMktColor(type) { return mktColors[type] || mktColors['Otro']; }
+
+        function getColorForString(str) {
+            const colors = [
+                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' }, { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
+                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' }, { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
+                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' }, { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
+                { bg: '#CCFBF1', text: '#0F766E', border: '#99F6E4' } 
+            ];
+            if(!str || str === 'General' || str.trim() === '') return { bg: '#EFE9DB', text: '#684B45', border: '#D6CDB8' };
+            let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        function getBitacoraBadge(status) {
+            const styles = {
+                'Trabajando': 'background: #CFE2FF; color: #084298; border: 1px solid #B6D4FE;',
+                'Pendiente': 'background: #EFE9DB; color: #684B45; border: 1px solid #D6CDB8;',
+                'A confirmar': 'background: #FFF3CD; color: #664D03; border: 1px solid #FFECB5;',
+                'Resuelto': 'background: #D1E7DD; color: #0F5132; border: 1px solid #BADBCC;',
+                'Bloqueado': 'background: #F8D7DA; color: #842029; border: 1px solid #F5C2C7;',
+                'Nuevo': 'background: #F8F9FA; color: #495057; border: 1px solid #DEE2E6;'
+            };
+            const s = styles[status] || styles['Nuevo'];
+            return `<span class="badge" style="${s}">${status}</span>`;
+        }
+
+        // --- INICIALIZACIÓN DE FIREBASE ---
+        try {
+            const miConfiguracionFirebase = {
+                apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
+                authDomain: "talento-impulsa.firebaseapp.com",
+                projectId: "talento-impulsa",
+                storageBucket: "talento-impulsa.firebasestorage.app",
+                messagingSenderId: "634847680772",
+                appId: "1:634847680772:web:fe093eab8b12dbaea5d851"
+            };
+
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : miConfiguracionFirebase;
+            
+            if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId !== "TU_PROJECT_ID") {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                const initFirebaseAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+                        else await signInAnonymously(auth);
+                    } catch (err) { window.handleFirebaseError(err); }
+                };
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) { firebaseUser = user; if (localUser) startRealtimeListeners(); } 
+                    else { firebaseUser = null; }
+                });
+
+                initFirebaseAuth();
+            } else { console.warn("Faltan credenciales de Firebase."); }
+        } catch (error) { console.error("Error al iniciar Firebase:", error); }
+
+        // --- FUNCIONES DE NAVEGACIÓN LATERAL / LOGIN ---
+        const toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            if(sb) sb.classList.toggle('open');
+            if(overlay) overlay.classList.toggle('active');
+        };
+        const btnOpen = document.getElementById('btn-open-sidebar');
+        const btnClose = document.getElementById('btn-close-sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        if(btnOpen) btnOpen.addEventListener('click', toggleSidebar);
+        if(btnClose) btnClose.addEventListener('click', toggleSidebar);
+        if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
+        
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const user = document.getElementById('user-select').value;
+                const pass = document.getElementById('password-input').value;
+
+                if (credentials[user] === pass) {
+                    if (!firebaseUser && auth) {
+                        try { await signInAnonymously(auth); } 
+                        catch (err) { window.handleFirebaseError(err); return; }
+                    }
+
+                    localUser = user;
+                    document.getElementById('login-error').style.display = 'none';
+                    document.getElementById('login-overlay').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('login-overlay').style.display = 'none';
+                        const appLayout = document.getElementById('app-layout');
+                        if(appLayout) appLayout.style.display = 'block';
+                        initDashboardUI();
+                        initCalendar();
+                        if (firebaseUser) startRealtimeListeners();
+                        navigateTo('inicio'); 
+                    }, 300);
+                } else {
+                    const errEl = document.getElementById('login-error');
+                    if(errEl) { errEl.textContent = "Contraseña incorrecta. (Usa sole123 o gaby123)"; errEl.style.display = 'block'; }
+                }
+            });
+        }
+
+        const handleLogout = () => {
+            localUser = null;
+            unsubscribers.forEach(unsub => unsub());
+            unsubscribers = [];
+            const appLayout = document.getElementById('app-layout');
+            if(appLayout) appLayout.style.display = 'none';
+            const loginOverlay = document.getElementById('login-overlay');
+            if(loginOverlay) { loginOverlay.style.display = 'flex'; setTimeout(() => loginOverlay.style.opacity = '1', 50); }
+            const passInput = document.getElementById('password-input');
+            if(passInput) passInput.value = '';
+        };
+
+        if(document.getElementById('btn-logout-top')) document.getElementById('btn-logout-top').addEventListener('click', handleLogout);
+
+        // --- SORTABLE ---
         function initSortable(containerId, collectionName) {
             const el = document.getElementById(containerId);
             if (!el) return;
-            
             if (el._sortable) el._sortable.destroy(); 
-
             el._sortable = Sortable.create(el, {
                 handle: '.drag-handle',
                 animation: 150,
@@ -1103,19 +1113,17 @@
                     itemEl.setAttribute('data-order', newOrder);
 
                     if (!db) return;
-                    try {
-                        await updateDoc(doc(db, "artifacts", appId, "public", "data", collectionName, docId), { order: newOrder });
-                    } catch (err) { window.handleFirebaseError(err); }
+                    try { await updateDoc(doc(db, "artifacts", appId, "public", "data", collectionName, docId), { order: newOrder }); } 
+                    catch (err) { window.handleFirebaseError(err); }
                 }
             });
         }
 
-        // --- LÓGICA DE EDICIÓN ---
+        // --- LÓGICA DE EDICIÓN GLOBAL ---
         window.editarMarketing = (mktId) => {
             const m = allMarketing.find(x => x.id === mktId);
             if(!m) return;
             idMarketingEnEdicion = mktId;
-            
             document.getElementById('mkt-date').value = m.date || '';
             document.getElementById('mkt-type').value = m.type || 'Post';
             document.getElementById('mkt-detail').value = m.detail || '';
@@ -1130,14 +1138,8 @@
 
         window.toggleMarketingStatus = async (mktId, field, newValue) => {
             if (!db || !firebaseUser) return;
-            try {
-                // Actualiza en tiempo real al hacer clic en la pastilla del dashboard
-                await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", mktId), { 
-                    [field]: newValue,
-                    lastUpdatedBy: localUser, 
-                    lastUpdatedAt: Date.now()
-                });
-            } catch (err) { window.handleFirebaseError(err); }
+            try { await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", mktId), { [field]: newValue, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() }); } 
+            catch (err) { window.handleFirebaseError(err); }
         };
 
         window.editarProyecto = (projectId) => {
@@ -1147,11 +1149,7 @@
             
             document.getElementById('proj-name').value = p.name || '';
             document.getElementById('proj-client').value = p.client || '';
-            document.getElementById('proj-status').value = p.status || 'active';
             document.getElementById('proj-progress').value = p.progress || 0;
-            document.getElementById('proj-kickoff').value = p.dates?.kickoff || '';
-            document.getElementById('proj-review').value = p.dates?.review || '';
-            document.getElementById('proj-delivery').value = p.dates?.delivery || '';
             document.getElementById('proj-notes').value = p.notes || '';
 
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Proyecto';
@@ -1164,7 +1162,6 @@
             const c = allClients.find(x => x.id === clientId);
             if(!c) return;
             idClienteEnEdicion = clientId;
-            
             document.getElementById('client-company').value = c.company || '';
             document.getElementById('client-name').value = c.name || '';
             document.getElementById('client-email').value = c.email || '';
@@ -1181,7 +1178,6 @@
             const l = allLinks.find(x => x.id === linkId);
             if(!l) return;
             idRecursoEnEdicion = linkId;
-            
             document.getElementById('link-relation').value = l.relationId || '';
             document.getElementById('link-type').value = l.type || 'enlace';
             document.getElementById('link-title').value = l.title || '';
@@ -1197,7 +1193,6 @@
             const i = allInternalLinks.find(x => x.id === internalId);
             if(!i) return;
             idInternoEnEdicion = internalId;
-            
             document.getElementById('internal-type').value = i.type || 'otro';
             document.getElementById('internal-title').value = i.title || '';
             document.getElementById('internal-url').value = i.url || '';
@@ -1212,302 +1207,24 @@
             const n = allNotes.find(x => x.id === noteId);
             if(!n) return;
             idNotaEnEdicion = noteId;
-            
             window.closeSummaryModal(); 
-            
+            navigateTo('inicio'); 
             const input = document.getElementById('note-input');
             const select = document.getElementById('note-relation');
-            
             if(input) { input.value = n.text; input.focus(); }
             if(select) select.value = n.relationId || '';
-            
             window.showToast('Editando mensaje...');
         };
 
-        // 3. BASE DE DATOS FIREBASE
-        function startRealtimeListeners() {
-            if (!firebaseUser || !db) return;
-            
-            // Marketing
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'marketing')), (snapshot) => {
-                allMarketing = []; snapshot.forEach(doc => allMarketing.push({ id: doc.id, ...doc.data() }));
-                allMarketing.sort((a, b) => {
-                    const oA = a.order !== undefined ? a.order : -a.createdAt;
-                    const oB = b.order !== undefined ? b.order : -b.createdAt;
-                    return oA - oB;
-                });
-                renderMarketing(allMarketing);
-            }));
-
-            // Proyectos
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
-                allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
-                allProjects.sort((a, b) => {
-                    const oA = a.order !== undefined ? a.order : -a.createdAt;
-                    const oB = b.order !== undefined ? b.order : -b.createdAt;
-                    return oA - oB;
-                });
-                renderProjects(allProjects); updateDropdowns();
-            }));
-
-            // Clientes
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'clientes')), (snapshot) => {
-                allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
-                allClients.sort((a, b) => {
-                    const oA = a.order !== undefined ? a.order : -a.createdAt;
-                    const oB = b.order !== undefined ? b.order : -b.createdAt;
-                    return oA - oB;
-                });
-                renderClients(allClients); updateDropdowns();
-            }));
-
-            // Recursos
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos')), (snapshot) => {
-                allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
-                allLinks.sort((a, b) => b.createdAt - a.createdAt);
-                renderLinks(allLinks);
-            }));
-
-            // Notas
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
-                allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
-                allNotes.sort((a, b) => a.createdAt - b.createdAt); // Orden cronológico para el chat
-                renderNotes(allNotes);
-            }));
-
-            // Enlaces Internos
-            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
-                allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
-                allInternalLinks.sort((a, b) => {
-                    const oA = a.order !== undefined ? a.order : -a.createdAt;
-                    const oB = b.order !== undefined ? b.order : -b.createdAt;
-                    return oA - oB;
-                });
-                renderInternalLinks(allInternalLinks);
-            }));
-        }
-
-        function updateDropdowns() {
-            let optionsHTML = '<option value="">Ninguno / General</option>';
-            if(allProjects.length > 0) {
-                optionsHTML += '<optgroup label="Proyectos">';
-                allProjects.forEach(p => optionsHTML += `<option value="P_${p.id}">${p.name}</option>`);
-                optionsHTML += '</optgroup>';
-            }
-            if(allClients.length > 0) {
-                optionsHTML += '<optgroup label="Clientes">';
-                allClients.forEach(c => optionsHTML += `<option value="C_${c.id}">${c.company} (${c.name})</option>`);
-                optionsHTML += '</optgroup>';
-            }
-
-            const linkSelect = document.getElementById('link-relation');
-            const noteSelect = document.getElementById('note-relation');
-            if(linkSelect) linkSelect.innerHTML = optionsHTML;
-            if(noteSelect) noteSelect.innerHTML = optionsHTML;
-
-            const projClientSelect = document.getElementById('proj-client');
-            let clientOptions = '<option value="">Ninguno / Proyecto Personal</option>';
-            allClients.forEach(c => clientOptions += `<option value="${c.company}">${c.company}</option>`);
-            if(projClientSelect) projClientSelect.innerHTML = clientOptions;
-        }
-
-        function getRelationName(relationId) {
-            if(!relationId) return 'General';
-            const [type, id] = relationId.split('_');
-            if(type === 'P') { const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido'; }
-            if(type === 'C') { const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido'; }
-            return 'General';
-        }
-
-        // BUSCADOR GLOBAL
-        const searchInput = document.getElementById('global-search');
-        const searchResults = document.getElementById('search-results');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                const queryText = e.target.value.toLowerCase().trim();
-                if(!queryText) { searchResults.style.display = 'none'; return; }
-
-                const matchedProjects = allProjects.filter(p => p.name.toLowerCase().includes(queryText));
-                const matchedClients = allClients.filter(c => c.company.toLowerCase().includes(queryText) || c.name.toLowerCase().includes(queryText));
-
-                if(matchedProjects.length === 0 && matchedClients.length === 0) {
-                    searchResults.innerHTML = '<div style="padding: 12px; color: var(--text-dim); text-align: center; font-size: 0.8rem;">Sin resultados</div>';
-                } else {
-                    let html = '';
-                    matchedProjects.forEach(p => {
-                        html += `<div class="search-result-item" onclick="openSummary('P_${p.id}')">
-                                    <span class="search-result-title">${p.name}</span>
-                                    <span class="search-result-meta"><span class="badge info">Proyecto</span></span>
-                                 </div>`;
-                    });
-                    matchedClients.forEach(c => {
-                        html += `<div class="search-result-item" onclick="openSummary('C_${c.id}')">
-                                    <span class="search-result-title">${c.company}</span>
-                                    <span class="search-result-meta"><span class="badge info" style="background:#EFE9DB; color:#684B45;">Cliente</span> Contacto: ${c.name}</span>
-                                 </div>`;
-                    });
-                    searchResults.innerHTML = html;
-                }
-                searchResults.style.display = 'block';
-            });
-        }
-
-        document.addEventListener('click', (e) => {
-            if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
-        });
-
-        // ABRIR FICHA DE RESUMEN 360° (INFO SINCRONIZADA)
-        window.openSummary = (relationId) => {
-            if (searchResults) searchResults.style.display = 'none';
-            if (searchInput) searchInput.value = '';
-
-            const [type, id] = relationId.split('_');
-            let entityName = '', entityBadge = '', entityNotes = '';
-            
-            const clientInfoContainer = document.getElementById('summary-client-info-container');
-            const projectsListContainer = document.getElementById('summary-projects-list-container');
-            clientInfoContainer.style.display = 'none';
-            projectsListContainer.style.display = 'none';
-
-            if(type === 'P') {
-                const p = allProjects.find(x => x.id === id);
-                if(p) { 
-                    entityName = p.name; 
-                    entityBadge = 'Proyecto'; 
-                    entityNotes = p.notes || ''; 
-
-                    if (p.client) {
-                        const c = allClients.find(x => x.company === p.client);
-                        if (c) {
-                            clientInfoContainer.innerHTML = `
-                                <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 4px;">Cliente Asociado</h3>
-                                <div style="font-weight: 600; color: var(--text);">${c.company}</div>
-                                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">
-                                    ${c.name ? `<span style="display:inline-block; margin-right:8px;"><i data-lucide="user" size="12" style="display:inline;"></i> ${c.name}</span>` : ''}
-                                    ${c.email ? `<span style="display:inline-block; margin-right:8px;"><i data-lucide="mail" size="12" style="display:inline;"></i> ${c.email}</span>` : ''}
-                                    ${c.phone ? `<span style="display:inline-block;"><i data-lucide="phone" size="12" style="display:inline;"></i> ${c.phone}</span>` : ''}
-                                </div>
-                            `;
-                            clientInfoContainer.style.display = 'block';
-                        }
-                    }
-                }
-            } else {
-                const c = allClients.find(x => x.id === id);
-                if(c) { 
-                    entityName = c.company; 
-                    entityBadge = 'Cliente'; 
-                    
-                    const relatedProjects = allProjects.filter(p => p.client === c.company);
-                    if(relatedProjects.length > 0) {
-                        let projListHtml = `<h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 8px;">Proyectos Activos</h3><ul style="list-style:none; padding:0; margin:0; font-size: 0.85rem;">`;
-                        relatedProjects.forEach(rp => {
-                            const progColor = rp.progress == 100 ? 'text-green-600' : 'text-brand-primary';
-                            projListHtml += `<li style="padding: 4px 0; border-bottom: 1px dashed var(--border-light); display: flex; justify-content: space-between;">
-                                <span>${rp.name}</span>
-                                <strong style="color: var(--brand-primary);">${rp.progress}%</strong>
-                            </li>`;
-                        });
-                        projListHtml += '</ul>';
-                        projectsListContainer.innerHTML = projListHtml;
-                        projectsListContainer.style.display = 'block';
-                    }
-                }
-            }
-
-            const summaryTitle = document.getElementById('summary-title');
-            if (summaryTitle) {
-                const btnEditHtml = `<button class="btn-icon" style="margin-left: 8px; color: var(--brand-primary);" onclick="closeSummaryModal(); ${type === 'P' ? `editarProyecto('${id}')` : `editarCliente('${id}')`}" title="Editar Info"><i data-lucide="pencil" size="18"></i></button>`;
-                summaryTitle.innerHTML = `${entityName} ${btnEditHtml}`;
-            }
-            
-            const summaryBadge = document.getElementById('summary-badge');
-            if (summaryBadge) {
-                summaryBadge.textContent = entityBadge;
-                if(type === 'C') {
-                    summaryBadge.style.background = '#EFE9DB'; summaryBadge.style.color = '#684B45';
-                } else {
-                    summaryBadge.style.background = '#CFE2FF'; summaryBadge.style.color = '#084298';
-                }
-            }
-
-            const internalNotesContainer = document.getElementById('summary-internal-notes-container');
-            const internalNotesText = document.getElementById('summary-internal-notes-text');
-            if (internalNotesContainer && internalNotesText) {
-                if (entityNotes.trim() !== '') {
-                    internalNotesText.textContent = entityNotes;
-                    internalNotesContainer.style.display = 'flex';
-                } else {
-                    internalNotesContainer.style.display = 'none';
-                }
-            }
-
-            const filteredLinks = allLinks.filter(l => l.relationId === relationId);
-            const filteredNotes = allNotes.filter(n => n.relationId === relationId);
-
-            const linksContainer = document.getElementById('summary-links-list');
-            if (linksContainer) {
-                if(filteredLinks.length === 0) linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
-                else {
-                    linksContainer.innerHTML = '';
-                    filteredLinks.forEach(link => {
-                        const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
-                        div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir</a></div></div>`;
-                        linksContainer.appendChild(div);
-                    });
-                }
-            }
-
-            const notesContainer = document.getElementById('summary-notes-list');
-            if (notesContainer) {
-                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas de actividad.</div>';
-                else {
-                    notesContainer.innerHTML = '';
-                    filteredNotes.forEach(note => {
-                        const dateFormatted = new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'});
-                        const uColor = getUserColor(note.addedBy);
-                        const isMe = note.addedBy === localUser;
-                        
-                        const div = document.createElement('div'); 
-                        div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
-                        div.innerHTML = `
-                            <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
-                                ${note.addedBy.charAt(0).toUpperCase()}
-                            </div>
-                            <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; flex-grow: 1; position: relative; max-width: 90%;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                    <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${note.addedBy}</span>
-                                    <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
-                                </div>
-                                <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text}</p>
-                                
-                                ${isMe ? `
-                                <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
-                                    <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor: pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
-                                    <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor: pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `;
-                        notesContainer.appendChild(div);
-                    });
-                }
-            }
-
-            lucide.createIcons();
-            const modal = document.getElementById('summary-overlay');
-            if (modal) {
-                modal.style.display = 'flex';
-                setTimeout(() => { 
-                    modal.style.opacity = '1'; 
-                    const summaryModalContent = document.getElementById('summary-modal');
-                    if (summaryModalContent) summaryModalContent.style.transform = 'translateY(0)'; 
-                }, 10);
+        window.deleteDocument = async (collectionName, docId) => {
+            if(!db || !firebaseUser) return;
+            if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado correctamente');} 
+                catch (err) { window.handleFirebaseError(err); }
             }
         };
 
-        // --- Envío de Formularios ---
+        // --- ENVÍO DE FORMULARIOS ---
         
         document.getElementById('form-add-marketing').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1526,12 +1243,11 @@
             try {
                 if (idMarketingEnEdicion) {
                     await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", idMarketingEnEdicion), data);
-                    window.showToast('Pieza actualizada exitosamente');
+                    window.showToast('Pieza actualizada');
                 } else {
-                    data.order = -Date.now(); 
-                    data.addedBy = localUser; data.createdAt = Date.now();
+                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'marketing'), data);
-                    window.showToast('Pieza de marketing guardada');
+                    window.showToast('Pieza guardada');
                 }
                 document.getElementById('form-add-marketing').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
@@ -1545,13 +1261,7 @@
             const data = { 
                 name: document.getElementById('proj-name').value.trim(), 
                 client: document.getElementById('proj-client').value,
-                status: document.getElementById('proj-status').value, 
                 progress: parseInt(document.getElementById('proj-progress').value) || 0, 
-                dates: { 
-                    kickoff: document.getElementById('proj-kickoff').value || null, 
-                    review: document.getElementById('proj-review').value || null, 
-                    delivery: document.getElementById('proj-delivery').value || null
-                },
                 notes: document.getElementById('proj-notes').value.trim() || '',
                 lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
             };
@@ -1559,10 +1269,9 @@
             try {
                 if (idProyectoEnEdicion) {
                     await updateDoc(doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion), data);
-                    window.showToast('Proyecto actualizado exitosamente');
+                    window.showToast('Proyecto actualizado');
                 } else {
-                    data.order = -Date.now(); 
-                    data.addedBy = localUser; data.createdAt = Date.now();
+                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), data);
                     window.showToast('Proyecto guardado');
                 }
@@ -1589,8 +1298,7 @@
                     await updateDoc(doc(db, "artifacts", appId, "public", "data", "clientes", idClienteEnEdicion), data);
                     window.showToast('Cliente actualizado');
                 } else {
-                    data.order = -Date.now();
-                    data.addedBy = localUser; data.createdAt = Date.now();
+                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), data);
                     window.showToast('Cliente registrado');
                 }
@@ -1605,11 +1313,8 @@
             
             const relationId = document.getElementById('link-relation').value;
             const data = { 
-                relationId: relationId,
-                relationName: getRelationName(relationId),
-                type: document.getElementById('link-type').value, 
-                title: document.getElementById('link-title').value.trim(), 
-                url: document.getElementById('link-url').value.trim(), 
+                relationId: relationId, relationName: getRelationName(relationId),
+                type: document.getElementById('link-type').value, title: document.getElementById('link-title').value.trim(), url: document.getElementById('link-url').value.trim(), 
                 lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
             };
 
@@ -1632,9 +1337,7 @@
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
             
             const data = { 
-                type: document.getElementById('internal-type').value, 
-                title: document.getElementById('internal-title').value.trim(), 
-                url: document.getElementById('internal-url').value.trim(), 
+                type: document.getElementById('internal-type').value, title: document.getElementById('internal-title').value.trim(), url: document.getElementById('internal-url').value.trim(), 
                 lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
             };
 
@@ -1643,8 +1346,7 @@
                     await updateDoc(doc(db, "artifacts", appId, "public", "data", "enlaces_internos", idInternoEnEdicion), data);
                     window.showToast('Enlace actualizado');
                 } else {
-                    data.order = -Date.now();
-                    data.addedBy = localUser; data.createdAt = Date.now();
+                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
                     await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), data);
                     window.showToast('Enlace interno guardado');
                 }
@@ -1661,49 +1363,233 @@
             try {
                 const relationId = document.getElementById('note-relation').value;
                 if (idNotaEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "notas_compartidas", idNotaEnEdicion), { 
-                        relationId: relationId, text: text, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
-                    });
-                    window.showToast('Nota actualizada');
-                    idNotaEnEdicion = null;
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "notas_compartidas", idNotaEnEdicion), { relationId: relationId, text: text, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                    window.showToast('Nota actualizada'); idNotaEnEdicion = null;
                 } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { 
-                        relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() 
-                    });
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() });
                 }
                 document.getElementById('note-input').value = '';
             } catch (err) { window.handleFirebaseError(err); }
         });
+        
+        document.getElementById('form-add-bitacora').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            if (!currentSummaryProjectId) return;
 
-        window.deleteDocument = async (collectionName, docId) => {
-            if(!db || !firebaseUser) return;
-            if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado correctamente');} 
-                catch (err) { window.handleFirebaseError(err); }
+            const data = {
+                projectId: currentSummaryProjectId,
+                date: document.getElementById('bit-date').value,
+                detail: document.getElementById('bit-detail').value.trim(),
+                status: document.getElementById('bit-status').value,
+                addedBy: localUser, createdAt: Date.now()
+            };
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras'), data);
+                document.getElementById('bit-detail').value = '';
+                window.showToast('Registro guardado');
+            } catch (err) { window.handleFirebaseError(err); }
+        });
+
+        // --- LISTENERS EN TIEMPO REAL ---
+        function startRealtimeListeners() {
+            if (!firebaseUser || !db) return;
+            
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras')), (snapshot) => {
+                allBitacoras = []; snapshot.forEach(doc => allBitacoras.push({ id: doc.id, ...doc.data() }));
+                renderProjects(allProjects);
+                if(currentSummaryProjectId) renderSummaryBitacora(currentSummaryProjectId);
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'marketing')), (snapshot) => {
+                allMarketing = []; snapshot.forEach(doc => allMarketing.push({ id: doc.id, ...doc.data() }));
+                allMarketing.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
+                renderMarketing(allMarketing);
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
+                allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
+                allProjects.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
+                renderProjects(allProjects); updateDropdowns();
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'clientes')), (snapshot) => {
+                allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
+                allClients.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
+                renderClients(allClients); updateDropdowns();
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos')), (snapshot) => {
+                allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
+                allLinks.sort((a, b) => b.createdAt - a.createdAt);
+                renderLinks(allLinks);
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
+                allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
+                allNotes.sort((a, b) => a.createdAt - b.createdAt); 
+                renderNotes(allNotes);
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
+                allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
+                allInternalLinks.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
+                renderInternalLinks(allInternalLinks);
+            }));
+        }
+
+        function updateDropdowns() {
+            let optionsHTML = '<option value="">Ninguno / General</option>';
+            if(allProjects.length > 0) {
+                optionsHTML += '<optgroup label="Proyectos">';
+                allProjects.forEach(p => optionsHTML += `<option value="P_${p.id}">${p.name}</option>`);
+                optionsHTML += '</optgroup>';
+            }
+            if(allClients.length > 0) {
+                optionsHTML += '<optgroup label="Clientes">';
+                allClients.forEach(c => optionsHTML += `<option value="C_${c.id}">${c.company} (${c.name})</option>`);
+                optionsHTML += '</optgroup>';
+            }
+            const linkSelect = document.getElementById('link-relation'); if(linkSelect) linkSelect.innerHTML = optionsHTML;
+            const noteSelect = document.getElementById('note-relation'); if(noteSelect) noteSelect.innerHTML = optionsHTML;
+
+            const projClientSelect = document.getElementById('proj-client');
+            let clientOptions = '<option value="">Ninguno / Proyecto Personal</option>';
+            allClients.forEach(c => clientOptions += `<option value="${c.company}">${c.company}</option>`);
+            if(projClientSelect) projClientSelect.innerHTML = clientOptions;
+        }
+
+        // --- RENDERIZADORES DE TABLAS Y VISTAS ---
+        function renderSummaryBitacora(projectId) {
+            const list = document.getElementById('summary-bitacora-list');
+            if(!list) return;
+            const projBits = allBitacoras.filter(b => b.projectId === projectId).sort((a,b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+            
+            if(projBits.length === 0) { 
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding:10px; font-size: var(--text-sm);">Aún no hay registros en la bitácora.</td></tr>'; 
+                return; 
+            }
+            
+            list.innerHTML = '';
+            projBits.forEach(b => {
+                const badge = getBitacoraBadge(b.status);
+                list.innerHTML += `
+                    <tr style="border-bottom: 1px solid var(--bg); transition: background 0.2s;">
+                        <td style="width: 80px; font-size: 0.75rem; color: var(--text-dim); vertical-align: top; padding: 10px 4px;">${formatStageDate(b.date)}</td>
+                        <td style="font-size: var(--text-sm); vertical-align: top; padding: 10px 4px; color: var(--text);">${b.detail}</td>
+                        <td style="width: 100px; vertical-align: top; padding: 10px 4px; text-align: center;">${badge}</td>
+                        <td style="width: 30px; text-align: right; vertical-align: top; padding: 10px 4px;">
+                            ${b.addedBy === localUser ? `<i data-lucide="trash-2" style="color:var(--alert-danger); cursor:pointer;" size="14" onclick="deleteDocument('bitacoras', '${b.id}')" title="Borrar registro"></i>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            lucide.createIcons();
+        }
+
+        window.openSummary = (relationId) => {
+            const searchResults = document.getElementById('search-results');
+            const searchInput = document.getElementById('global-search');
+            if (searchResults) searchResults.style.display = 'none';
+            if (searchInput) searchInput.value = '';
+
+            const [type, id] = relationId.split('_');
+            let entityName = '', entityBadge = '', entityNotes = '';
+            
+            const clientInfoContainer = document.getElementById('summary-client-info-container');
+            const projectsListContainer = document.getElementById('summary-projects-list-container');
+            const bitacoraContainer = document.getElementById('summary-bitacora-container');
+            clientInfoContainer.style.display = 'none'; projectsListContainer.style.display = 'none'; bitacoraContainer.style.display = 'none';
+            currentSummaryProjectId = null;
+
+            if(type === 'P') {
+                const p = allProjects.find(x => x.id === id);
+                if(p) { 
+                    currentSummaryProjectId = id; entityName = p.name; entityBadge = 'Proyecto'; entityNotes = p.notes || ''; 
+                    if (p.client) {
+                        const c = allClients.find(x => x.company === p.client);
+                        if (c) {
+                            clientInfoContainer.innerHTML = `
+                                <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 4px;">Cliente Asociado</h3>
+                                <div style="font-weight: 600; color: var(--text);">${c.company}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">
+                                    ${c.name ? `<span style="display:inline-block; margin-right:8px;"><i data-lucide="user" size="12" style="display:inline;"></i> ${c.name}</span>` : ''}
+                                    ${c.email ? `<span style="display:inline-block; margin-right:8px;"><i data-lucide="mail" size="12" style="display:inline;"></i> ${c.email}</span>` : ''}
+                                    ${c.phone ? `<span style="display:inline-block;"><i data-lucide="phone" size="12" style="display:inline;"></i> ${c.phone}</span>` : ''}
+                                </div>
+                            `;
+                            clientInfoContainer.style.display = 'block';
+                        }
+                    }
+                    bitacoraContainer.style.display = 'block';
+                    const bitDateInput = document.getElementById('bit-date');
+                    if(bitDateInput) bitDateInput.value = new Date().toISOString().split('T')[0];
+                    renderSummaryBitacora(id);
+                }
+            } else {
+                const c = allClients.find(x => x.id === id);
+                if(c) { 
+                    entityName = c.company; entityBadge = 'Cliente'; 
+                    const relatedProjects = allProjects.filter(p => p.client === c.company);
+                    if(relatedProjects.length > 0) {
+                        let projListHtml = `<h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 8px;">Proyectos Activos</h3><ul style="list-style:none; padding:0; margin:0; font-size: 0.85rem;">`;
+                        relatedProjects.forEach(rp => {
+                            projListHtml += `<li style="padding: 4px 0; border-bottom: 1px dashed var(--border-light); display: flex; justify-content: space-between;">
+                                <span>${rp.name}</span><strong style="color: var(--brand-primary);">${rp.progress}%</strong></li>`;
+                        });
+                        projListHtml += '</ul>';
+                        projectsListContainer.innerHTML = projListHtml; projectsListContainer.style.display = 'block';
+                    }
+                }
+            }
+
+            const summaryTitle = document.getElementById('summary-title');
+            if (summaryTitle) {
+                const btnEditHtml = `<button class="btn-icon" style="margin-left: 8px; color: var(--brand-primary);" onclick="closeSummaryModal(); ${type === 'P' ? `editarProyecto('${id}')` : `editarCliente('${id}')`}" title="Editar Info"><i data-lucide="pencil" size="18"></i></button>`;
+                summaryTitle.innerHTML = `${entityName} ${btnEditHtml}`;
+            }
+            
+            const summaryBadge = document.getElementById('summary-badge');
+            if (summaryBadge) {
+                summaryBadge.textContent = entityBadge;
+                if(type === 'C') { summaryBadge.style.background = '#EFE9DB'; summaryBadge.style.color = '#684B45'; } 
+                else { summaryBadge.style.background = '#CFE2FF'; summaryBadge.style.color = '#084298'; }
+            }
+
+            const internalNotesContainer = document.getElementById('summary-internal-notes-container');
+            const internalNotesText = document.getElementById('summary-internal-notes-text');
+            if (internalNotesContainer && internalNotesText) {
+                if (entityNotes.trim() !== '') { internalNotesText.textContent = entityNotes; internalNotesContainer.style.display = 'block'; } 
+                else { internalNotesContainer.style.display = 'none'; }
+            }
+
+            const filteredLinks = allLinks.filter(l => l.relationId === relationId);
+            const linksContainer = document.getElementById('summary-links-list');
+            if (linksContainer) {
+                if(filteredLinks.length === 0) linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
+                else {
+                    linksContainer.innerHTML = '';
+                    filteredLinks.forEach(link => {
+                        const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
+                        div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir</a></div></div>`;
+                        linksContainer.appendChild(div);
+                    });
+                }
+            }
+
+            lucide.createIcons();
+            const modal = document.getElementById('summary-overlay');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => { modal.style.opacity = '1'; const summaryModalContent = document.getElementById('summary-modal'); if (summaryModalContent) summaryModalContent.style.transform = 'translateY(0)'; }, 10);
             }
         };
-
-        // --- Renderizadores del Dashboard ---
 
         function formatStageDate(dateString) {
             if (!dateString) return '';
             return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
-        }
-
-        function getDeliveryAlertData(dateString, status, progress) {
-            const isCompleted = (status === 'info' || parseInt(progress) === 100);
-            if (isCompleted) return { class: 'success', text: dateString ? `🏁 ${formatStageDate(dateString)} (Terminado)` : '🏁 Terminado' };
-            if (!dateString) return { class: 'neutral', text: '⚪ Sin fecha' };
-
-            const deliveryDate = new Date(dateString + 'T12:00:00');
-            const today = new Date(); today.setHours(0,0,0,0);
-            const diffTime = deliveryDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            const formattedDate = formatStageDate(dateString);
-
-            if (diffDays < 0) return { class: 'danger', text: `🔥 ${formattedDate} (Vencido)` };
-            if (diffDays <= 7) return { class: 'warning', text: `⏳ ${formattedDate} (${diffDays}d)` };
-            return { class: 'neutral', text: `📅 ${formattedDate}` };
         }
 
         function renderMarketing(marketingList) {
@@ -1719,16 +1605,11 @@
                 
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-id', m.id);
-                const sortOrder = m.order !== undefined ? m.order : -m.createdAt;
-                tr.setAttribute('data-order', sortOrder);
+                tr.setAttribute('data-order', m.order !== undefined ? m.order : -m.createdAt);
                 
                 tr.innerHTML = `
-                    <td style="width: 30px; text-align: center;">
-                        <i data-lucide="grip-vertical" class="drag-handle" size="16"></i>
-                    </td>
-                    <td style="${dateClass}">
-                        ${formatStageDate(m.date)}
-                    </td>
+                    <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
+                    <td style="${dateClass}">${formatStageDate(m.date)}</td>
                     <td>
                         <span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; margin-bottom: 4px; display: inline-block;">${m.type}</span>
                         <div style="font-size: var(--text-sm); color: var(--text); line-height: 1.4; white-space: pre-wrap;">${m.detail}</div>
@@ -1757,14 +1638,13 @@
         function renderProjects(projects) {
             const tbody = document.getElementById('firebase-projects-list');
             if (!tbody) return;
-            if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
-            const statusMap = { 'active': { label: 'En progreso', class: 'active' }, 'pending': { label: 'Pausado', class: 'pending' }, 'info': { label: 'Completado', class: 'info' } };
+            if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
             tbody.innerHTML = '';
             
             projects.forEach(p => {
-                const s = statusMap[p.status] || statusMap['pending'];
-                const deliveryAlert = getDeliveryAlertData(p.dates?.delivery, p.status, p.progress);
-                const kickoffHtml = p.dates?.kickoff ? `<div class="date-badge neutral" style="margin-bottom:2px;"><i data-lucide="flag" size="10" style="display:inline;"></i> ${formatStageDate(p.dates.kickoff)}</div>` : '';
+                const projBitacoras = allBitacoras.filter(b => b.projectId === p.id).sort((a, b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+                const statusText = projBitacoras.length > 0 ? projBitacoras[0].status : 'Nuevo';
+                const statusBadge = getBitacoraBadge(statusText);
                 
                 const cColor = getColorForString(p.client);
                 const clientHtml = p.client ? `<div style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${cColor.bg}; color: ${cColor.text}; border: 1px solid ${cColor.border}; width: max-content; margin-top: 4px;"><i data-lucide="user" size="10" style="display:inline; margin-right:2px;"></i> ${p.client}</div>` : '';
@@ -1772,30 +1652,21 @@
 
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-id', p.id);
-                const sortOrder = p.order !== undefined ? p.order : -p.createdAt;
-                tr.setAttribute('data-order', sortOrder);
+                tr.setAttribute('data-order', p.order !== undefined ? p.order : -p.createdAt);
                 
                 tr.innerHTML = `
-                    <td style="width: 30px; text-align: center;">
-                        <i data-lucide="grip-vertical" class="drag-handle" size="16"></i>
-                    </td>
+                    <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
                     <td>
                         <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('P_${p.id}')" title="Ver Ficha de Proyecto">
                             ${p.name} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${notasIcon}
                         </div>
                         ${clientHtml}
                     </td>
-                    <td><span class="badge ${s.class}">${s.label}</span></td>
+                    <td style="text-align: center;">${statusBadge}</td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="font-size: 0.75rem; width: 30px; font-weight: 600;">${p.progress}%</span>
                             <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress == 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="stage-dates">
-                            ${kickoffHtml}
-                            <div class="date-badge ${deliveryAlert.class}"><i data-lucide="rocket" size="10" style="display:inline;"></i> ${deliveryAlert.text}</div>
                         </div>
                     </td>
                     <td style="text-align: center; white-space: nowrap;">
@@ -2014,6 +1885,46 @@
                 grid.appendChild(dayDiv);
             }
         }
+        
+        // Asignar listeners del buscador global (fuera del condicional para evitar duplicados en reinicios)
+        const searchInputGlobal = document.getElementById('global-search');
+        if (searchInputGlobal) {
+            searchInputGlobal.addEventListener('input', (e) => {
+                const searchResults = document.getElementById('search-results');
+                if(!searchResults) return;
+                
+                const queryText = e.target.value.toLowerCase().trim();
+                if(!queryText) { searchResults.style.display = 'none'; return; }
+
+                const matchedProjects = allProjects.filter(p => p.name.toLowerCase().includes(queryText));
+                const matchedClients = allClients.filter(c => c.company.toLowerCase().includes(queryText) || c.name.toLowerCase().includes(queryText));
+
+                if(matchedProjects.length === 0 && matchedClients.length === 0) {
+                    searchResults.innerHTML = '<div style="padding: 12px; color: var(--text-dim); text-align: center; font-size: 0.8rem;">Sin resultados</div>';
+                } else {
+                    let html = '';
+                    matchedProjects.forEach(p => {
+                        html += `<div class="search-result-item" onclick="openSummary('P_${p.id}')">
+                                    <span class="search-result-title">${p.name}</span>
+                                    <span class="search-result-meta"><span class="badge info">Proyecto</span></span>
+                                 </div>`;
+                    });
+                    matchedClients.forEach(c => {
+                        html += `<div class="search-result-item" onclick="openSummary('C_${c.id}')">
+                                    <span class="search-result-title">${c.company}</span>
+                                    <span class="search-result-meta"><span class="badge info" style="background:#EFE9DB; color:#684B45;">Cliente</span> Contacto: ${c.name}</span>
+                                 </div>`;
+                    });
+                    searchResults.innerHTML = html;
+                }
+                searchResults.style.display = 'block';
+            });
+        }
+        document.addEventListener('click', (e) => {
+            const searchResults = document.getElementById('search-results');
+            if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
+        });
+
     </script>
 </body>
 </html>
