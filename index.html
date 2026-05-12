@@ -507,9 +507,9 @@
                             <input type="text" id="link-title" class="form-control" placeholder="Ej: Post Carrusel 1" required>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>URL (Canva, Drive, Web) *</label>
+                            <label>URL o Ubicación en el equipo *</label>
                             <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
-                            <input type="text" id="link-url" class="form-control" placeholder="Pega el enlace aquí..." required>
+                            <input type="text" id="link-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -534,9 +534,9 @@
                             <input type="text" id="internal-title" class="form-control" placeholder="Ej: LinkedIn Talento Impulsa" required>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>URL *</label>
+                            <label>URL o Ubicación en el equipo *</label>
                             <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
-                            <input type="text" id="internal-url" class="form-control" placeholder="Pega el enlace aquí..." required>
+                            <input type="text" id="internal-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -1661,8 +1661,14 @@
                     linksContainer.innerHTML = '';
                     filteredLinks.forEach(link => {
                         try {
+                            // Detector Inteligente de Links vs Rutas Locales
+                            let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
+                            let actionHtml = isWebLink 
+                                ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Enlace &rarr;</a>`
+                                : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${link.url}</span>`;
+
                             const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
-                            div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir Enlace</a></div></div>`;
+                            div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span>${actionHtml}</div></div>`;
                             linksContainer.appendChild(div);
                         } catch(e) { console.error(e); }
                     });
@@ -1911,6 +1917,12 @@
                     const relationName = getRelationName(link.relationId);
                     const badgeColor = getColorForString(relationName);
 
+                    // Detector Inteligente de Links vs Rutas Locales
+                    let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
+                    let actionHtml = isWebLink 
+                        ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Recurso &rarr;</a>`
+                        : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${link.url}</span>`;
+
                     const div = document.createElement('div'); div.className = 'data-row';
                     div.innerHTML = `
                         <div class="data-row-top">
@@ -1919,7 +1931,7 @@
                                 <div class="data-details">
                                     <span class="badge" style="width: max-content; margin-bottom: 4px; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border};">${relationName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span>
                                     <span class="data-title">${link.title}</span>
-                                    <a href="${link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary)">Abrir Recurso &rarr;</a>
+                                    ${actionHtml}
                                 </div>
                             </div>
                         </div>
@@ -1948,10 +1960,16 @@
                     div.setAttribute('data-id', link.id);
                     div.setAttribute('data-order', link.order !== undefined ? link.order : -link.createdAt);
 
+                    // Detector Inteligente
+                    let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
+                    let titleHtml = isWebLink 
+                        ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="internal-link-title">${link.title}</a>`
+                        : `<span class="internal-link-title" style="color: var(--text-dim); font-size: 0.8rem;" title="${link.url}"><i data-lucide="hard-drive" size="12" style="display:inline; margin-right:4px;"></i>${link.title}</span>`;
+
                     div.innerHTML = `
                         <i data-lucide="grip-vertical" class="drag-handle" size="14"></i>
                         <i data-lucide="${iconName}" class="internal-link-icon" size="18"></i>
-                        <a href="${link.url}" target="_blank" class="internal-link-title">${link.title}</a>
+                        ${titleHtml}
                         <button class="btn-icon" style="padding:0; color:var(--brand-primary);" onclick="editarEnlaceInterno('${link.id}')" title="Editar"><i data-lucide="pencil" size="14"></i></button>
                         <button class="btn-icon" style="padding:0; color:var(--alert-danger); margin-left:4px;" onclick="deleteDocument('enlaces_internos', '${link.id}')" title="Eliminar"><i data-lucide="trash-2" size="14"></i></button>
                     `;
