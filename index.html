@@ -258,13 +258,6 @@
         .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
         .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
         
-        .date-badge.success { background: var(--alert-success-bg); color: var(--alert-success); font-weight: 700; border: 1px solid #BADBCC; }
-        .date-badge.warning { background: var(--alert-warning-bg); color: var(--alert-warning); font-weight: 700; border: 1px solid #FFE69C;}
-        .date-badge.danger { background: var(--alert-danger-bg); color: var(--alert-danger); font-weight: 700; border: 1px solid #F5C2C7; animation: pulse 2s infinite;}
-        .date-badge.neutral { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
         /* --- Calendario & Listas --- */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
         .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
@@ -444,6 +437,7 @@
                             <label>Cliente Asociado</label>
                             <select id="proj-client" class="form-control">
                                 <option value="">Ninguno / Proyecto Personal</option>
+                                <!-- JS Injected Options -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -482,7 +476,8 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Sitio Web de la Organización</label>
-                            <input type="url" id="client-web" class="form-control" placeholder="https://www...">
+                            <!-- Cambiado a type="text" para evitar errores si no se pone http:// -->
+                            <input type="text" id="client-web" class="form-control" placeholder="www.ejemplo.com">
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -494,10 +489,9 @@
                 <form id="form-add-link" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Asociar a (Proyecto o Cliente) *</label>
-                            <!-- YA NO ES REQUIRED PARA PERMITIR "GENERAL" -->
+                            <label>Asociar a (Proyecto o Cliente) (Opcional)</label>
                             <select id="link-relation" class="form-control">
-                                <option value="">Selecciona a dónde pertenece...</option>
+                                <option value="">General (Sin asociar)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -514,7 +508,8 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL (Canva, Drive, Web) *</label>
-                            <input type="url" id="link-url" class="form-control" placeholder="https://..." required>
+                            <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
+                            <input type="text" id="link-url" class="form-control" placeholder="Pega el enlace aquí..." required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -540,7 +535,8 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL *</label>
-                            <input type="url" id="internal-url" class="form-control" placeholder="https://..." required>
+                            <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
+                            <input type="text" id="internal-url" class="form-control" placeholder="Pega el enlace aquí..." required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -608,10 +604,16 @@
                     <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
                 </div>
 
-                <!-- NOTAS EN LA FICHA -->
+                <!-- NOTAS EN LA FICHA (Chat y Actividad) -->
                 <div class="card" id="summary-notes-card">
                     <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Actividad</h3>
                     <div class="notes-list" id="summary-notes-list" style="max-height: 250px; padding: 0;"></div>
+                    
+                    <!-- NUEVO: Formulario para agregar notas directo desde el proyecto -->
+                    <form id="form-add-summary-note" style="display: flex; gap: 8px; margin-top: 12px; align-items: center;">
+                        <input type="text" id="summary-note-input" class="form-control" placeholder="Escribe un mensaje aquí..." required autocomplete="off" style="flex-grow: 1;">
+                        <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="14"></i></button>
+                    </form>
                 </div>
 
             </div>
@@ -838,6 +840,7 @@
         let idProyectoEnEdicion = null; let idClienteEnEdicion = null; let idRecursoEnEdicion = null; 
         let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null;
         let currentSummaryProjectId = null; 
+        let currentSummaryRelationId = null;
 
         // --- SISTEMA INTELIGENTE DE ERRORES ---
         window.showToast = (message) => {
@@ -900,13 +903,17 @@
 
         function getColorForString(str) {
             const colors = [
-                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' }, { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
-                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' }, { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
-                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' }, { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
+                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' },
+                { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
+                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' },
+                { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
+                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' },
+                { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
                 { bg: '#CCFBF1', text: '#0F766E', border: '#99F6E4' } 
             ];
-            if(!str || str === 'General' || str.trim() === '') return { bg: '#EFE9DB', text: '#684B45', border: '#D6CDB8' };
-            let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            if(!str || typeof str !== 'string' || str === 'General' || str.trim() === '') return { bg: '#EFE9DB', text: '#684B45', border: '#D6CDB8' };
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
             return colors[Math.abs(hash) % colors.length];
         }
 
@@ -1013,8 +1020,11 @@
             modal.style.opacity = '0';
             const modalEl = document.getElementById('summary-modal');
             if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => modal.style.display = 'none', 300);
-            currentSummaryProjectId = null;
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentSummaryProjectId = null;
+                currentSummaryRelationId = null;
+            }, 300);
         };
 
         // --- LÓGICA DE UX: MENU Y LOGIN ---
@@ -1366,6 +1376,21 @@
             } catch (err) { window.handleFirebaseError(err); }
         });
         
+        // --- NUEVO: FORMULARIO DE NOTAS DENTRO DEL SUMMARY ---
+        document.getElementById('form-add-summary-note').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db || !firebaseUser || !currentSummaryRelationId) return;
+            
+            const text = document.getElementById('summary-note-input').value.trim();
+            if (!text) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { 
+                    relationId: currentSummaryRelationId, text: text, addedBy: localUser, createdAt: Date.now() 
+                });
+                document.getElementById('summary-note-input').value = '';
+            } catch (err) { window.handleFirebaseError(err); }
+        });
+        
         document.getElementById('form-add-bitacora').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
@@ -1419,12 +1444,14 @@
                 allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
                 allLinks.sort((a, b) => b.createdAt - a.createdAt);
                 renderLinks(allLinks);
+                if (currentSummaryRelationId) renderSummaryLinks(currentSummaryRelationId);
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
                 allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
                 allNotes.sort((a, b) => a.createdAt - b.createdAt); 
                 renderNotes(allNotes);
+                if (currentSummaryRelationId) renderSummaryNotes(currentSummaryRelationId);
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
@@ -1455,6 +1482,52 @@
             if(projClientSelect) projClientSelect.innerHTML = clientOptions;
         }
 
+        function getRelationName(relationId) {
+            if(!relationId || typeof relationId !== 'string') return 'General';
+            const [type, id] = relationId.split('_');
+            if(type === 'P') { const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido'; }
+            if(type === 'C') { const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido'; }
+            return 'General';
+        }
+
+        // BUSCADOR GLOBAL
+        const searchInput = document.getElementById('global-search');
+        const searchResults = document.getElementById('search-results');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const queryText = e.target.value.toLowerCase().trim();
+                if(!queryText) { searchResults.style.display = 'none'; return; }
+
+                const matchedProjects = allProjects.filter(p => p.name.toLowerCase().includes(queryText));
+                const matchedClients = allClients.filter(c => c.company.toLowerCase().includes(queryText) || c.name.toLowerCase().includes(queryText));
+
+                if(matchedProjects.length === 0 && matchedClients.length === 0) {
+                    searchResults.innerHTML = '<div style="padding: 12px; color: var(--text-dim); text-align: center; font-size: 0.8rem;">Sin resultados</div>';
+                } else {
+                    let html = '';
+                    matchedProjects.forEach(p => {
+                        html += `<div class="search-result-item" onclick="openSummary('P_${p.id}')">
+                                    <span class="search-result-title">${p.name}</span>
+                                    <span class="search-result-meta"><span class="badge info">Proyecto</span></span>
+                                 </div>`;
+                    });
+                    matchedClients.forEach(c => {
+                        html += `<div class="search-result-item" onclick="openSummary('C_${c.id}')">
+                                    <span class="search-result-title">${c.company}</span>
+                                    <span class="search-result-meta"><span class="badge info" style="background:#EFE9DB; color:#684B45;">Cliente</span> Contacto: ${c.name}</span>
+                                 </div>`;
+                    });
+                    searchResults.innerHTML = html;
+                }
+                searchResults.style.display = 'block';
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
+        });
+
         // --- RENDERIZADORES DE TABLAS Y VISTAS ---
         function renderSummaryBitacora(projectId) {
             const list = document.getElementById('summary-bitacora-list');
@@ -1468,20 +1541,82 @@
             
             list.innerHTML = '';
             projBits.forEach(b => {
-                const badge = getBitacoraBadge(b.status);
-                list.innerHTML += `
-                    <tr style="border-bottom: 1px solid var(--bg); transition: background 0.2s;">
-                        <td style="width: 80px; font-size: 0.75rem; color: var(--text-dim); vertical-align: top; padding: 10px 4px;">${formatStageDate(b.date)}</td>
-                        <td style="font-size: var(--text-sm); vertical-align: top; padding: 10px 4px; color: var(--text);">${b.detail}</td>
-                        <td style="width: 100px; vertical-align: top; padding: 10px 4px; text-align: center;">${badge}</td>
-                        <td style="width: 30px; text-align: right; vertical-align: top; padding: 10px 4px;">
-                            ${b.addedBy === localUser ? `<i data-lucide="trash-2" style="color:var(--alert-danger); cursor:pointer;" size="14" onclick="deleteDocument('bitacoras', '${b.id}')" title="Borrar registro"></i>` : ''}
-                        </td>
-                    </tr>
-                `;
+                try {
+                    const badge = getBitacoraBadge(b.status);
+                    list.innerHTML += `
+                        <tr style="border-bottom: 1px solid var(--bg); transition: background 0.2s;">
+                            <td style="width: 80px; font-size: 0.75rem; color: var(--text-dim); vertical-align: top; padding: 10px 4px;">${formatStageDate(b.date)}</td>
+                            <td style="font-size: var(--text-sm); vertical-align: top; padding: 10px 4px; color: var(--text);">${b.detail}</td>
+                            <td style="width: 100px; vertical-align: top; padding: 10px 4px; text-align: center;">${badge}</td>
+                            <td style="width: 30px; text-align: right; vertical-align: top; padding: 10px 4px;">
+                                ${b.addedBy === localUser ? `<i data-lucide="trash-2" style="color:var(--alert-danger); cursor:pointer;" size="14" onclick="deleteDocument('bitacoras', '${b.id}')" title="Borrar registro"></i>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                } catch(e) { console.error("Error al dibujar bitácora", e); }
             });
             lucide.createIcons();
         }
+
+        window.renderSummaryNotes = (relationId) => {
+            const filteredNotes = allNotes.filter(n => n.relationId === relationId);
+            const notesContainer = document.getElementById('summary-notes-list');
+            if (notesContainer) {
+                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px; text-align: center;">El historial de chat está vacío.</div>';
+                else {
+                    notesContainer.innerHTML = '';
+                    filteredNotes.forEach(note => {
+                        try {
+                            const author = note.addedBy || 'Sistema';
+                            const dateFormatted = note.createdAt ? new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'}) : '--/--';
+                            const uColor = getUserColor(author);
+                            const isMe = author === localUser;
+                            
+                            const div = document.createElement('div'); 
+                            div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
+                            div.innerHTML = `
+                                <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
+                                    ${author.charAt(0).toUpperCase()}
+                                </div>
+                                <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; flex-grow: 1; position: relative; max-width: 90%;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
+                                        <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
+                                    </div>
+                                    <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text || ''}</p>
+                                    
+                                    ${isMe ? `
+                                    <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
+                                        <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor: pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                            notesContainer.appendChild(div);
+                        } catch(e) { console.error("Error al dibujar nota en modal", e); }
+                    });
+                }
+                setTimeout(() => { notesContainer.scrollTop = notesContainer.scrollHeight; }, 50);
+            }
+        };
+
+        window.renderSummaryLinks = (relationId) => {
+            const filteredLinks = allLinks.filter(l => l.relationId === relationId);
+            const linksContainer = document.getElementById('summary-links-list');
+            if (linksContainer) {
+                if(filteredLinks.length === 0) linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px; text-align: center;">Sin recursos asociados.</div>';
+                else {
+                    linksContainer.innerHTML = '';
+                    filteredLinks.forEach(link => {
+                        try {
+                            const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
+                            div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir Enlace</a></div></div>`;
+                            linksContainer.appendChild(div);
+                        } catch(e) { console.error(e); }
+                    });
+                }
+            }
+        };
 
         window.openSummary = (relationId) => {
             const searchResults = document.getElementById('search-results');
@@ -1496,7 +1631,9 @@
             const projectsListContainer = document.getElementById('summary-projects-list-container');
             const bitacoraContainer = document.getElementById('summary-bitacora-container');
             clientInfoContainer.style.display = 'none'; projectsListContainer.style.display = 'none'; bitacoraContainer.style.display = 'none';
+            
             currentSummaryProjectId = null;
+            currentSummaryRelationId = relationId;
 
             if(type === 'P') {
                 const p = allProjects.find(x => x.id === id);
@@ -1559,58 +1696,8 @@
                 else { internalNotesContainer.style.display = 'none'; }
             }
 
-            const filteredLinks = allLinks.filter(l => l.relationId === relationId);
-            const linksContainer = document.getElementById('summary-links-list');
-            if (linksContainer) {
-                if(filteredLinks.length === 0) linksContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin recursos asociados.</div>';
-                else {
-                    linksContainer.innerHTML = '';
-                    filteredLinks.forEach(link => {
-                        const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
-                        div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span><a href="${link.url}" target="_blank" class="data-subtitle">Abrir</a></div></div>`;
-                        linksContainer.appendChild(div);
-                    });
-                }
-            }
-
-            // Integración de notas del chat en la ficha resumen con control seguro del usuario
-            const filteredNotes = allNotes.filter(n => n.relationId === relationId);
-            const notesContainer = document.getElementById('summary-notes-list');
-            if (notesContainer) {
-                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas de actividad.</div>';
-                else {
-                    notesContainer.innerHTML = '';
-                    filteredNotes.forEach(note => {
-                        const author = note.addedBy || 'Sistema'; // Salvavidas
-                        const dateFormatted = note.createdAt ? new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'}) : '--/--';
-                        const uColor = getUserColor(author);
-                        const isMe = author === localUser;
-                        
-                        const div = document.createElement('div'); 
-                        div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
-                        div.innerHTML = `
-                            <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
-                                ${(author).charAt(0).toUpperCase()}
-                            </div>
-                            <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; flex-grow: 1; position: relative; max-width: 90%;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                    <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
-                                    <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
-                                </div>
-                                <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text}</p>
-                                
-                                ${isMe ? `
-                                <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
-                                    <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor: pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
-                                    <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor: pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
-                                </div>
-                                ` : ''}
-                            </div>
-                        `;
-                        notesContainer.appendChild(div);
-                    });
-                }
-            }
+            renderSummaryLinks(relationId);
+            renderSummaryNotes(relationId);
 
             lucide.createIcons();
             const modal = document.getElementById('summary-overlay');
@@ -1632,38 +1719,39 @@
             tbody.innerHTML = '';
             
             marketingList.forEach(m => {
-                const typeColor = getMktColor(m.type);
-                const isOverdue = new Date(m.date + 'T12:00:00') < new Date() && (!m.published || !m.designed);
-                const dateClass = isOverdue ? 'color: var(--alert-danger); font-weight: bold;' : 'color: var(--text-dim);';
-                
-                const tr = document.createElement('tr');
-                tr.setAttribute('data-id', m.id);
-                const sortOrder = m.order !== undefined ? m.order : -m.createdAt;
-                tr.setAttribute('data-order', sortOrder);
-                
-                tr.innerHTML = `
-                    <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
-                    <td style="${dateClass}">${formatStageDate(m.date)}</td>
-                    <td>
-                        <span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; margin-bottom: 4px; display: inline-block;">${m.type}</span>
-                        <div style="font-size: var(--text-sm); color: var(--text); line-height: 1.4; white-space: pre-wrap;">${m.detail}</div>
-                    </td>
-                    <td>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span onclick="toggleMarketingStatus('${m.id}', 'designed', ${!m.designed})" class="badge" style="cursor:pointer; width: max-content; background: ${m.designed ? 'var(--alert-success-bg)' : 'var(--bg)'}; color: ${m.designed ? 'var(--alert-success)' : 'var(--text-dim)'}; border: 1px solid ${m.designed ? '#BADBCC' : 'var(--border-light)'};">
-                                <i data-lucide="pen-tool" size="10" style="margin-right:4px;"></i> ${m.designed ? 'Diseñado' : 'Pend. Diseño'}
-                            </span>
-                            <span onclick="toggleMarketingStatus('${m.id}', 'published', ${!m.published})" class="badge" style="cursor:pointer; width: max-content; background: ${m.published ? 'var(--alert-success-bg)' : 'var(--bg)'}; color: ${m.published ? 'var(--alert-success)' : 'var(--text-dim)'}; border: 1px solid ${m.published ? '#BADBCC' : 'var(--border-light)'};">
-                                <i data-lucide="send" size="10" style="margin-right:4px;"></i> ${m.published ? 'Publicado' : 'Pend. Publicación'}
-                            </span>
-                        </div>
-                    </td>
-                    <td style="text-align: center; white-space: nowrap;">
-                        <button class="btn-icon" title="Editar" onclick="editarMarketing('${m.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
-                        <button class="btn-icon" title="Eliminar" onclick="deleteDocument('marketing', '${m.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                try {
+                    const typeColor = getMktColor(m.type);
+                    const isOverdue = new Date(m.date + 'T12:00:00') < new Date() && (!m.published || !m.designed);
+                    const dateClass = isOverdue ? 'color: var(--alert-danger); font-weight: bold;' : 'color: var(--text-dim);';
+                    
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-id', m.id);
+                    tr.setAttribute('data-order', m.order !== undefined ? m.order : -m.createdAt);
+                    
+                    tr.innerHTML = `
+                        <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
+                        <td style="${dateClass}">${formatStageDate(m.date)}</td>
+                        <td>
+                            <span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; margin-bottom: 4px; display: inline-block;">${m.type}</span>
+                            <div style="font-size: var(--text-sm); color: var(--text); line-height: 1.4; white-space: pre-wrap;">${m.detail}</div>
+                        </td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <span onclick="toggleMarketingStatus('${m.id}', 'designed', ${!m.designed})" class="badge" style="cursor:pointer; width: max-content; background: ${m.designed ? 'var(--alert-success-bg)' : 'var(--bg)'}; color: ${m.designed ? 'var(--alert-success)' : 'var(--text-dim)'}; border: 1px solid ${m.designed ? '#BADBCC' : 'var(--border-light)'};">
+                                    <i data-lucide="pen-tool" size="10" style="margin-right:4px;"></i> ${m.designed ? 'Diseñado' : 'Pend. Diseño'}
+                                </span>
+                                <span onclick="toggleMarketingStatus('${m.id}', 'published', ${!m.published})" class="badge" style="cursor:pointer; width: max-content; background: ${m.published ? 'var(--alert-success-bg)' : 'var(--bg)'}; color: ${m.published ? 'var(--alert-success)' : 'var(--text-dim)'}; border: 1px solid ${m.published ? '#BADBCC' : 'var(--border-light)'};">
+                                    <i data-lucide="send" size="10" style="margin-right:4px;"></i> ${m.published ? 'Publicado' : 'Pend. Publicación'}
+                                </span>
+                            </div>
+                        </td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button class="btn-icon" title="Editar" onclick="editarMarketing('${m.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
+                            <button class="btn-icon" title="Eliminar" onclick="deleteDocument('marketing', '${m.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                } catch(e) { console.error("Error marketing row", e); }
             });
             lucide.createIcons();
             initSortable('firebase-marketing-list', 'marketing');
@@ -1676,39 +1764,41 @@
             tbody.innerHTML = '';
             
             projects.forEach(p => {
-                const projBitacoras = allBitacoras.filter(b => b.projectId === p.id).sort((a, b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
-                const statusText = projBitacoras.length > 0 ? projBitacoras[0].status : 'Nuevo';
-                const statusBadge = getBitacoraBadge(statusText);
-                
-                const cColor = getColorForString(p.client);
-                const clientHtml = p.client ? `<div style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${cColor.bg}; color: ${cColor.text}; border: 1px solid ${cColor.border}; width: max-content; margin-top: 4px;"><i data-lucide="user" size="10" style="display:inline; margin-right:2px;"></i> ${p.client}</div>` : '';
-                const notasIcon = p.notes ? `<i data-lucide="align-left" size="14" style="color: var(--brand-primary); margin-left: 6px; display: inline;" title="Tiene notas"></i>` : '';
+                try {
+                    const projBitacoras = allBitacoras.filter(b => b.projectId === p.id).sort((a, b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+                    const statusText = projBitacoras.length > 0 ? projBitacoras[0].status : 'Nuevo';
+                    const statusBadge = getBitacoraBadge(statusText);
+                    
+                    const cColor = getColorForString(p.client);
+                    const clientHtml = p.client ? `<div style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${cColor.bg}; color: ${cColor.text}; border: 1px solid ${cColor.border}; width: max-content; margin-top: 4px;"><i data-lucide="user" size="10" style="display:inline; margin-right:2px;"></i> ${p.client}</div>` : '';
+                    const notasIcon = p.notes ? `<i data-lucide="align-left" size="14" style="color: var(--brand-primary); margin-left: 6px; display: inline;" title="Tiene notas"></i>` : '';
 
-                const tr = document.createElement('tr');
-                tr.setAttribute('data-id', p.id);
-                tr.setAttribute('data-order', p.order !== undefined ? p.order : -p.createdAt);
-                
-                tr.innerHTML = `
-                    <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
-                    <td>
-                        <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('P_${p.id}')" title="Ver Ficha de Proyecto">
-                            ${p.name} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${notasIcon}
-                        </div>
-                        ${clientHtml}
-                    </td>
-                    <td style="text-align: center;">${statusBadge}</td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 0.75rem; width: 30px; font-weight: 600;">${p.progress}%</span>
-                            <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress == 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
-                        </div>
-                    </td>
-                    <td style="text-align: center; white-space: nowrap;">
-                        <button class="btn-icon" title="Editar Proyecto" onclick="editarProyecto('${p.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
-                        <button class="btn-icon" title="Eliminar Proyecto" onclick="deleteDocument('proyectos', '${p.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-id', p.id);
+                    tr.setAttribute('data-order', p.order !== undefined ? p.order : -p.createdAt);
+                    
+                    tr.innerHTML = `
+                        <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
+                        <td>
+                            <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('P_${p.id}')" title="Ver Ficha de Proyecto">
+                                ${p.name} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${notasIcon}
+                            </div>
+                            ${clientHtml}
+                        </td>
+                        <td style="text-align: center;">${statusBadge}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 0.75rem; width: 30px; font-weight: 600;">${p.progress}%</span>
+                                <div class="progress-bar"><div class="progress-fill" style="width: ${p.progress}%; background: ${p.progress == 100 ? '#0F5132' : 'var(--brand-primary)'};"></div></div>
+                            </div>
+                        </td>
+                        <td style="text-align: center; white-space: nowrap;">
+                            <button class="btn-icon" title="Editar Proyecto" onclick="editarProyecto('${p.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
+                            <button class="btn-icon" title="Eliminar Proyecto" onclick="deleteDocument('proyectos', '${p.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                } catch(e) { console.error("Error project row", e); }
             });
             lucide.createIcons();
             initSortable('firebase-projects-list', 'proyectos');
@@ -1720,35 +1810,37 @@
             if (clients.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Sin clientes registrados.</div>`; return; }
             list.innerHTML = '';
             clients.forEach(client => {
-                const div = document.createElement('div'); div.className = 'data-row';
-                div.setAttribute('data-id', client.id);
-                div.setAttribute('data-order', client.order !== undefined ? client.order : -client.createdAt);
-                
-                let contactInfo = '';
-                if(client.name) contactInfo += `<span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline; margin-right:2px;"></i> ${client.name}</span>`;
-                if(client.email) contactInfo += `<span class="data-subtitle"><i data-lucide="mail" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.email}</span>`;
-                if(client.phone) contactInfo += `<span class="data-subtitle"><i data-lucide="phone" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.phone}</span>`;
-                if(client.web) contactInfo += `<a href="${client.web}" target="_blank" class="data-subtitle" style="color:var(--brand-primary); margin-left: 6px;"><i data-lucide="globe" size="12" style="display:inline; margin-right:2px;"></i> Sitio</a>`;
+                try {
+                    const div = document.createElement('div'); div.className = 'data-row';
+                    div.setAttribute('data-id', client.id);
+                    div.setAttribute('data-order', client.order !== undefined ? client.order : -client.createdAt);
+                    
+                    let contactInfo = '';
+                    if(client.name) contactInfo += `<span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline; margin-right:2px;"></i> ${client.name}</span>`;
+                    if(client.email) contactInfo += `<span class="data-subtitle"><i data-lucide="mail" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.email}</span>`;
+                    if(client.phone) contactInfo += `<span class="data-subtitle"><i data-lucide="phone" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.phone}</span>`;
+                    if(client.web) contactInfo += `<a href="${client.web}" target="_blank" class="data-subtitle" style="color:var(--brand-primary); margin-left: 6px;"><i data-lucide="globe" size="12" style="display:inline; margin-right:2px;"></i> Sitio</a>`;
 
-                const cColor = getColorForString(client.company);
+                    const cColor = getColorForString(client.company);
 
-                div.innerHTML = `
-                    <div class="data-row-top">
-                        <div class="data-info">
-                            <i data-lucide="grip-vertical" class="drag-handle" size="18" style="margin-top: 8px;"></i>
-                            <div class="data-icon" style="color: ${cColor.text}; background: ${cColor.bg}; border: 1px solid ${cColor.border};"><i data-lucide="building-2" size="20"></i></div>
-                            <div class="data-details">
-                                <span class="data-title" style="cursor:pointer; color: var(--text);" onclick="openSummary('C_${client.id}')" title="Ver Ficha">${client.company} <i data-lucide="external-link" size="10" style="color:var(--text-dim);"></i></span>
-                                <div style="display:flex; flex-wrap:wrap; margin-top:2px;">${contactInfo}</div>
+                    div.innerHTML = `
+                        <div class="data-row-top">
+                            <div class="data-info">
+                                <i data-lucide="grip-vertical" class="drag-handle" size="18" style="margin-top: 8px;"></i>
+                                <div class="data-icon" style="color: ${cColor.text}; background: ${cColor.bg}; border: 1px solid ${cColor.border};"><i data-lucide="building-2" size="20"></i></div>
+                                <div class="data-details">
+                                    <span class="data-title" style="cursor:pointer; color: var(--text);" onclick="openSummary('C_${client.id}')" title="Ver Ficha">${client.company} <i data-lucide="external-link" size="10" style="color:var(--text-dim);"></i></span>
+                                    <div style="display:flex; flex-wrap:wrap; margin-top:2px;">${contactInfo}</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="data-footer" style="justify-content: flex-end;">
-                        <button class="btn-icon" title="Editar Cliente" onclick="editarCliente('${client.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
-                        <button class="btn-icon" title="Eliminar Cliente" onclick="deleteDocument('clientes', '${client.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
-                    </div>
-                `;
-                list.appendChild(div);
+                        <div class="data-footer" style="justify-content: flex-end;">
+                            <button class="btn-icon" title="Editar Cliente" onclick="editarCliente('${client.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
+                            <button class="btn-icon" title="Eliminar Cliente" onclick="deleteDocument('clientes', '${client.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error client row", e); }
             });
             lucide.createIcons();
             initSortable('firebase-clients-list', 'clientes');
@@ -1762,28 +1854,30 @@
             const typeConfig = { 'imagen': { icon: 'image', color: '#9A7B3D', bg: 'rgba(154,123,61,0.12)' }, 'documento': { icon: 'file-text', color: '#684B45', bg: '#EFE9DB' }, 'enlace': { icon: 'link', color: '#918671', bg: '#F8F9FA' } };
 
             links.forEach(link => {
-                const config = typeConfig[link.type] || typeConfig['enlace'];
-                const relationName = getRelationName(link.relationId);
-                const badgeColor = getColorForString(relationName);
+                try {
+                    const config = typeConfig[link.type] || typeConfig['enlace'];
+                    const relationName = getRelationName(link.relationId);
+                    const badgeColor = getColorForString(relationName);
 
-                const div = document.createElement('div'); div.className = 'data-row';
-                div.innerHTML = `
-                    <div class="data-row-top">
-                        <div class="data-info">
-                            <div class="data-icon" style="color: ${config.color}; background: ${config.bg};"><i data-lucide="${config.icon}" size="20"></i></div>
-                            <div class="data-details">
-                                <span class="badge" style="width: max-content; margin-bottom: 4px; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border};">${relationName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span>
-                                <span class="data-title">${link.title}</span>
-                                <a href="${link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary)">Abrir Recurso &rarr;</a>
+                    const div = document.createElement('div'); div.className = 'data-row';
+                    div.innerHTML = `
+                        <div class="data-row-top">
+                            <div class="data-info">
+                                <div class="data-icon" style="color: ${config.color}; background: ${config.bg};"><i data-lucide="${config.icon}" size="20"></i></div>
+                                <div class="data-details">
+                                    <span class="badge" style="width: max-content; margin-bottom: 4px; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border};">${relationName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span>
+                                    <span class="data-title">${link.title}</span>
+                                    <a href="${link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary)">Abrir Recurso &rarr;</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="data-footer" style="justify-content: flex-end;">
-                        <button class="btn-icon" title="Editar" onclick="editarRecurso('${link.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
-                        <button class="btn-icon" title="Eliminar" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
-                    </div>
-                `;
-                list.appendChild(div);
+                        <div class="data-footer" style="justify-content: flex-end;">
+                            <button class="btn-icon" title="Editar" onclick="editarRecurso('${link.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
+                            <button class="btn-icon" title="Eliminar" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error resource row", e); }
             });
             lucide.createIcons();
         }
@@ -1796,25 +1890,26 @@
             const iconMap = { 'social': 'share-2', 'repo': 'github', 'web': 'globe', 'otro': 'link' };
 
             links.forEach(link => {
-                const iconName = iconMap[link.type] || 'link';
-                const div = document.createElement('div'); div.className = 'internal-link';
-                div.setAttribute('data-id', link.id);
-                div.setAttribute('data-order', link.order !== undefined ? link.order : -link.createdAt);
+                try {
+                    const iconName = iconMap[link.type] || 'link';
+                    const div = document.createElement('div'); div.className = 'internal-link';
+                    div.setAttribute('data-id', link.id);
+                    div.setAttribute('data-order', link.order !== undefined ? link.order : -link.createdAt);
 
-                div.innerHTML = `
-                    <i data-lucide="grip-vertical" class="drag-handle" size="14"></i>
-                    <i data-lucide="${iconName}" class="internal-link-icon" size="18"></i>
-                    <a href="${link.url}" target="_blank" class="internal-link-title">${link.title}</a>
-                    <button class="btn-icon" style="padding:0; color:var(--brand-primary);" onclick="editarEnlaceInterno('${link.id}')" title="Editar"><i data-lucide="pencil" size="14"></i></button>
-                    <button class="btn-icon" style="padding:0; color:var(--alert-danger); margin-left:4px;" onclick="deleteDocument('enlaces_internos', '${link.id}')" title="Eliminar"><i data-lucide="trash-2" size="14"></i></button>
-                `;
-                list.appendChild(div);
+                    div.innerHTML = `
+                        <i data-lucide="grip-vertical" class="drag-handle" size="14"></i>
+                        <i data-lucide="${iconName}" class="internal-link-icon" size="18"></i>
+                        <a href="${link.url}" target="_blank" class="internal-link-title">${link.title}</a>
+                        <button class="btn-icon" style="padding:0; color:var(--brand-primary);" onclick="editarEnlaceInterno('${link.id}')" title="Editar"><i data-lucide="pencil" size="14"></i></button>
+                        <button class="btn-icon" style="padding:0; color:var(--alert-danger); margin-left:4px;" onclick="deleteDocument('enlaces_internos', '${link.id}')" title="Eliminar"><i data-lucide="trash-2" size="14"></i></button>
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error internal link", e); }
             });
             lucide.createIcons();
             initSortable('firebase-internal-links', 'enlaces_internos');
         }
 
-        // Salvavidas para renderizar chat general (evita fallos de notas antiguas sin "addedBy")
         function renderNotes(notes) {
             const list = document.getElementById('firebase-notes-list');
             if (!list) return;
@@ -1822,38 +1917,41 @@
             list.innerHTML = '';
             
             notes.forEach(note => {
-                const author = note.addedBy || 'Sistema'; // Previene error si falta usuario
-                const dateText = note.createdAt ? new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                const isMe = author === localUser;
-                const uColor = getUserColor(author);
-                const badgeColor = getColorForString(getRelationName(note.relationId));
-                
-                const relationBadge = note.relationId ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${getRelationName(note.relationId).replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
+                try {
+                    const author = note.addedBy || 'Sistema';
+                    const dateText = note.createdAt ? new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                    const isMe = author === localUser;
+                    const uColor = getUserColor(author);
+                    const relName = getRelationName(note.relationId);
+                    const badgeColor = getColorForString(relName);
+                    
+                    const relationBadge = note.relationId ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${relName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
 
-                const div = document.createElement('div'); 
-                div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
-                
-                div.innerHTML = `
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
-                        ${author.charAt(0).toUpperCase()}
-                    </div>
-                    <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; max-width: 85%; box-shadow: var(--shadow-sm); position: relative;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 4px; gap: 16px;">
-                            <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
-                            <span style="font-size: 0.65rem; color: var(--text-dim);">${dateText}</span>
+                    const div = document.createElement('div'); 
+                    div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
+                    
+                    div.innerHTML = `
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
+                            ${author.charAt(0).toUpperCase()}
                         </div>
-                        ${relationBadge}
-                        <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text}</p>
-                        
-                        ${isMe ? `
-                        <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
-                            <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor:pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
-                            <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor:pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
+                        <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; max-width: 85%; box-shadow: var(--shadow-sm); position: relative;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; gap: 16px;">
+                                <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
+                                <span style="font-size: 0.65rem; color: var(--text-dim);">${dateText}</span>
+                            </div>
+                            ${relationBadge}
+                            <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text || ''}</p>
+                            
+                            ${isMe ? `
+                            <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
+                                <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor:pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
+                                <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor:pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
+                            </div>
+                            ` : ''}
                         </div>
-                        ` : ''}
-                    </div>
-                `;
-                list.appendChild(div);
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error al renderizar nota de chat", e); }
             });
             lucide.createIcons();
             
