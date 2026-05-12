@@ -676,6 +676,24 @@
             <div id="view-inicio" class="view-section active">
                 <div class="dashboard-grid">
                     <div class="col-main">
+                        <!-- NUEVO: MÓDULO DE BRAINSTORMING -->
+                        <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none; margin-bottom: var(--space-6);">
+                            <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: var(--space-3); margin-bottom: var(--space-3);">
+                                <h2 class="card-title" style="color: white; font-weight: 700;">
+                                    <i data-lucide="lightbulb" style="color: #FDE68A;"></i> Brainstorming & Ideas 
+                                    <i data-lucide="sparkles" size="16" style="color: #FDE68A;"></i>
+                                </h2>
+                            </div>
+                            <div class="notes-list" id="firebase-ideas-list" style="max-height: 300px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
+                                <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Cargando ideas...</div>
+                            </div>
+                            
+                            <form id="form-add-idea" style="display: flex; gap: var(--space-2); margin-top: var(--space-4); align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--space-3);">
+                                <input type="text" id="idea-input" class="form-control" placeholder="¡Tengo una idea brillante!..." required autocomplete="off" style="flex-grow: 1; background: rgba(255,255,255,0.9); border: none; color: var(--text);">
+                                <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0; background: #FDE68A; color: var(--brand-primary-deep);"><i data-lucide="plus" size="18"></i></button>
+                            </form>
+                        </div>
+
                         <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary); height: 100%;">
                             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
                                 <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
@@ -833,12 +851,12 @@
         let app, auth, db;
         let firebaseUser = null;
         let localUser = null;
-        
-        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [];
+        // ESTADO GLOBAL EN MEMORIA
+        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [], allIdeas = [];
         let unsubscribers = [];
         
         let idProyectoEnEdicion = null; let idClienteEnEdicion = null; let idRecursoEnEdicion = null; 
-        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null;
+        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null; let idIdeaEnEdicion = null;
         let currentSummaryProjectId = null; 
         let currentSummaryRelationId = null;
 
@@ -1220,6 +1238,16 @@
             window.showToast('Editando mensaje...');
         };
 
+        window.editarIdea = (ideaId) => {
+            const i = allIdeas.find(x => x.id === ideaId);
+            if(!i) return;
+            idIdeaEnEdicion = ideaId;
+            navigateTo('inicio'); 
+            const input = document.getElementById('idea-input');
+            if(input) { input.value = i.text; input.focus(); }
+            window.showToast('Editando idea...');
+        };
+
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
             if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
@@ -1375,6 +1403,24 @@
                 document.getElementById('note-input').value = '';
             } catch (err) { window.handleFirebaseError(err); }
         });
+
+        document.getElementById('form-add-idea').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            const text = document.getElementById('idea-input').value.trim();
+            if (!text) return;
+            try {
+                if (idIdeaEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "ideas", idIdeaEnEdicion), { text: text, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                    window.showToast('Idea actualizada'); idIdeaEnEdicion = null;
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ideas'), { text: text, addedBy: localUser, createdAt: Date.now() });
+                    window.showToast('¡Idea guardada brillante!');
+                }
+                document.getElementById('idea-input').value = '';
+            } catch (err) { window.handleFirebaseError(err); }
+        });
         
         // --- NUEVO: FORMULARIO DE NOTAS DENTRO DEL SUMMARY ---
         document.getElementById('form-add-summary-note').addEventListener('submit', async (e) => {
@@ -1452,6 +1498,12 @@
                 allNotes.sort((a, b) => a.createdAt - b.createdAt); 
                 renderNotes(allNotes);
                 if (currentSummaryRelationId) renderSummaryNotes(currentSummaryRelationId);
+            }));
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'ideas')), (snapshot) => {
+                allIdeas = []; snapshot.forEach(doc => allIdeas.push({ id: doc.id, ...doc.data() }));
+                allIdeas.sort((a, b) => b.createdAt - a.createdAt); // Las más nuevas arriba
+                renderIdeas(allIdeas);
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
@@ -1956,6 +2008,40 @@
             lucide.createIcons();
             
             setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
+        }
+
+        function renderIdeas(ideasList) {
+            const list = document.getElementById('firebase-ideas-list');
+            if (!list) return;
+            if (ideasList.length === 0) { list.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Aún no hay ideas. ¡Que fluya la creatividad!</div>`; return; }
+            list.innerHTML = '';
+            
+            ideasList.forEach(idea => {
+                try {
+                    const author = idea.addedBy || 'Sistema';
+                    const isMe = author === localUser;
+                    
+                    const div = document.createElement('div'); 
+                    div.style.cssText = `display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);`;
+                    
+                    div.innerHTML = `
+                        <div style="color: #FDE68A; margin-top: 2px;"><i data-lucide="zap" size="18"></i></div>
+                        <div style="flex-grow: 1; position: relative; padding-right: ${isMe ? '40px' : '0'};">
+                            <p style="font-size: var(--text-sm); color: white; margin: 0 0 4px 0; line-height: 1.4;">${idea.text || ''}</p>
+                            <span style="font-size: 0.65rem; color: rgba(255,255,255,0.5);">Aportada por ${author}</span>
+                            
+                            ${isMe ? `
+                            <div style="position: absolute; top: 0; right: 0; display: flex; gap: 8px;">
+                                <i data-lucide="pencil" style="color: #FDE68A; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="editarIdea('${idea.id}')" title="Editar"></i>
+                                <i data-lucide="trash-2" style="color: #FECACA; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="deleteDocument('ideas', '${idea.id}')" title="Borrar"></i>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error al renderizar idea", e); }
+            });
+            lucide.createIcons();
         }
 
         // 4. INIT UI & CALENDAR
