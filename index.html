@@ -258,6 +258,13 @@
         .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
         .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
         
+        .date-badge.success { background: var(--alert-success-bg); color: var(--alert-success); font-weight: 700; border: 1px solid #BADBCC; }
+        .date-badge.warning { background: var(--alert-warning-bg); color: var(--alert-warning); font-weight: 700; border: 1px solid #FFE69C;}
+        .date-badge.danger { background: var(--alert-danger-bg); color: var(--alert-danger); font-weight: 700; border: 1px solid #F5C2C7; animation: pulse 2s infinite;}
+        .date-badge.neutral { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); }
+        
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
         /* --- Calendario & Listas --- */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
         .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
@@ -426,7 +433,7 @@
                     </div>
                 </form>
                 
-                <!-- TAB: PROYECTO (Simplificado sin Cronograma ni Estado Inicial) -->
+                <!-- TAB: PROYECTO (Sin Cronograma) -->
                 <form id="form-add-project" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -437,7 +444,6 @@
                             <label>Cliente Asociado</label>
                             <select id="proj-client" class="form-control">
                                 <option value="">Ninguno / Proyecto Personal</option>
-                                <!-- JS Injected Options -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -445,7 +451,6 @@
                             <input type="number" id="proj-progress" class="form-control" placeholder="0" min="0" max="100" required>
                         </div>
                         
-                        <!-- Notas del Proyecto -->
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas Generales (Opcional)</label>
                             <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, links o información fija del proyecto..."></textarea>
@@ -490,7 +495,8 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Asociar a (Proyecto o Cliente) *</label>
-                            <select id="link-relation" class="form-control" required>
+                            <!-- YA NO ES REQUIRED PARA PERMITIR "GENERAL" -->
+                            <select id="link-relation" class="form-control">
                                 <option value="">Selecciona a dónde pertenece...</option>
                             </select>
                         </div>
@@ -558,13 +564,10 @@
             </div>
             <div class="data-entry-body" style="background: var(--bg); display: flex; flex-direction: column; gap: var(--space-4);">
                 
-                <!-- Panel: Info cruzada del Cliente -->
                 <div id="summary-client-info-container" class="card" style="display: none; background: #FFF; border-left: 3px solid var(--text-dim);"></div>
 
-                <!-- Panel: Proyectos de este cliente -->
                 <div id="summary-projects-list-container" class="card" style="display: none;"></div>
 
-                <!-- Panel: Notas fijas del proyecto -->
                 <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
                     <h3 style="font-size: var(--text-sm); color: var(--brand-primary-deep); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
                         <i data-lucide="align-left" size="16"></i> Notas Fijas / Accesos
@@ -605,10 +608,15 @@
                     <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
                 </div>
 
+                <!-- NOTAS EN LA FICHA -->
+                <div class="card" id="summary-notes-card">
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Actividad</h3>
+                    <div class="notes-list" id="summary-notes-list" style="max-height: 250px; padding: 0;"></div>
+                </div>
+
             </div>
         </div>
     </div>
-
 
     <!-- ==========================================
          APP PRINCIPAL (DASHBOARD LECTURA)
@@ -616,7 +624,6 @@
     <div id="app-layout">
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- SIDEBAR NAVEGACIÓN -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo"><i data-lucide="sparkles"></i> Talento</div>
@@ -638,20 +645,17 @@
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
         <main class="main-content">
             
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-3);">
                     <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
-                    <!-- Bloque de Saludo -->
                     <div class="greeting" id="greeting-container">
                         <h1 id="greeting-text">Buen día</h1>
                         <p id="current-date">Fecha</p>
                     </div>
                 </div>
                 
-                <!-- BUSCADOR GLOBAL -->
                 <div class="search-container">
                     <i data-lucide="search" class="search-icon" size="18"></i>
                     <input type="search" id="global-search" class="search-input" placeholder="Buscar proyecto o cliente..." autocomplete="off">
@@ -666,12 +670,9 @@
                 </div>
             </header>
 
-            <!-- VISTAS SPA (Una por cada sección del menú) -->
-            
             <!-- 1. VISTA: INICIO -->
             <div id="view-inicio" class="view-section active">
                 <div class="dashboard-grid">
-                    <!-- Columna Principal -->
                     <div class="col-main">
                         <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary); height: 100%;">
                             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
@@ -693,10 +694,7 @@
                         </div>
                     </div>
 
-                    <!-- Columna Lateral -->
                     <div class="col-side">
-                        
-                        <!-- ENLACES INTERNOS -->
                         <div class="card">
                             <div class="card-header">
                                 <h2 class="card-title"><i data-lucide="link"></i> Enlaces Propios</h2>
@@ -707,7 +705,6 @@
                             </div>
                         </div>
                         
-                        <!-- CALENDARIO -->
                         <div class="card">
                             <div class="card-header">
                                 <h2 class="card-title"><i data-lucide="calendar"></i> Calendario</h2>
@@ -729,7 +726,6 @@
                                 <div class="calendar-grid" id="calendar-days-grid"></div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
@@ -815,6 +811,11 @@
         </main>
     </div>
 
+    <!-- TOAST NOTIFICACIÓN -->
+    <div id="toast-notification" style="position: fixed; bottom: 20px; right: 20px; background: #D1E7DD; color: #0F5132; padding: 12px 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-md); transform: translateY(100px); opacity: 0; transition: all 0.3s var(--ease-standard); z-index: 10000; display: flex; align-items: center; gap: 8px; border: 1px solid #BADBCC; pointer-events: none;">
+        <i data-lucide="check-circle" size="18"></i> <span id="toast-message" style="font-weight: 600; font-size: var(--text-sm);">Guardado</span>
+    </div>
+
     <!-- ==========================================
          LÓGICA DE LA APLICACIÓN JAVASCRIPT
          ========================================== -->
@@ -825,7 +826,7 @@
 
         lucide.createIcons();
 
-        // --- ESTADO GLOBAL ---
+        // 1. CONFIGURACIÓN FIREBASE SEGURA
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
@@ -834,16 +835,11 @@
         let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [];
         let unsubscribers = [];
         
-        // IDs para saber si creamos o editamos
-        let idProyectoEnEdicion = null;
-        let idClienteEnEdicion = null;
-        let idRecursoEnEdicion = null;
-        let idInternoEnEdicion = null;
-        let idNotaEnEdicion = null;
-        let idMarketingEnEdicion = null;
+        let idProyectoEnEdicion = null; let idClienteEnEdicion = null; let idRecursoEnEdicion = null; 
+        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null;
         let currentSummaryProjectId = null; 
 
-        // --- SISTEMA DE TOASTS & ERRORES ---
+        // --- SISTEMA INTELIGENTE DE ERRORES ---
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             if(!toast) return;
@@ -863,75 +859,13 @@
         };
 
         window.handleFirebaseError = (err) => {
-            console.error("Firebase Error:", err);
+            console.error("Firebase Error detallado:", err);
             let msg = '❌ Error: ' + (err.message || 'Desconocido');
             if (err.code === 'permission-denied') msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
             else if (err.code === 'auth/unauthorized-domain') msg = '⚠️ Dominio bloqueado: Autoriza la URL en Firebase Auth.';
-            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita "Anónimo" en Firebase.';
-            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet.';
+            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
+            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
             window.showErrorToast(msg);
-        };
-
-        // --- FUNCIONES DE MODALES GLOBALES ---
-        window.openEntryModal = (tabId, isEditing = false) => {
-            if (!isEditing) {
-                idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null;
-                
-                const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing'];
-                forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
-                
-                const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Nuevo Registro';
-                const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
-                const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
-                const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
-                const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
-                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza de Marketing';
-                lucide.createIcons();
-            }
-
-            const modal = document.getElementById('data-entry-overlay');
-            if(modal) {
-                modal.style.display = 'flex';
-                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
-            }
-            
-            const tabsContainer = document.getElementById('data-entry-tabs-container');
-            if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
-            
-            if(tabId) window.switchTab(tabId);
-        };
-
-        window.closeEntryModal = () => {
-            const modal = document.getElementById('data-entry-overlay');
-            if(!modal) return;
-            modal.style.opacity = '0';
-            const modalEl = document.getElementById('data-entry-modal');
-            if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; }, 300);
-        };
-
-        window.switchTab = (tabId) => {
-            const formIdMap = { 
-                'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
-                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing'
-            };
-            document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-            
-            const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
-            const formEl = document.getElementById(formIdMap[tabId]);
-            if (tabEl) tabEl.classList.add('active');
-            if (formEl) formEl.classList.add('active');
-        };
-
-        window.closeSummaryModal = () => {
-            const modal = document.getElementById('summary-overlay');
-            if(!modal) return;
-            modal.style.opacity = '0';
-            const modalEl = document.getElementById('summary-modal');
-            if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => modal.style.display = 'none', 300);
-            currentSummaryProjectId = null;
         };
 
         // --- LÓGICA DE NAVEGACIÓN SPA ---
@@ -1023,7 +957,67 @@
             } else { console.warn("Faltan credenciales de Firebase."); }
         } catch (error) { console.error("Error al iniciar Firebase:", error); }
 
-        // --- FUNCIONES DE NAVEGACIÓN LATERAL / LOGIN ---
+        // --- FUNCIONES DE MODALES ---
+        window.openEntryModal = (tabId, isEditing = false) => {
+            if (!isEditing) {
+                idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null;
+                const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing'];
+                forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
+                
+                const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Nuevo Registro';
+                const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
+                const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
+                const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
+                const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
+                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza';
+                lucide.createIcons();
+            }
+
+            const modal = document.getElementById('data-entry-overlay');
+            if(modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
+            }
+            
+            const tabsContainer = document.getElementById('data-entry-tabs-container');
+            if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
+            if(tabId) window.switchTab(tabId);
+        };
+
+        window.closeEntryModal = () => {
+            const modal = document.getElementById('data-entry-overlay');
+            if(!modal) return;
+            modal.style.opacity = '0';
+            const modalEl = document.getElementById('data-entry-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; }, 300);
+        };
+
+        window.switchTab = (tabId) => {
+            const formIdMap = { 
+                'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
+                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing'
+            };
+            document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            
+            const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
+            const formEl = document.getElementById(formIdMap[tabId]);
+            if (tabEl) tabEl.classList.add('active');
+            if (formEl) formEl.classList.add('active');
+        };
+
+        window.closeSummaryModal = () => {
+            const modal = document.getElementById('summary-overlay');
+            if(!modal) return;
+            modal.style.opacity = '0';
+            const modalEl = document.getElementById('summary-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
+            setTimeout(() => modal.style.display = 'none', 300);
+            currentSummaryProjectId = null;
+        };
+
+        // --- LÓGICA DE UX: MENU Y LOGIN ---
         const toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1579,6 +1573,45 @@
                 }
             }
 
+            // Integración de notas del chat en la ficha resumen con control seguro del usuario
+            const filteredNotes = allNotes.filter(n => n.relationId === relationId);
+            const notesContainer = document.getElementById('summary-notes-list');
+            if (notesContainer) {
+                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px;">Sin notas de actividad.</div>';
+                else {
+                    notesContainer.innerHTML = '';
+                    filteredNotes.forEach(note => {
+                        const author = note.addedBy || 'Sistema'; // Salvavidas
+                        const dateFormatted = note.createdAt ? new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'}) : '--/--';
+                        const uColor = getUserColor(author);
+                        const isMe = author === localUser;
+                        
+                        const div = document.createElement('div'); 
+                        div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
+                        div.innerHTML = `
+                            <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
+                                ${(author).charAt(0).toUpperCase()}
+                            </div>
+                            <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; flex-grow: 1; position: relative; max-width: 90%;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                    <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
+                                </div>
+                                <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text}</p>
+                                
+                                ${isMe ? `
+                                <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
+                                    <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor: pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
+                                    <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor: pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
+                                </div>
+                                ` : ''}
+                            </div>
+                        `;
+                        notesContainer.appendChild(div);
+                    });
+                }
+            }
+
             lucide.createIcons();
             const modal = document.getElementById('summary-overlay');
             if (modal) {
@@ -1605,7 +1638,8 @@
                 
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-id', m.id);
-                tr.setAttribute('data-order', m.order !== undefined ? m.order : -m.createdAt);
+                const sortOrder = m.order !== undefined ? m.order : -m.createdAt;
+                tr.setAttribute('data-order', sortOrder);
                 
                 tr.innerHTML = `
                     <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
@@ -1780,6 +1814,7 @@
             initSortable('firebase-internal-links', 'enlaces_internos');
         }
 
+        // Salvavidas para renderizar chat general (evita fallos de notas antiguas sin "addedBy")
         function renderNotes(notes) {
             const list = document.getElementById('firebase-notes-list');
             if (!list) return;
@@ -1787,9 +1822,10 @@
             list.innerHTML = '';
             
             notes.forEach(note => {
-                const date = new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
-                const isMe = note.addedBy === localUser;
-                const uColor = getUserColor(note.addedBy);
+                const author = note.addedBy || 'Sistema'; // Previene error si falta usuario
+                const dateText = note.createdAt ? new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                const isMe = author === localUser;
+                const uColor = getUserColor(author);
                 const badgeColor = getColorForString(getRelationName(note.relationId));
                 
                 const relationBadge = note.relationId ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${getRelationName(note.relationId).replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
@@ -1799,12 +1835,12 @@
                 
                 div.innerHTML = `
                     <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
-                        ${note.addedBy.charAt(0).toUpperCase()}
+                        ${author.charAt(0).toUpperCase()}
                     </div>
                     <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; max-width: 85%; box-shadow: var(--shadow-sm); position: relative;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px; gap: 16px;">
-                            <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${note.addedBy}</span>
-                            <span style="font-size: 0.65rem; color: var(--text-dim);">${date}</span>
+                            <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
+                            <span style="font-size: 0.65rem; color: var(--text-dim);">${dateText}</span>
                         </div>
                         ${relationBadge}
                         <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text}</p>
@@ -1885,46 +1921,6 @@
                 grid.appendChild(dayDiv);
             }
         }
-        
-        // Asignar listeners del buscador global (fuera del condicional para evitar duplicados en reinicios)
-        const searchInputGlobal = document.getElementById('global-search');
-        if (searchInputGlobal) {
-            searchInputGlobal.addEventListener('input', (e) => {
-                const searchResults = document.getElementById('search-results');
-                if(!searchResults) return;
-                
-                const queryText = e.target.value.toLowerCase().trim();
-                if(!queryText) { searchResults.style.display = 'none'; return; }
-
-                const matchedProjects = allProjects.filter(p => p.name.toLowerCase().includes(queryText));
-                const matchedClients = allClients.filter(c => c.company.toLowerCase().includes(queryText) || c.name.toLowerCase().includes(queryText));
-
-                if(matchedProjects.length === 0 && matchedClients.length === 0) {
-                    searchResults.innerHTML = '<div style="padding: 12px; color: var(--text-dim); text-align: center; font-size: 0.8rem;">Sin resultados</div>';
-                } else {
-                    let html = '';
-                    matchedProjects.forEach(p => {
-                        html += `<div class="search-result-item" onclick="openSummary('P_${p.id}')">
-                                    <span class="search-result-title">${p.name}</span>
-                                    <span class="search-result-meta"><span class="badge info">Proyecto</span></span>
-                                 </div>`;
-                    });
-                    matchedClients.forEach(c => {
-                        html += `<div class="search-result-item" onclick="openSummary('C_${c.id}')">
-                                    <span class="search-result-title">${c.company}</span>
-                                    <span class="search-result-meta"><span class="badge info" style="background:#EFE9DB; color:#684B45;">Cliente</span> Contacto: ${c.name}</span>
-                                 </div>`;
-                    });
-                    searchResults.innerHTML = html;
-                }
-                searchResults.style.display = 'block';
-            });
-        }
-        document.addEventListener('click', (e) => {
-            const searchResults = document.getElementById('search-results');
-            if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
-        });
-
     </script>
 </body>
 </html>
