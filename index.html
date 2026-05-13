@@ -263,7 +263,7 @@
         .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
         .calendar-day-name { font-size: 0.65rem; color: var(--text-dim); font-weight: 600; padding-bottom: 4px; }
-        .calendar-day { font-size: var(--text-sm); padding: 6px 0; border-radius: var(--radius-sm); color: var(--text); }
+        .calendar-day { font-size: var(--text-sm); padding: 6px 0; border-radius: var(--radius-sm); color: var(--text); display: flex; flex-direction: column; align-items: center; }
         .calendar-day.empty { visibility: hidden; }
         .calendar-day.active { background: var(--brand-primary); color: white; font-weight: 600; box-shadow: var(--shadow-sm); }
         .calendar-day.standard:hover { background: var(--brand-primary-glow); color: var(--brand-primary); cursor: default;}
@@ -379,17 +379,43 @@
             </div>
             
             <div class="data-entry-tabs" id="data-entry-tabs-container">
-                <div class="entry-tab active" data-tab="tab-marketing" onclick="switchTab('tab-marketing')">Marketing</div>
+                <div class="entry-tab active" data-tab="tab-evento" onclick="switchTab('tab-evento')">Reunión / Evento</div>
+                <div class="entry-tab" data-tab="tab-marketing" onclick="switchTab('tab-marketing')">Marketing</div>
                 <div class="entry-tab" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
                 <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
-                <div class="entry-tab" data-tab="tab-recurso" onclick="switchTab('tab-recurso')">Recurso Proyecto</div>
-                <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento / Interno</div>
+                <div class="entry-tab" data-tab="tab-recurso" onclick="switchTab('tab-recurso')">Recurso</div>
+                <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento</div>
             </div>
 
             <div class="data-entry-body">
 
+                <!-- TAB: EVENTOS / REUNIONES -->
+                <form id="form-add-evento" class="form-section active">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Título de la Reunión / Evento *</label>
+                            <input type="text" id="evento-title" class="form-control" placeholder="Ej: Meet Inicial Cliente X" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha *</label>
+                            <input type="date" id="evento-date" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora *</label>
+                            <input type="time" id="evento-time" class="form-control" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Enlace (Google Meet, Zoom, etc.)</label>
+                            <input type="text" id="evento-link" class="form-control" placeholder="https://meet.google.com/...">
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-evento"><i data-lucide="save" size="16"></i> Agendar Evento</button>
+                    </div>
+                </form>
+
                 <!-- TAB: MARKETING -->
-                <form id="form-add-marketing" class="form-section active">
+                <form id="form-add-marketing" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
                             <label>Fecha de Publicación *</label>
@@ -411,7 +437,6 @@
                             <textarea id="mkt-detail" class="form-control" rows="3" placeholder="Describe la idea, el copy, o las instrucciones de diseño..." required></textarea>
                         </div>
                         
-                        <!-- Lista de verificación -->
                         <div class="form-group" style="grid-column: 1 / -1; display: flex; gap: var(--space-6); background: var(--bg); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
                             <label class="mkt-checkbox-label">
                                 <input type="checkbox" id="mkt-designed"> Pieza Diseñada
@@ -426,7 +451,7 @@
                     </div>
                 </form>
                 
-                <!-- TAB: PROYECTO (Sin Cronograma) -->
+                <!-- TAB: PROYECTO -->
                 <form id="form-add-project" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -437,7 +462,6 @@
                             <label>Cliente Asociado</label>
                             <select id="proj-client" class="form-control">
                                 <option value="">Ninguno / Proyecto Personal</option>
-                                <!-- JS Injected Options -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -476,7 +500,6 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Sitio Web de la Organización</label>
-                            <!-- Cambiado a type="text" para evitar errores si no se pone http:// -->
                             <input type="text" id="client-web" class="form-control" placeholder="www.ejemplo.com">
                         </div>
                     </div>
@@ -508,7 +531,6 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL o Ubicación en el equipo *</label>
-                            <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
                             <input type="text" id="link-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
                         </div>
                     </div>
@@ -535,7 +557,6 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL o Ubicación en el equipo *</label>
-                            <!-- Cambiado a type="text" para evitar bloqueos del navegador -->
                             <input type="text" id="internal-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
                         </div>
                     </div>
@@ -604,12 +625,12 @@
                     <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
                 </div>
 
-                <!-- NOTAS EN LA FICHA (Chat y Actividad) -->
+                <!-- NOTAS EN LA FICHA -->
                 <div class="card" id="summary-notes-card">
                     <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Actividad</h3>
                     <div class="notes-list" id="summary-notes-list" style="max-height: 250px; padding: 0;"></div>
                     
-                    <!-- NUEVO: Formulario para agregar notas directo desde el proyecto -->
+                    <!-- Formulario para agregar notas directo desde el proyecto -->
                     <form id="form-add-summary-note" style="display: flex; gap: 8px; margin-top: 12px; align-items: center;">
                         <input type="text" id="summary-note-input" class="form-control" placeholder="Escribe un mensaje aquí..." required autocomplete="off" style="flex-grow: 1;">
                         <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="14"></i></button>
@@ -676,7 +697,7 @@
             <div id="view-inicio" class="view-section active">
                 <div class="dashboard-grid">
                     <div class="col-main">
-                        <!-- NUEVO: MÓDULO DE BRAINSTORMING -->
+                        <!-- BRAINSTORMING -->
                         <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none; margin-bottom: var(--space-6);">
                             <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: var(--space-3); margin-bottom: var(--space-3);">
                                 <h2 class="card-title" style="color: white; font-weight: 700;">
@@ -694,6 +715,7 @@
                             </form>
                         </div>
 
+                        <!-- CHAT -->
                         <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary); height: 100%;">
                             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
                                 <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
@@ -725,9 +747,11 @@
                             </div>
                         </div>
                         
+                        <!-- CALENDARIO INTERACTIVO (AGENDA MEETS) -->
                         <div class="card">
                             <div class="card-header">
-                                <h2 class="card-title"><i data-lucide="calendar"></i> Calendario</h2>
+                                <h2 class="card-title"><i data-lucide="calendar"></i> Calendario y Meets</h2>
+                                <button class="btn-icon" onclick="openEntryModal('tab-evento', false)" title="Agendar Reunión"><i data-lucide="plus" size="16"></i></button>
                             </div>
                             <div>
                                 <div class="calendar-header">
@@ -744,6 +768,10 @@
                                     <div class="calendar-day-name">Sa</div>
                                 </div>
                                 <div class="calendar-grid" id="calendar-days-grid"></div>
+                            </div>
+                            <!-- Lista de próximos eventos -->
+                            <div id="firebase-eventos-list" style="margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-3); max-height: 200px; overflow-y: auto;">
+                                <div style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Sin reuniones próximas.</div>
                             </div>
                         </div>
                     </div>
@@ -846,21 +874,21 @@
 
         lucide.createIcons();
 
-        // 1. CONFIGURACIÓN FIREBASE SEGURA
+        // --- ESTADO GLOBAL ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'talento-impulsa-default';
         let app, auth, db;
         let firebaseUser = null;
         let localUser = null;
-        // ESTADO GLOBAL EN MEMORIA
-        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [], allIdeas = [];
+        
+        let allProjects = [], allClients = [], allLinks = [], allNotes = [], allInternalLinks = [], allMarketing = [], allBitacoras = [], allIdeas = [], allEventos = [];
         let unsubscribers = [];
         
         let idProyectoEnEdicion = null; let idClienteEnEdicion = null; let idRecursoEnEdicion = null; 
-        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null; let idIdeaEnEdicion = null;
+        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null; let idIdeaEnEdicion = null; let idEventoEnEdicion = null;
         let currentSummaryProjectId = null; 
         let currentSummaryRelationId = null;
 
-        // --- SISTEMA INTELIGENTE DE ERRORES ---
+        // --- SISTEMA DE TOASTS & ERRORES ---
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             if(!toast) return;
@@ -880,13 +908,79 @@
         };
 
         window.handleFirebaseError = (err) => {
-            console.error("Firebase Error detallado:", err);
+            console.error("Firebase Error:", err);
             let msg = '❌ Error: ' + (err.message || 'Desconocido');
             if (err.code === 'permission-denied') msg = '❌ Permiso denegado: Revisa las Reglas de Firestore.';
             else if (err.code === 'auth/unauthorized-domain') msg = '⚠️ Dominio bloqueado: Autoriza la URL en Firebase Auth.';
-            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita el modo "Anónimo" en Firebase.';
-            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet o Firebase inaccesible.';
+            else if (err.code === 'auth/operation-not-allowed') msg = '⚠️ Auth apagado: Habilita "Anónimo" en Firebase.';
+            else if (err.code === 'unavailable') msg = '📶 Sin conexión a Internet.';
             window.showErrorToast(msg);
+        };
+
+        // --- FUNCIONES DE MODALES GLOBALES ---
+        window.openEntryModal = (tabId, isEditing = false) => {
+            if (!isEditing) {
+                idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; idEventoEnEdicion = null;
+                
+                const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing', 'form-add-evento'];
+                forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
+                
+                const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Nuevo Registro';
+                const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
+                const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
+                const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
+                const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
+                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza de Marketing';
+                const btnSubmitE = document.getElementById('btn-submit-evento'); if(btnSubmitE) btnSubmitE.innerHTML = '<i data-lucide="save" size="16"></i> Agendar Evento';
+                lucide.createIcons();
+            }
+
+            const modal = document.getElementById('data-entry-overlay');
+            if(modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
+            }
+            
+            const tabsContainer = document.getElementById('data-entry-tabs-container');
+            if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
+            
+            if(tabId) window.switchTab(tabId);
+        };
+
+        window.closeEntryModal = () => {
+            const modal = document.getElementById('data-entry-overlay');
+            if(!modal) return;
+            modal.style.opacity = '0';
+            const modalEl = document.getElementById('data-entry-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
+            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; idEventoEnEdicion = null; }, 300);
+        };
+
+        window.switchTab = (tabId) => {
+            const formIdMap = { 
+                'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
+                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing', 'tab-evento': 'form-add-evento'
+            };
+            document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+            
+            const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
+            const formEl = document.getElementById(formIdMap[tabId]);
+            if (tabEl) tabEl.classList.add('active');
+            if (formEl) formEl.classList.add('active');
+        };
+
+        window.closeSummaryModal = () => {
+            const modal = document.getElementById('summary-overlay');
+            if(!modal) return;
+            modal.style.opacity = '0';
+            const modalEl = document.getElementById('summary-modal');
+            if(modalEl) modalEl.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                modal.style.display = 'none';
+                currentSummaryProjectId = null;
+                currentSummaryRelationId = null;
+            }, 300);
         };
 
         // --- LÓGICA DE NAVEGACIÓN SPA ---
@@ -898,6 +992,7 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             const targetNav = document.querySelector(`.nav-item[data-view="${viewId}"]`);
             if(targetNav) targetNav.classList.add('active');
+            
             if (window.innerWidth <= 1024) toggleSidebar();
         }
 
@@ -921,17 +1016,13 @@
 
         function getColorForString(str) {
             const colors = [
-                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' },
-                { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
-                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' },
-                { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
-                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' },
-                { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
+                { bg: '#E0F2FE', text: '#0369A1', border: '#BAE6FD' }, { bg: '#DCFCE7', text: '#15803D', border: '#BBF7D0' },
+                { bg: '#FEF9C3', text: '#B45309', border: '#FEF08A' }, { bg: '#FEE2E2', text: '#B91C1C', border: '#FECACA' },
+                { bg: '#F3E8FF', text: '#7E22CE', border: '#E9D5FF' }, { bg: '#FFE4E6', text: '#BE185D', border: '#FECDD3' },
                 { bg: '#CCFBF1', text: '#0F766E', border: '#99F6E4' } 
             ];
             if(!str || typeof str !== 'string' || str === 'General' || str.trim() === '') return { bg: '#EFE9DB', text: '#684B45', border: '#D6CDB8' };
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
             return colors[Math.abs(hash) % colors.length];
         }
 
@@ -982,70 +1073,7 @@
             } else { console.warn("Faltan credenciales de Firebase."); }
         } catch (error) { console.error("Error al iniciar Firebase:", error); }
 
-        // --- FUNCIONES DE MODALES ---
-        window.openEntryModal = (tabId, isEditing = false) => {
-            if (!isEditing) {
-                idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null;
-                const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing'];
-                forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
-                
-                const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Nuevo Registro';
-                const btnSubmitP = document.getElementById('btn-submit-project'); if(btnSubmitP) btnSubmitP.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Proyecto';
-                const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
-                const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
-                const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
-                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza';
-                lucide.createIcons();
-            }
-
-            const modal = document.getElementById('data-entry-overlay');
-            if(modal) {
-                modal.style.display = 'flex';
-                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
-            }
-            
-            const tabsContainer = document.getElementById('data-entry-tabs-container');
-            if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
-            if(tabId) window.switchTab(tabId);
-        };
-
-        window.closeEntryModal = () => {
-            const modal = document.getElementById('data-entry-overlay');
-            if(!modal) return;
-            modal.style.opacity = '0';
-            const modalEl = document.getElementById('data-entry-modal');
-            if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => { modal.style.display = 'none'; idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; }, 300);
-        };
-
-        window.switchTab = (tabId) => {
-            const formIdMap = { 
-                'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
-                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing'
-            };
-            document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-            
-            const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
-            const formEl = document.getElementById(formIdMap[tabId]);
-            if (tabEl) tabEl.classList.add('active');
-            if (formEl) formEl.classList.add('active');
-        };
-
-        window.closeSummaryModal = () => {
-            const modal = document.getElementById('summary-overlay');
-            if(!modal) return;
-            modal.style.opacity = '0';
-            const modalEl = document.getElementById('summary-modal');
-            if(modalEl) modalEl.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                modal.style.display = 'none';
-                currentSummaryProjectId = null;
-                currentSummaryRelationId = null;
-            }, 300);
-        };
-
-        // --- LÓGICA DE UX: MENU Y LOGIN ---
+        // --- FUNCIONES DE NAVEGACIÓN LATERAL / LOGIN ---
         const toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
@@ -1248,6 +1276,22 @@
             window.showToast('Editando idea...');
         };
 
+        window.editarEvento = (evtId) => {
+            const eObj = allEventos.find(x => x.id === evtId);
+            if(!eObj) return;
+            idEventoEnEdicion = evtId;
+            
+            document.getElementById('evento-title').value = eObj.title || '';
+            document.getElementById('evento-date').value = eObj.date || '';
+            document.getElementById('evento-time').value = eObj.time || '';
+            document.getElementById('evento-link').value = eObj.meetLink || '';
+
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Evento';
+            const btnSubmit = document.getElementById('btn-submit-evento'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Evento';
+            lucide.createIcons();
+            window.openEntryModal('tab-evento', true);
+        };
+
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
             if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
@@ -1258,6 +1302,32 @@
 
         // --- ENVÍO DE FORMULARIOS ---
         
+        document.getElementById('form-add-evento').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            
+            const data = { 
+                title: document.getElementById('evento-title').value.trim(), 
+                date: document.getElementById('evento-date').value,
+                time: document.getElementById('evento-time').value, 
+                meetLink: document.getElementById('evento-link').value.trim() || '',
+                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
+            };
+
+            try {
+                if (idEventoEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "eventos", idEventoEnEdicion), data);
+                    window.showToast('Evento actualizado');
+                } else {
+                    data.addedBy = localUser; data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), data);
+                    window.showToast('Evento guardado');
+                }
+                document.getElementById('form-add-evento').reset(); window.closeEntryModal(); 
+            } catch (err) { window.handleFirebaseError(err); }
+        });
+
         document.getElementById('form-add-marketing').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
@@ -1422,7 +1492,6 @@
             } catch (err) { window.handleFirebaseError(err); }
         });
         
-        // --- NUEVO: FORMULARIO DE NOTAS DENTRO DEL SUMMARY ---
         document.getElementById('form-add-summary-note').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db || !firebaseUser || !currentSummaryRelationId) return;
@@ -1461,6 +1530,14 @@
         // --- LISTENERS EN TIEMPO REAL ---
         function startRealtimeListeners() {
             if (!firebaseUser || !db) return;
+
+            unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'eventos')), (snapshot) => {
+                allEventos = []; snapshot.forEach(doc => allEventos.push({ id: doc.id, ...doc.data() }));
+                // Ordenar por fecha y hora (más próximos primero)
+                allEventos.sort((a, b) => new Date(a.date+'T'+(a.time||'00:00')) - new Date(b.date+'T'+(b.time||'00:00')));
+                renderEventosList(allEventos);
+                renderCalendar(currentDate); // Refrescar calendario para ver puntitos
+            }));
             
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras')), (snapshot) => {
                 allBitacoras = []; snapshot.forEach(doc => allBitacoras.push({ id: doc.id, ...doc.data() }));
@@ -1502,7 +1579,7 @@
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'ideas')), (snapshot) => {
                 allIdeas = []; snapshot.forEach(doc => allIdeas.push({ id: doc.id, ...doc.data() }));
-                allIdeas.sort((a, b) => b.createdAt - a.createdAt); // Las más nuevas arriba
+                allIdeas.sort((a, b) => b.createdAt - a.createdAt); 
                 renderIdeas(allIdeas);
             }));
 
@@ -1532,14 +1609,6 @@
             let clientOptions = '<option value="">Ninguno / Proyecto Personal</option>';
             allClients.forEach(c => clientOptions += `<option value="${c.company}">${c.company}</option>`);
             if(projClientSelect) projClientSelect.innerHTML = clientOptions;
-        }
-
-        function getRelationName(relationId) {
-            if(!relationId || typeof relationId !== 'string') return 'General';
-            const [type, id] = relationId.split('_');
-            if(type === 'P') { const p = allProjects.find(x => x.id === id); return p ? `Proyecto: ${p.name}` : 'Desconocido'; }
-            if(type === 'C') { const c = allClients.find(x => x.id === id); return c ? `Cliente: ${c.company}` : 'Desconocido'; }
-            return 'General';
         }
 
         // BUSCADOR GLOBAL
@@ -1661,7 +1730,6 @@
                     linksContainer.innerHTML = '';
                     filteredLinks.forEach(link => {
                         try {
-                            // Detector Inteligente de Links vs Rutas Locales
                             let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
                             let actionHtml = isWebLink 
                                 ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Enlace &rarr;</a>`
@@ -1768,6 +1836,48 @@
         function formatStageDate(dateString) {
             if (!dateString) return '';
             return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
+        }
+
+        // --- RENDER EVENTOS / MEETS ---
+        function renderEventosList(eventos) {
+            const list = document.getElementById('firebase-eventos-list');
+            if (!list) return;
+
+            // Filtrar eventos viejos (opcional: dejar los de hoy en adelante)
+            const todayStr = new Date().toISOString().split('T')[0];
+            const futureEvents = eventos.filter(e => e.date >= todayStr);
+
+            if (futureEvents.length === 0) { 
+                list.innerHTML = `<div style="text-align: center; color: var(--text-dim); font-size: var(--text-sm); padding: var(--space-2);">Sin reuniones próximas.</div>`; 
+                return; 
+            }
+            
+            list.innerHTML = '';
+            futureEvents.forEach(evt => {
+                let actionHtml = '';
+                if(evt.meetLink) {
+                    let url = evt.meetLink.startsWith('http') ? evt.meetLink : 'https://' + evt.meetLink;
+                    actionHtml = `<a href="${url}" target="_blank" class="badge" style="background: var(--brand-primary-glow); color: var(--brand-primary); cursor:pointer; font-size: 0.6rem; text-transform:none; text-decoration:none;"><i data-lucide="video" size="10" style="margin-right:4px;"></i> Unirse a Meet</a>`;
+                }
+
+                const div = document.createElement('div');
+                div.style.cssText = `display: flex; flex-direction: column; gap: 4px; padding: var(--space-3) 0; border-bottom: 1px dashed var(--border-light); position: relative;`;
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <span style="font-weight: 600; font-size: var(--text-sm); color: var(--text);">${evt.title}</span>
+                        <div style="display: flex; gap: 4px;">
+                            <i data-lucide="pencil" style="color: var(--brand-primary); cursor: pointer;" size="14" onclick="editarEvento('${evt.id}')" title="Editar"></i>
+                            <i data-lucide="trash-2" style="color: var(--alert-danger); cursor: pointer;" size="14" onclick="deleteDocument('eventos', '${evt.id}')" title="Borrar"></i>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
+                        <span><i data-lucide="clock" size="12" style="display:inline; margin-bottom:-2px;"></i> ${formatStageDate(evt.date)} a las ${evt.time || '--:--'}</span>
+                        ${actionHtml}
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
         }
 
         function renderMarketing(marketingList) {
@@ -1917,7 +2027,6 @@
                     const relationName = getRelationName(link.relationId);
                     const badgeColor = getColorForString(relationName);
 
-                    // Detector Inteligente de Links vs Rutas Locales
                     let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
                     let actionHtml = isWebLink 
                         ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Recurso &rarr;</a>`
@@ -1960,7 +2069,6 @@
                     div.setAttribute('data-id', link.id);
                     div.setAttribute('data-order', link.order !== undefined ? link.order : -link.createdAt);
 
-                    // Detector Inteligente
                     let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
                     let titleHtml = isWebLink 
                         ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="internal-link-title">${link.title}</a>`
@@ -1978,6 +2086,40 @@
             });
             lucide.createIcons();
             initSortable('firebase-internal-links', 'enlaces_internos');
+        }
+
+        function renderIdeas(ideasList) {
+            const list = document.getElementById('firebase-ideas-list');
+            if (!list) return;
+            if (ideasList.length === 0) { list.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Aún no hay ideas. ¡Que fluya la creatividad!</div>`; return; }
+            list.innerHTML = '';
+            
+            ideasList.forEach(idea => {
+                try {
+                    const author = idea.addedBy || 'Sistema';
+                    const isMe = author === localUser;
+                    
+                    const div = document.createElement('div'); 
+                    div.style.cssText = `display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);`;
+                    
+                    div.innerHTML = `
+                        <div style="color: #FDE68A; margin-top: 2px;"><i data-lucide="zap" size="18"></i></div>
+                        <div style="flex-grow: 1; position: relative; padding-right: ${isMe ? '40px' : '0'};">
+                            <p style="font-size: var(--text-sm); color: white; margin: 0 0 4px 0; line-height: 1.4;">${idea.text || ''}</p>
+                            <span style="font-size: 0.65rem; color: rgba(255,255,255,0.5);">Aportada por ${author}</span>
+                            
+                            ${isMe ? `
+                            <div style="position: absolute; top: 0; right: 0; display: flex; gap: 8px;">
+                                <i data-lucide="pencil" style="color: #FDE68A; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="editarIdea('${idea.id}')" title="Editar"></i>
+                                <i data-lucide="trash-2" style="color: #FECACA; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="deleteDocument('ideas', '${idea.id}')" title="Borrar"></i>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    list.appendChild(div);
+                } catch(e) { console.error("Error al renderizar idea", e); }
+            });
+            lucide.createIcons();
         }
 
         function renderNotes(notes) {
@@ -2026,40 +2168,6 @@
             lucide.createIcons();
             
             setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
-        }
-
-        function renderIdeas(ideasList) {
-            const list = document.getElementById('firebase-ideas-list');
-            if (!list) return;
-            if (ideasList.length === 0) { list.innerHTML = `<div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Aún no hay ideas. ¡Que fluya la creatividad!</div>`; return; }
-            list.innerHTML = '';
-            
-            ideasList.forEach(idea => {
-                try {
-                    const author = idea.addedBy || 'Sistema';
-                    const isMe = author === localUser;
-                    
-                    const div = document.createElement('div'); 
-                    div.style.cssText = `display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1);`;
-                    
-                    div.innerHTML = `
-                        <div style="color: #FDE68A; margin-top: 2px;"><i data-lucide="zap" size="18"></i></div>
-                        <div style="flex-grow: 1; position: relative; padding-right: ${isMe ? '40px' : '0'};">
-                            <p style="font-size: var(--text-sm); color: white; margin: 0 0 4px 0; line-height: 1.4;">${idea.text || ''}</p>
-                            <span style="font-size: 0.65rem; color: rgba(255,255,255,0.5);">Aportada por ${author}</span>
-                            
-                            ${isMe ? `
-                            <div style="position: absolute; top: 0; right: 0; display: flex; gap: 8px;">
-                                <i data-lucide="pencil" style="color: #FDE68A; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="editarIdea('${idea.id}')" title="Editar"></i>
-                                <i data-lucide="trash-2" style="color: #FECACA; cursor: pointer; opacity: 0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8" size="14" onclick="deleteDocument('ideas', '${idea.id}')" title="Borrar"></i>
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    list.appendChild(div);
-                } catch(e) { console.error("Error al renderizar idea", e); }
-            });
-            lucide.createIcons();
         }
 
         // 4. INIT UI & CALENDAR
@@ -2118,8 +2226,21 @@
             grid.innerHTML = '';
             for (let i = 0; i < firstDay; i++) { const emptyDiv = document.createElement('div'); emptyDiv.className = 'calendar-day empty'; grid.appendChild(emptyDiv); }
             for (let i = 1; i <= daysInMonth; i++) {
-                const dayDiv = document.createElement('div'); dayDiv.textContent = i;
-                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dayDiv.className = 'calendar-day active'; else dayDiv.className = 'calendar-day standard';
+                const currentDayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                // Verificar si hay eventos en este dia
+                const hasEvent = allEventos.some(e => e.date === currentDayString);
+
+                const dayDiv = document.createElement('div');
+                if (year === today.getFullYear() && month === today.getMonth() && i === today.getDate()) dayDiv.className = 'calendar-day active'; 
+                else dayDiv.className = 'calendar-day standard';
+
+                if (hasEvent) {
+                    dayDiv.innerHTML = `<span>${i}</span><div style="width: 4px; height: 4px; background: ${dayDiv.classList.contains('active') ? '#FFF' : 'var(--brand-primary)'}; border-radius: 50%; margin-top: 2px;"></div>`;
+                } else {
+                    dayDiv.textContent = i;
+                }
+                
                 grid.appendChild(dayDiv);
             }
         }
