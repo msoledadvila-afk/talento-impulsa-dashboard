@@ -19,7 +19,7 @@
     <!-- Iconos de Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- SortableJS para Drag & Drop (Mover elementos) -->
+    <!-- SortableJS para Drag & Drop -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
@@ -128,7 +128,6 @@
         .form-group { margin-bottom: var(--space-3); }
         .form-group label { display: block; font-size: 0.7rem; font-weight: 500; margin-bottom: 2px; color: var(--text-dim); }
 
-        /* Mover items (Drag & Drop) */
         .drag-handle { cursor: grab; padding-right: 8px; color: var(--border-light); transition: color 0.2s; display: flex; align-items: center;}
         .drag-handle:hover { color: var(--brand-primary); }
         .sortable-ghost { opacity: 0.4; background-color: var(--bg); }
@@ -208,7 +207,6 @@
         .greeting p { color: var(--text-dim); font-size: var(--text-xs); }
         .mobile-menu-btn { display: none; }
 
-        /* Views SPA */
         .view-section { display: none; animation: fadeIn 0.3s ease; }
         .view-section.active { display: block; }
 
@@ -241,13 +239,12 @@
         .search-result-meta { font-size: 0.7rem; color: var(--text-dim); }
 
         /* ============================================================
-           GRID REORDENAMIENTO (MOBILE VS DESKTOP)
+           GRID REORDENAMIENTO
            ============================================================ */
         .dashboard-grid { display: flex; flex-direction: column; gap: var(--space-6); }
         .col-side { order: 1; display: flex; flex-direction: column; gap: var(--space-6); }
         .col-main { order: 2; display: flex; flex-direction: column; gap: var(--space-6); }
 
-        /* --- Tablas --- */
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th { color: var(--text-dim); font-size: var(--text-xs); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-light); text-align: left; }
@@ -258,7 +255,6 @@
         .stage-dates { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: var(--text-dim); }
         .date-badge { padding: 2px 6px; border-radius: 4px; background: var(--bg); display: inline-block; width: max-content; }
         
-        /* --- Calendario & Listas --- */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); }
         .calendar-title { font-weight: 700; color: var(--brand-primary); text-transform: capitalize; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
@@ -281,13 +277,11 @@
         .data-footer { display: flex; justify-content: flex-end; align-items: center; border-top: 1px dashed var(--border-light); padding-top: var(--space-2); margin-top: var(--space-1); gap: 4px; }
         .data-meta { font-size: 0.7rem; color: var(--text-dim); margin-right: auto;}
 
-        /* Enlaces Internos (Talento) */
         .internal-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--border-light); background: var(--bg-card);}
         .internal-link:last-child { border: none; }
         .internal-link-icon { color: var(--brand-primary); }
         .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 
-        /* Marketing */
         .mkt-checkbox-label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: var(--text-sm); }
         .mkt-checkbox-label input { width: 16px; height: 16px; accent-color: var(--brand-primary); }
 
@@ -315,7 +309,6 @@
 </head>
 <body>
 
-    <!-- PWA Magic Injection -->
     <script>
         const manifestData = {
             "name": "Talento Impulsa Dashboard",
@@ -389,7 +382,7 @@
 
             <div class="data-entry-body">
 
-                <!-- TAB: EVENTOS / REUNIONES -->
+                <!-- TAB: EVENTOS -->
                 <form id="form-add-evento" class="form-section active">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
@@ -531,7 +524,7 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL o Ubicación en el equipo *</label>
-                            <input type="text" id="link-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
+                            <input type="text" id="link-url" class="form-control" placeholder="Pega el link o la ruta local (Ej: C:\Carpeta)" required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -557,7 +550,7 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>URL o Ubicación en el equipo *</label>
-                            <input type="text" id="internal-url" class="form-control" placeholder="Pega el link o la ruta (Ej: C:\Carpetas\Diseño)" required>
+                            <input type="text" id="internal-url" class="form-control" placeholder="Pega el link o la ruta local (Ej: C:\Carpeta)" required>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -582,7 +575,6 @@
             <div class="data-entry-body" style="background: var(--bg); display: flex; flex-direction: column; gap: var(--space-4);">
                 
                 <div id="summary-client-info-container" class="card" style="display: none; background: #FFF; border-left: 3px solid var(--text-dim);"></div>
-
                 <div id="summary-projects-list-container" class="card" style="display: none;"></div>
 
                 <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
@@ -597,7 +589,6 @@
                     <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
                         <i data-lucide="book-open" size="16"></i> Bitácora de Novedades
                     </h3>
-                    
                     <form id="form-add-bitacora" style="display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-start; flex-wrap: wrap;">
                         <input type="date" id="bit-date" class="form-control" style="width: auto;" required>
                         <input type="text" id="bit-detail" class="form-control" placeholder="¿Qué avance se hizo hoy?" style="flex-grow: 1; min-width: 200px;" required>
@@ -610,12 +601,9 @@
                         </select>
                         <button type="submit" class="btn-primary btn-small" style="width: auto; padding: 8px 12px;" title="Agregar a bitácora"><i data-lucide="plus" size="18"></i></button>
                     </form>
-
                     <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
                         <table style="width: 100%; min-width: 400px; border-collapse: collapse;">
-                            <tbody id="summary-bitacora-list">
-                                <!-- JS inyecta la bitacora aqui -->
-                            </tbody>
+                            <tbody id="summary-bitacora-list"></tbody>
                         </table>
                     </div>
                 </div>
@@ -628,9 +616,7 @@
                 <!-- NOTAS EN LA FICHA -->
                 <div class="card" id="summary-notes-card">
                     <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Actividad</h3>
-                    <div class="notes-list" id="summary-notes-list" style="max-height: 250px; padding: 0;"></div>
-                    
-                    <!-- Formulario para agregar notas directo desde el proyecto -->
+                    <div class="notes-list" id="summary-notes-list" style="min-height: 100px; max-height: 250px; padding: 0; overflow-y: auto;"></div>
                     <form id="form-add-summary-note" style="display: flex; gap: 8px; margin-top: 12px; align-items: center;">
                         <input type="text" id="summary-note-input" class="form-control" placeholder="Escribe un mensaje aquí..." required autocomplete="off" style="flex-grow: 1;">
                         <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="14"></i></button>
@@ -669,7 +655,6 @@
         </aside>
 
         <main class="main-content">
-            
             <header class="topbar">
                 <div style="display: flex; align-items: center; gap: var(--space-3);">
                     <button class="mobile-menu-btn" id="btn-open-sidebar"><i data-lucide="menu" size="24"></i></button>
@@ -705,7 +690,7 @@
                                     <i data-lucide="sparkles" size="16" style="color: #FDE68A;"></i>
                                 </h2>
                             </div>
-                            <div class="notes-list" id="firebase-ideas-list" style="max-height: 300px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
+                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 150px; max-height: 300px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
                                 <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Cargando ideas...</div>
                             </div>
                             
@@ -715,12 +700,12 @@
                             </form>
                         </div>
 
-                        <!-- CHAT -->
-                        <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary); height: 100%;">
+                        <!-- CHAT GLOBAL -->
+                        <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary);">
                             <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
                                 <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
                             </div>
-                            <div class="notes-list" id="firebase-notes-list" style="max-height: 400px; padding: 10px; background: #FAFAFA; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-grow: 1;">
+                            <div class="notes-list" id="firebase-notes-list" style="min-height: 250px; max-height: 400px; padding: 10px; background: #FAFAFA; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-grow: 1; overflow-y: auto;">
                                 <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando mensajes...</div>
                             </div>
                             
@@ -743,11 +728,10 @@
                                 <button class="btn-icon" onclick="openEntryModal('tab-interno', false)"><i data-lucide="plus" size="16"></i></button>
                             </div>
                             <div id="firebase-internal-links" style="display: flex; flex-direction: column;">
-                                <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Sin enlaces.</div>
+                                <div style="text-align: center; color: var(--text-dim); padding: var(--space-2); font-size: var(--text-sm);">Cargando enlaces...</div>
                             </div>
                         </div>
                         
-                        <!-- CALENDARIO INTERACTIVO (AGENDA MEETS) -->
                         <div class="card">
                             <div class="card-header">
                                 <h2 class="card-title"><i data-lucide="calendar"></i> Calendario y Meets</h2>
@@ -769,7 +753,6 @@
                                 </div>
                                 <div class="calendar-grid" id="calendar-days-grid"></div>
                             </div>
-                            <!-- Lista de próximos eventos -->
                             <div id="firebase-eventos-list" style="margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-3); max-height: 200px; overflow-y: auto;">
                                 <div style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Sin reuniones próximas.</div>
                             </div>
@@ -864,9 +847,6 @@
         <i data-lucide="check-circle" size="18"></i> <span id="toast-message" style="font-weight: 600; font-size: var(--text-sm);">Guardado</span>
     </div>
 
-    <!-- ==========================================
-         LÓGICA DE LA APLICACIÓN JAVASCRIPT
-         ========================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -888,7 +868,6 @@
         let currentSummaryProjectId = null; 
         let currentSummaryRelationId = null;
 
-        // --- SISTEMA DE TOASTS & ERRORES ---
         window.showToast = (message) => {
             const toast = document.getElementById('toast-notification');
             if(!toast) return;
@@ -917,11 +896,9 @@
             window.showErrorToast(msg);
         };
 
-        // --- FUNCIONES DE MODALES GLOBALES ---
         window.openEntryModal = (tabId, isEditing = false) => {
             if (!isEditing) {
                 idProyectoEnEdicion = null; idClienteEnEdicion = null; idRecursoEnEdicion = null; idInternoEnEdicion = null; idMarketingEnEdicion = null; idEventoEnEdicion = null;
-                
                 const forms = ['form-add-project', 'form-add-client', 'form-add-link', 'form-add-internal', 'form-add-marketing', 'form-add-evento'];
                 forms.forEach(id => { const f = document.getElementById(id); if(f) f.reset(); });
                 
@@ -930,20 +907,15 @@
                 const btnSubmitC = document.getElementById('btn-submit-client'); if(btnSubmitC) btnSubmitC.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Cliente';
                 const btnSubmitL = document.getElementById('btn-submit-link'); if(btnSubmitL) btnSubmitL.innerHTML = '<i data-lucide="upload-cloud" size="16"></i> Subir Recurso';
                 const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
-                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza de Marketing';
+                const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza';
                 const btnSubmitE = document.getElementById('btn-submit-evento'); if(btnSubmitE) btnSubmitE.innerHTML = '<i data-lucide="save" size="16"></i> Agendar Evento';
                 lucide.createIcons();
             }
 
             const modal = document.getElementById('data-entry-overlay');
-            if(modal) {
-                modal.style.display = 'flex';
-                setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10);
-            }
-            
+            if(modal) { modal.style.display = 'flex'; setTimeout(() => { modal.style.opacity = '1'; const modalEl = document.getElementById('data-entry-modal'); if(modalEl) modalEl.style.transform = 'translateY(0)'; }, 10); }
             const tabsContainer = document.getElementById('data-entry-tabs-container');
             if (tabsContainer) tabsContainer.style.display = isEditing ? 'none' : 'flex';
-            
             if(tabId) window.switchTab(tabId);
         };
 
@@ -959,11 +931,10 @@
         window.switchTab = (tabId) => {
             const formIdMap = { 
                 'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-recurso': 'form-add-link', 
-                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing', 'tab-evento': 'form-add-evento'
+                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing', 'tab-evento': 'form-add-evento' 
             };
             document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
-            
             const tabEl = document.querySelector(`.entry-tab[data-tab="${tabId}"]`);
             const formEl = document.getElementById(formIdMap[tabId]);
             if (tabEl) tabEl.classList.add('active');
@@ -983,7 +954,6 @@
             }, 300);
         };
 
-        // --- LÓGICA DE NAVEGACIÓN SPA ---
         window.navigateTo = (viewId) => {
             document.querySelectorAll('.view-section').forEach(el => { el.classList.remove('active'); el.style.display = 'none'; });
             const targetView = document.getElementById('view-' + viewId);
@@ -994,9 +964,8 @@
             if(targetNav) targetNav.classList.add('active');
             
             if (window.innerWidth <= 1024) toggleSidebar();
-        }
+        };
 
-        // --- LÓGICA DE COLORES & BADGES ---
         const userColors = {
             'Soledad': { bg: '#FCE7F3', text: '#BE185D' },
             'Gabriel': { bg: '#E0F2FE', text: '#0369A1' },
@@ -1039,7 +1008,15 @@
             return `<span class="badge" style="${s}">${status}</span>`;
         }
 
-        // --- INICIALIZACIÓN DE FIREBASE ---
+        function getTimestamp(val) {
+            if (!val) return 0;
+            if (typeof val === 'number') return val;
+            if (val.toMillis) return val.toMillis();
+            if (val.seconds) return val.seconds * 1000;
+            const parsed = Date.parse(val);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+
         try {
             const miConfiguracionFirebase = {
                 apiKey: "AIzaSyBLdy9Kql0hwb4dxAa4SZOeCuJbhWM2NPs",
@@ -1073,19 +1050,14 @@
             } else { console.warn("Faltan credenciales de Firebase."); }
         } catch (error) { console.error("Error al iniciar Firebase:", error); }
 
-        // --- FUNCIONES DE NAVEGACIÓN LATERAL / LOGIN ---
         const toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             if(sb) sb.classList.toggle('open');
             if(overlay) overlay.classList.toggle('active');
         };
-        const btnOpen = document.getElementById('btn-open-sidebar');
-        const btnClose = document.getElementById('btn-close-sidebar');
-        const sidebarOverlay = document.getElementById('sidebar-overlay');
-        if(btnOpen) btnOpen.addEventListener('click', toggleSidebar);
-        if(btnClose) btnClose.addEventListener('click', toggleSidebar);
-        if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+        const btnOpen = document.getElementById('btn-open-sidebar'); const btnClose = document.getElementById('btn-close-sidebar'); const sidebarOverlay = document.getElementById('sidebar-overlay');
+        if(btnOpen) btnOpen.addEventListener('click', toggleSidebar); if(btnClose) btnClose.addEventListener('click', toggleSidebar); if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
         const credentials = { "Soledad": "sole123", "Gabriel": "gaby123" };
         
@@ -1098,10 +1070,8 @@
 
                 if (credentials[user] === pass) {
                     if (!firebaseUser && auth) {
-                        try { await signInAnonymously(auth); } 
-                        catch (err) { window.handleFirebaseError(err); return; }
+                        try { await signInAnonymously(auth); } catch (err) { window.handleFirebaseError(err); return; }
                     }
-
                     localUser = user;
                     document.getElementById('login-error').style.display = 'none';
                     document.getElementById('login-overlay').style.opacity = '0';
@@ -1123,207 +1093,130 @@
 
         const handleLogout = () => {
             localUser = null;
-            unsubscribers.forEach(unsub => unsub());
-            unsubscribers = [];
-            const appLayout = document.getElementById('app-layout');
-            if(appLayout) appLayout.style.display = 'none';
-            const loginOverlay = document.getElementById('login-overlay');
-            if(loginOverlay) { loginOverlay.style.display = 'flex'; setTimeout(() => loginOverlay.style.opacity = '1', 50); }
-            const passInput = document.getElementById('password-input');
-            if(passInput) passInput.value = '';
+            unsubscribers.forEach(unsub => unsub()); unsubscribers = [];
+            const appLayout = document.getElementById('app-layout'); if(appLayout) appLayout.style.display = 'none';
+            const loginOverlay = document.getElementById('login-overlay'); if(loginOverlay) { loginOverlay.style.display = 'flex'; setTimeout(() => loginOverlay.style.opacity = '1', 50); }
+            const passInput = document.getElementById('password-input'); if(passInput) passInput.value = '';
         };
-
         if(document.getElementById('btn-logout-top')) document.getElementById('btn-logout-top').addEventListener('click', handleLogout);
 
-        // --- SORTABLE ---
         function initSortable(containerId, collectionName) {
             const el = document.getElementById(containerId);
             if (!el) return;
             if (el._sortable) el._sortable.destroy(); 
             el._sortable = Sortable.create(el, {
-                handle: '.drag-handle',
-                animation: 150,
-                ghostClass: 'sortable-ghost',
+                handle: '.drag-handle', animation: 150, ghostClass: 'sortable-ghost',
                 onEnd: async function (evt) {
-                    const itemEl = evt.item;
-                    const docId = itemEl.getAttribute('data-id');
-                    if (!docId) return;
-
-                    const prevEl = itemEl.previousElementSibling;
-                    const nextEl = itemEl.nextElementSibling;
-                    
-                    let prevOrder = prevEl ? parseFloat(prevEl.getAttribute('data-order')) : null;
-                    let nextOrder = nextEl ? parseFloat(nextEl.getAttribute('data-order')) : null;
-                    
+                    const itemEl = evt.item; const docId = itemEl.getAttribute('data-id'); if (!docId) return;
+                    const prevEl = itemEl.previousElementSibling; const nextEl = itemEl.nextElementSibling;
+                    let prevOrder = prevEl ? parseFloat(prevEl.getAttribute('data-order')) : null; let nextOrder = nextEl ? parseFloat(nextEl.getAttribute('data-order')) : null;
                     let newOrder = 0;
-                    if (prevOrder !== null && nextOrder !== null) newOrder = (prevOrder + nextOrder) / 2.0;
-                    else if (prevOrder !== null) newOrder = prevOrder + 1000;
-                    else if (nextOrder !== null) newOrder = nextOrder - 1000;
-
+                    if (prevOrder !== null && nextOrder !== null) newOrder = (prevOrder + nextOrder) / 2.0; else if (prevOrder !== null) newOrder = prevOrder + 1000; else if (nextOrder !== null) newOrder = nextOrder - 1000;
                     itemEl.setAttribute('data-order', newOrder);
-
                     if (!db) return;
-                    try { await updateDoc(doc(db, "artifacts", appId, "public", "data", collectionName, docId), { order: newOrder }); } 
-                    catch (err) { window.handleFirebaseError(err); }
+                    try { await updateDoc(doc(db, "artifacts", appId, "public", "data", collectionName, docId), { order: newOrder }); } catch (err) { window.handleFirebaseError(err); }
                 }
             });
         }
 
-        // --- LÓGICA DE EDICIÓN GLOBAL ---
         window.editarMarketing = (mktId) => {
-            const m = allMarketing.find(x => x.id === mktId);
-            if(!m) return;
+            const m = allMarketing.find(x => x.id === mktId); if(!m) return;
             idMarketingEnEdicion = mktId;
-            document.getElementById('mkt-date').value = m.date || '';
-            document.getElementById('mkt-type').value = m.type || 'Post';
-            document.getElementById('mkt-detail').value = m.detail || '';
-            document.getElementById('mkt-designed').checked = m.designed || false;
-            document.getElementById('mkt-published').checked = m.published || false;
-
+            document.getElementById('mkt-date').value = m.date || ''; document.getElementById('mkt-type').value = m.type || 'Post'; document.getElementById('mkt-detail').value = m.detail || '';
+            document.getElementById('mkt-designed').checked = m.designed || false; document.getElementById('mkt-published').checked = m.published || false;
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Marketing';
             const btnSubmit = document.getElementById('btn-submit-marketing'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Pieza';
-            lucide.createIcons();
-            window.openEntryModal('tab-marketing', true);
+            lucide.createIcons(); window.openEntryModal('tab-marketing', true);
         };
 
         window.toggleMarketingStatus = async (mktId, field, newValue) => {
             if (!db || !firebaseUser) return;
-            try { await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", mktId), { [field]: newValue, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() }); } 
-            catch (err) { window.handleFirebaseError(err); }
+            try { await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", mktId), { [field]: newValue, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() }); } catch (err) { window.handleFirebaseError(err); }
         };
 
         window.editarProyecto = (projectId) => {
-            const p = allProjects.find(x => x.id === projectId);
-            if(!p) return;
+            const p = allProjects.find(x => x.id === projectId); if(!p) return;
             idProyectoEnEdicion = projectId;
             
-            document.getElementById('proj-name').value = p.name || '';
-            document.getElementById('proj-client').value = p.client || '';
-            document.getElementById('proj-progress').value = p.progress || 0;
-            document.getElementById('proj-notes').value = p.notes || '';
-
+            document.getElementById('proj-name').value = p.name || ''; document.getElementById('proj-client').value = p.client || '';
+            document.getElementById('proj-progress').value = p.progress || 0; document.getElementById('proj-notes').value = p.notes || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Proyecto';
             const btnSubmit = document.getElementById('btn-submit-project'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Proyecto';
-            lucide.createIcons();
-            window.openEntryModal('tab-proyecto', true);
+            lucide.createIcons(); window.openEntryModal('tab-proyecto', true);
         };
 
         window.editarCliente = (clientId) => {
-            const c = allClients.find(x => x.id === clientId);
-            if(!c) return;
+            const c = allClients.find(x => x.id === clientId); if(!c) return;
             idClienteEnEdicion = clientId;
-            document.getElementById('client-company').value = c.company || '';
-            document.getElementById('client-name').value = c.name || '';
-            document.getElementById('client-email').value = c.email || '';
-            document.getElementById('client-phone').value = c.phone || '';
-            document.getElementById('client-web').value = c.web || '';
-
+            document.getElementById('client-company').value = c.company || ''; document.getElementById('client-name').value = c.name || '';
+            document.getElementById('client-email').value = c.email || ''; document.getElementById('client-phone').value = c.phone || ''; document.getElementById('client-web').value = c.web || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Cliente';
             const btnSubmit = document.getElementById('btn-submit-client'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Cliente';
-            lucide.createIcons();
-            window.openEntryModal('tab-cliente', true);
+            lucide.createIcons(); window.openEntryModal('tab-cliente', true);
         };
 
         window.editarRecurso = (linkId) => {
-            const l = allLinks.find(x => x.id === linkId);
-            if(!l) return;
+            const l = allLinks.find(x => x.id === linkId); if(!l) return;
             idRecursoEnEdicion = linkId;
-            document.getElementById('link-relation').value = l.relationId || '';
-            document.getElementById('link-type').value = l.type || 'enlace';
-            document.getElementById('link-title').value = l.title || '';
-            document.getElementById('link-url').value = l.url || '';
-
+            document.getElementById('link-relation').value = l.relationId || ''; document.getElementById('link-type').value = l.type || 'enlace';
+            document.getElementById('link-title').value = l.title || ''; document.getElementById('link-url').value = l.url || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Recurso';
             const btnSubmit = document.getElementById('btn-submit-link'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Recurso';
-            lucide.createIcons();
-            window.openEntryModal('tab-recurso', true);
+            lucide.createIcons(); window.openEntryModal('tab-recurso', true);
         };
 
         window.editarEnlaceInterno = (internalId) => {
-            const i = allInternalLinks.find(x => x.id === internalId);
-            if(!i) return;
+            const i = allInternalLinks.find(x => x.id === internalId); if(!i) return;
             idInternoEnEdicion = internalId;
-            document.getElementById('internal-type').value = i.type || 'otro';
-            document.getElementById('internal-title').value = i.title || '';
-            document.getElementById('internal-url').value = i.url || '';
-
+            document.getElementById('internal-type').value = i.type || 'otro'; document.getElementById('internal-title').value = i.title || ''; document.getElementById('internal-url').value = i.url || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Enlace Propio';
             const btnSubmit = document.getElementById('btn-submit-internal'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Enlace';
-            lucide.createIcons();
-            window.openEntryModal('tab-interno', true);
+            lucide.createIcons(); window.openEntryModal('tab-interno', true);
         };
 
         window.editarNota = (noteId) => {
-            const n = allNotes.find(x => x.id === noteId);
-            if(!n) return;
+            const n = allNotes.find(x => x.id === noteId); if(!n) return;
             idNotaEnEdicion = noteId;
-            window.closeSummaryModal(); 
-            navigateTo('inicio'); 
-            const input = document.getElementById('note-input');
-            const select = document.getElementById('note-relation');
+            window.closeSummaryModal(); navigateTo('inicio'); 
+            const input = document.getElementById('note-input'); const select = document.getElementById('note-relation');
             if(input) { input.value = n.text; input.focus(); }
             if(select) select.value = n.relationId || '';
             window.showToast('Editando mensaje...');
         };
 
         window.editarIdea = (ideaId) => {
-            const i = allIdeas.find(x => x.id === ideaId);
-            if(!i) return;
+            const i = allIdeas.find(x => x.id === ideaId); if(!i) return;
             idIdeaEnEdicion = ideaId;
             navigateTo('inicio'); 
-            const input = document.getElementById('idea-input');
-            if(input) { input.value = i.text; input.focus(); }
+            const input = document.getElementById('idea-input'); if(input) { input.value = i.text; input.focus(); }
             window.showToast('Editando idea...');
         };
 
         window.editarEvento = (evtId) => {
-            const eObj = allEventos.find(x => x.id === evtId);
-            if(!eObj) return;
+            const eObj = allEventos.find(x => x.id === evtId); if(!eObj) return;
             idEventoEnEdicion = evtId;
-            
-            document.getElementById('evento-title').value = eObj.title || '';
-            document.getElementById('evento-date').value = eObj.date || '';
-            document.getElementById('evento-time').value = eObj.time || '';
-            document.getElementById('evento-link').value = eObj.meetLink || '';
-
+            document.getElementById('evento-title').value = eObj.title || ''; document.getElementById('evento-date').value = eObj.date || '';
+            document.getElementById('evento-time').value = eObj.time || ''; document.getElementById('evento-link').value = eObj.meetLink || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Evento';
             const btnSubmit = document.getElementById('btn-submit-evento'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Evento';
-            lucide.createIcons();
-            window.openEntryModal('tab-evento', true);
+            lucide.createIcons(); window.openEntryModal('tab-evento', true);
         };
 
         window.deleteDocument = async (collectionName, docId) => {
             if(!db || !firebaseUser) return;
             if(confirm("¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado correctamente');} 
-                catch (err) { window.handleFirebaseError(err); }
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); window.showToast('Eliminado correctamente');} catch (err) { window.handleFirebaseError(err); }
             }
         };
 
-        // --- ENVÍO DE FORMULARIOS ---
-        
         document.getElementById('form-add-evento').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
-            const data = { 
-                title: document.getElementById('evento-title').value.trim(), 
-                date: document.getElementById('evento-date').value,
-                time: document.getElementById('evento-time').value, 
-                meetLink: document.getElementById('evento-link').value.trim() || '',
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
-            };
-
+            const data = { title: document.getElementById('evento-title').value.trim(), date: document.getElementById('evento-date').value, time: document.getElementById('evento-time').value, meetLink: document.getElementById('evento-link').value.trim() || '', lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if (idEventoEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "eventos", idEventoEnEdicion), data);
-                    window.showToast('Evento actualizado');
-                } else {
-                    data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), data);
-                    window.showToast('Evento guardado');
-                }
+                if (idEventoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "eventos", idEventoEnEdicion), data); window.showToast('Evento actualizado'); } 
+                else { data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), data); window.showToast('Evento guardado'); }
                 document.getElementById('form-add-evento').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1332,25 +1225,10 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
-            const data = { 
-                date: document.getElementById('mkt-date').value, 
-                type: document.getElementById('mkt-type').value,
-                detail: document.getElementById('mkt-detail').value.trim(), 
-                designed: document.getElementById('mkt-designed').checked,
-                published: document.getElementById('mkt-published').checked,
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
-            };
-
+            const data = { date: document.getElementById('mkt-date').value, type: document.getElementById('mkt-type').value, detail: document.getElementById('mkt-detail').value.trim(), designed: document.getElementById('mkt-designed').checked, published: document.getElementById('mkt-published').checked, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if (idMarketingEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", idMarketingEnEdicion), data);
-                    window.showToast('Pieza actualizada');
-                } else {
-                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'marketing'), data);
-                    window.showToast('Pieza guardada');
-                }
+                if (idMarketingEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", idMarketingEnEdicion), data); window.showToast('Pieza actualizada'); } 
+                else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'marketing'), data); window.showToast('Pieza guardada'); }
                 document.getElementById('form-add-marketing').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1359,24 +1237,10 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
-            const data = { 
-                name: document.getElementById('proj-name').value.trim(), 
-                client: document.getElementById('proj-client').value,
-                progress: parseInt(document.getElementById('proj-progress').value) || 0, 
-                notes: document.getElementById('proj-notes').value.trim() || '',
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
-            };
-
+            const data = { name: document.getElementById('proj-name').value.trim(), client: document.getElementById('proj-client').value, progress: parseInt(document.getElementById('proj-progress').value) || 0, notes: document.getElementById('proj-notes').value.trim() || '', lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if (idProyectoEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion), data);
-                    window.showToast('Proyecto actualizado');
-                } else {
-                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), data);
-                    window.showToast('Proyecto guardado');
-                }
+                if (idProyectoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "proyectos", idProyectoEnEdicion), data); window.showToast('Proyecto actualizado'); } 
+                else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos'), data); window.showToast('Proyecto guardado'); }
                 document.getElementById('form-add-project').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1385,25 +1249,10 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
-            const data = { 
-                company: document.getElementById('client-company').value.trim(), 
-                name: document.getElementById('client-name').value.trim() || '', 
-                email: document.getElementById('client-email').value.trim() || '', 
-                phone: document.getElementById('client-phone').value.trim() || '',
-                web: document.getElementById('client-web').value.trim() || '',
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now()
-            };
-
+            const data = { company: document.getElementById('client-company').value.trim(), name: document.getElementById('client-name').value.trim() || '', email: document.getElementById('client-email').value.trim() || '', phone: document.getElementById('client-phone').value.trim() || '', web: document.getElementById('client-web').value.trim() || '', lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if (idClienteEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "clientes", idClienteEnEdicion), data);
-                    window.showToast('Cliente actualizado');
-                } else {
-                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), data);
-                    window.showToast('Cliente registrado');
-                }
+                if (idClienteEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "clientes", idClienteEnEdicion), data); window.showToast('Cliente actualizado'); } 
+                else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), data); window.showToast('Cliente registrado'); }
                 document.getElementById('form-add-client').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1412,23 +1261,11 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
             const relationId = document.getElementById('link-relation').value;
-            const data = { 
-                relationId: relationId, relationName: getRelationName(relationId),
-                type: document.getElementById('link-type').value, title: document.getElementById('link-title').value.trim(), url: document.getElementById('link-url').value.trim(), 
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
-            };
-
+            const data = { relationId: relationId, relationName: getRelationName(relationId), type: document.getElementById('link-type').value, title: document.getElementById('link-title').value.trim(), url: document.getElementById('link-url').value.trim(), lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if (idRecursoEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "recursos_compartidos", idRecursoEnEdicion), data);
-                    window.showToast('Recurso actualizado');
-                } else {
-                    data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), data);
-                    window.showToast('Recurso subido');
-                }
+                if (idRecursoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "recursos_compartidos", idRecursoEnEdicion), data); window.showToast('Recurso actualizado'); } 
+                else { data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), data); window.showToast('Recurso subido'); }
                 document.getElementById('form-add-link').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1437,21 +1274,10 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            
-            const data = { 
-                type: document.getElementById('internal-type').value, title: document.getElementById('internal-title').value.trim(), url: document.getElementById('internal-url').value.trim(), 
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
-            };
-
+            const data = { type: document.getElementById('internal-type').value, title: document.getElementById('internal-title').value.trim(), url: document.getElementById('internal-url').value.trim(), lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
-                if(idInternoEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "enlaces_internos", idInternoEnEdicion), data);
-                    window.showToast('Enlace actualizado');
-                } else {
-                    data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now();
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), data);
-                    window.showToast('Enlace interno guardado');
-                }
+                if(idInternoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "enlaces_internos", idInternoEnEdicion), data); window.showToast('Enlace actualizado'); } 
+                else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos'), data); window.showToast('Enlace interno guardado'); }
                 document.getElementById('form-add-internal').reset(); window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1495,13 +1321,10 @@
         document.getElementById('form-add-summary-note').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db || !firebaseUser || !currentSummaryRelationId) return;
-            
             const text = document.getElementById('summary-note-input').value.trim();
             if (!text) return;
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { 
-                    relationId: currentSummaryRelationId, text: text, addedBy: localUser, createdAt: Date.now() 
-                });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { relationId: currentSummaryRelationId, text: text, addedBy: localUser, createdAt: Date.now() });
                 document.getElementById('summary-note-input').value = '';
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1513,80 +1336,91 @@
             if (!currentSummaryProjectId) return;
 
             const data = {
-                projectId: currentSummaryProjectId,
-                date: document.getElementById('bit-date').value,
-                detail: document.getElementById('bit-detail').value.trim(),
-                status: document.getElementById('bit-status').value,
-                addedBy: localUser, createdAt: Date.now()
+                projectId: currentSummaryProjectId, date: document.getElementById('bit-date').value, detail: document.getElementById('bit-detail').value.trim(), status: document.getElementById('bit-status').value, addedBy: localUser, createdAt: Date.now()
             };
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras'), data);
-                document.getElementById('bit-detail').value = '';
-                window.showToast('Registro guardado');
+                document.getElementById('bit-detail').value = ''; window.showToast('Registro guardado');
             } catch (err) { window.handleFirebaseError(err); }
         });
 
-        // --- LISTENERS EN TIEMPO REAL ---
         function startRealtimeListeners() {
             if (!firebaseUser || !db) return;
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'eventos')), (snapshot) => {
-                allEventos = []; snapshot.forEach(doc => allEventos.push({ id: doc.id, ...doc.data() }));
-                // Ordenar por fecha y hora (más próximos primero)
-                allEventos.sort((a, b) => new Date(a.date+'T'+(a.time||'00:00')) - new Date(b.date+'T'+(b.time||'00:00')));
-                renderEventosList(allEventos);
-                renderCalendar(currentDate); // Refrescar calendario para ver puntitos
+                try {
+                    allEventos = []; snapshot.forEach(doc => allEventos.push({ id: doc.id, ...doc.data() }));
+                    allEventos.sort((a, b) => new Date(a.date+'T'+(a.time||'00:00')) - new Date(b.date+'T'+(b.time||'00:00')));
+                    renderEventosList(allEventos); renderCalendar(currentDate); 
+                } catch(e) { console.error("Error cargando eventos", e); }
             }));
             
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras')), (snapshot) => {
-                allBitacoras = []; snapshot.forEach(doc => allBitacoras.push({ id: doc.id, ...doc.data() }));
-                renderProjects(allProjects);
-                if(currentSummaryProjectId) renderSummaryBitacora(currentSummaryProjectId);
+                try {
+                    allBitacoras = []; snapshot.forEach(doc => allBitacoras.push({ id: doc.id, ...doc.data() }));
+                    renderProjects(allProjects); if(currentSummaryProjectId) renderSummaryBitacora(currentSummaryProjectId);
+                } catch(e) { console.error("Error cargando bitacoras", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'marketing')), (snapshot) => {
-                allMarketing = []; snapshot.forEach(doc => allMarketing.push({ id: doc.id, ...doc.data() }));
-                allMarketing.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
-                renderMarketing(allMarketing);
+                try {
+                    allMarketing = []; snapshot.forEach(doc => allMarketing.push({ id: doc.id, ...doc.data() }));
+                    allMarketing.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
+                    renderMarketing(allMarketing);
+                } catch(e) { console.error("Error cargando marketing", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'proyectos')), (snapshot) => {
-                allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
-                allProjects.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
-                renderProjects(allProjects); updateDropdowns();
+                try {
+                    allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
+                    allProjects.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
+                    renderProjects(allProjects); updateDropdowns();
+                } catch(e) { console.error("Error cargando proyectos", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'clientes')), (snapshot) => {
-                allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
-                allClients.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
-                renderClients(allClients); updateDropdowns();
+                try {
+                    allClients = []; snapshot.forEach(doc => allClients.push({ id: doc.id, ...doc.data() }));
+                    allClients.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
+                    renderClients(allClients); updateDropdowns();
+                } catch(e) { console.error("Error cargando clientes", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos')), (snapshot) => {
-                allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
-                allLinks.sort((a, b) => b.createdAt - a.createdAt);
-                renderLinks(allLinks);
-                if (currentSummaryRelationId) renderSummaryLinks(currentSummaryRelationId);
+                try {
+                    allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
+                    allLinks.sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
+                    renderLinks(allLinks); if (currentSummaryRelationId) renderSummaryLinks(currentSummaryRelationId);
+                } catch(e) { console.error("Error cargando links", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas')), (snapshot) => {
-                allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
-                allNotes.sort((a, b) => a.createdAt - b.createdAt); 
-                renderNotes(allNotes);
-                if (currentSummaryRelationId) renderSummaryNotes(currentSummaryRelationId);
+                try {
+                    allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
+                    allNotes.sort((a, b) => getTimestamp(a.createdAt) - getTimestamp(b.createdAt)); 
+                    renderNotes(allNotes);
+                    if (currentSummaryRelationId) renderSummaryNotes(currentSummaryRelationId);
+                } catch(e) { console.error("Error cargando notas", e); window.showErrorToast("Error interno cargando notas. Revisar consola."); }
+            }, (error) => {
+                console.error("Error de Firebase leyendo notas:", error);
+                window.showErrorToast("Permisos insuficientes para leer notas");
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'ideas')), (snapshot) => {
-                allIdeas = []; snapshot.forEach(doc => allIdeas.push({ id: doc.id, ...doc.data() }));
-                allIdeas.sort((a, b) => b.createdAt - a.createdAt); 
-                renderIdeas(allIdeas);
+                try {
+                    allIdeas = []; snapshot.forEach(doc => allIdeas.push({ id: doc.id, ...doc.data() }));
+                    allIdeas.sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt)); 
+                    renderIdeas(allIdeas);
+                } catch(e) { console.error("Error cargando ideas", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'enlaces_internos')), (snapshot) => {
-                allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
-                allInternalLinks.sort((a, b) => { const oA = a.order !== undefined ? a.order : -a.createdAt; const oB = b.order !== undefined ? b.order : -b.createdAt; return oA - oB; });
-                renderInternalLinks(allInternalLinks);
+                try {
+                    allInternalLinks = []; snapshot.forEach(doc => allInternalLinks.push({ id: doc.id, ...doc.data() }));
+                    allInternalLinks.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
+                    renderInternalLinks(allInternalLinks);
+                } catch(e) { console.error("Error cargando internos", e); }
             }));
         }
 
@@ -1611,7 +1445,6 @@
             if(projClientSelect) projClientSelect.innerHTML = clientOptions;
         }
 
-        // BUSCADOR GLOBAL
         const searchInput = document.getElementById('global-search');
         const searchResults = document.getElementById('search-results');
 
@@ -1649,7 +1482,6 @@
             if(!e.target.closest('.search-container') && searchResults) searchResults.style.display = 'none';
         });
 
-        // --- RENDERIZADORES DE TABLAS Y VISTAS ---
         function renderSummaryBitacora(projectId) {
             const list = document.getElementById('summary-bitacora-list');
             if(!list) return;
@@ -1688,8 +1520,9 @@
                     notesContainer.innerHTML = '';
                     filteredNotes.forEach(note => {
                         try {
-                            const author = note.addedBy || 'Sistema';
-                            const dateFormatted = note.createdAt ? new Date(note.createdAt).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'}) : '--/--';
+                            const author = String(note.addedBy || 'Sistema');
+                            const ts = getTimestamp(note.createdAt);
+                            const dateFormatted = ts > 0 ? new Date(ts).toLocaleDateString('es-AR', {day: '2-digit', month: 'short', hour:'2-digit', minute:'2-digit'}) : '--/--';
                             const uColor = getUserColor(author);
                             const isMe = author === localUser;
                             
@@ -1704,7 +1537,7 @@
                                         <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
                                         <span style="font-size: 0.65rem; color: var(--text-dim);">${dateFormatted}</span>
                                     </div>
-                                    <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text || ''}</p>
+                                    <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left; word-break: break-word;">${note.text || ''}</p>
                                     
                                     ${isMe ? `
                                     <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
@@ -1838,12 +1671,10 @@
             return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
         }
 
-        // --- RENDER EVENTOS / MEETS ---
         function renderEventosList(eventos) {
             const list = document.getElementById('firebase-eventos-list');
             if (!list) return;
 
-            // Filtrar eventos viejos (opcional: dejar los de hoy en adelante)
             const todayStr = new Date().toISOString().split('T')[0];
             const futureEvents = eventos.filter(e => e.date >= todayStr);
 
@@ -1894,7 +1725,8 @@
                     
                     const tr = document.createElement('tr');
                     tr.setAttribute('data-id', m.id);
-                    tr.setAttribute('data-order', m.order !== undefined ? m.order : -m.createdAt);
+                    const sortOrder = m.order !== undefined ? m.order : -m.createdAt;
+                    tr.setAttribute('data-order', sortOrder);
                     
                     tr.innerHTML = `
                         <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
@@ -1987,7 +1819,7 @@
                     if(client.name) contactInfo += `<span class="data-subtitle"><i data-lucide="user" size="12" style="display:inline; margin-right:2px;"></i> ${client.name}</span>`;
                     if(client.email) contactInfo += `<span class="data-subtitle"><i data-lucide="mail" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.email}</span>`;
                     if(client.phone) contactInfo += `<span class="data-subtitle"><i data-lucide="phone" size="12" style="display:inline; margin-right:2px; margin-left: 6px;"></i> ${client.phone}</span>`;
-                    if(client.web) contactInfo += `<a href="${client.web}" target="_blank" class="data-subtitle" style="color:var(--brand-primary); margin-left: 6px;"><i data-lucide="globe" size="12" style="display:inline; margin-right:2px;"></i> Sitio</a>`;
+                    if(client.web) contactInfo += `<a href="${client.web.startsWith('http') ? client.web : 'https://'+client.web}" target="_blank" class="data-subtitle" style="color:var(--brand-primary); margin-left: 6px;"><i data-lucide="globe" size="12" style="display:inline; margin-right:2px;"></i> Sitio</a>`;
 
                     const cColor = getColorForString(client.company);
 
@@ -2096,7 +1928,7 @@
             
             ideasList.forEach(idea => {
                 try {
-                    const author = idea.addedBy || 'Sistema';
+                    const author = String(idea.addedBy || 'Sistema');
                     const isMe = author === localUser;
                     
                     const div = document.createElement('div'); 
@@ -2105,7 +1937,7 @@
                     div.innerHTML = `
                         <div style="color: #FDE68A; margin-top: 2px;"><i data-lucide="zap" size="18"></i></div>
                         <div style="flex-grow: 1; position: relative; padding-right: ${isMe ? '40px' : '0'};">
-                            <p style="font-size: var(--text-sm); color: white; margin: 0 0 4px 0; line-height: 1.4;">${idea.text || ''}</p>
+                            <p style="font-size: var(--text-sm); color: white; margin: 0 0 4px 0; line-height: 1.4; word-break: break-word;">${idea.text || ''}</p>
                             <span style="font-size: 0.65rem; color: rgba(255,255,255,0.5);">Aportada por ${author}</span>
                             
                             ${isMe ? `
@@ -2125,19 +1957,30 @@
         function renderNotes(notes) {
             const list = document.getElementById('firebase-notes-list');
             if (!list) return;
-            if (notes.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">El Tablón está vacío. Escribe algo abajo para empezar.</div>`; return; }
+            
+            if (!Array.isArray(notes)) notes = [];
+
+            if (notes.length === 0) { 
+                list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">El Tablón está vacío. Escribe algo abajo para empezar.</div>`; 
+                return; 
+            }
             list.innerHTML = '';
             
             notes.forEach(note => {
                 try {
-                    const author = note.addedBy || 'Sistema';
-                    const dateText = note.createdAt ? new Date(note.createdAt).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                    const author = String(note.addedBy || 'Sistema');
+                    
+                    const ts = getTimestamp(note.createdAt);
+                    const dateText = ts > 0 ? new Date(ts).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
+
                     const isMe = author === localUser;
                     const uColor = getUserColor(author);
-                    const relName = getRelationName(note.relationId);
+                    
+                    const relId = note.relationId || '';
+                    const relName = relId ? getRelationName(relId) : '';
                     const badgeColor = getColorForString(relName);
                     
-                    const relationBadge = note.relationId ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${relName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
+                    const relationBadge = (relId && relName !== 'General') ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${relName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
 
                     const div = document.createElement('div'); 
                     div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
@@ -2152,7 +1995,7 @@
                                 <span style="font-size: 0.65rem; color: var(--text-dim);">${dateText}</span>
                             </div>
                             ${relationBadge}
-                            <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left;">${note.text || ''}</p>
+                            <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left; word-break: break-word;">${note.text || ''}</p>
                             
                             ${isMe ? `
                             <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
@@ -2170,7 +2013,6 @@
             setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
         }
 
-        // 4. INIT UI & CALENDAR
         function initDashboardUI() {
             const dateEl = document.getElementById('current-date');
             if (dateEl) {
@@ -2228,7 +2070,6 @@
             for (let i = 1; i <= daysInMonth; i++) {
                 const currentDayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 
-                // Verificar si hay eventos en este dia
                 const hasEvent = allEventos.some(e => e.date === currentDayString);
 
                 const dayDiv = document.createElement('div');
