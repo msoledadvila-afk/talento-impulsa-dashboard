@@ -133,7 +133,7 @@
         .sortable-ghost { opacity: 0.4; background-color: var(--bg); }
 
         /* ============================================================
-           MODALES (LOGIN, DATA ENTRY & SUMMARY)
+           MODALES
            ============================================================ */
         .overlay-fullscreen {
             position: fixed; inset: 0; background-color: rgba(239, 233, 219, 0.95); backdrop-filter: blur(4px);
@@ -498,9 +498,10 @@
                             <label>Progreso (%)</label>
                             <input type="number" id="proj-progress" class="form-control" placeholder="0" min="0" max="100" required>
                         </div>
+                        
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas Base / Info Fija (Opcional)</label>
-                            <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, links o información general del proyecto..."></textarea>
+                            <label><i data-lucide="align-left" size="12" style="display:inline;"></i> Notas Generales (Opcional)</label>
+                            <textarea id="proj-notes" class="form-control" rows="3" placeholder="Detalla claves, links o información fija del proyecto..."></textarea>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
@@ -615,7 +616,7 @@
 
                 <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
                     <h3 style="font-size: var(--text-sm); color: var(--brand-primary-deep); margin-bottom: var(--space-2); display: flex; align-items: center; gap: 4px;">
-                        <i data-lucide="align-left" size="16"></i> Información Base / Accesos
+                        <i data-lucide="align-left" size="16"></i> Notas Fijas / Accesos
                     </h3>
                     <div id="summary-internal-notes-text" style="font-size: var(--text-sm); color: var(--text); white-space: pre-wrap; line-height: 1.6;"></div>
                 </div>
@@ -661,7 +662,7 @@
                         <button type="submit" class="btn-primary btn-small" style="width: auto; padding: 8px 12px;" title="Subir"><i data-lucide="upload-cloud" size="18"></i></button>
                     </form>
 
-                    <div class="data-list" id="summary-links-list" style="max-height: 200px;"></div>
+                    <div class="data-list" id="summary-links-list" style="max-height: 200px; overflow-y: auto;"></div>
                 </div>
 
                 <!-- NOTAS EN LA FICHA -->
@@ -1995,7 +1996,7 @@
             clients.forEach(client => {
                 try {
                     const div = document.createElement('div'); div.className = 'data-row';
-                    div.style.padding = '0'; // Quitado el padding interno para que todo sea clickeable
+                    div.style.padding = '0'; 
                     div.setAttribute('data-id', client.id);
                     div.setAttribute('data-order', client.order !== undefined ? client.order : -getTimestamp(client.createdAt));
                     
