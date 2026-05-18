@@ -375,8 +375,8 @@
                 <div class="entry-tab" data-tab="tab-marketing" onclick="switchTab('tab-marketing')">Marketing</div>
                 <div class="entry-tab" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
                 <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
-                <div class="entry-tab" data-tab="tab-recurso" onclick="switchTab('tab-recurso')">Recurso</div>
                 <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento</div>
+                <!-- Eliminado el Tab global de Recursos para evitar confusiones. Se hace desde el Proyecto. -->
             </div>
 
             <div class="data-entry-body">
@@ -538,11 +538,11 @@
                     </div>
                 </form>
 
-                <!-- TAB: RECURSO ASOCIADO -->
+                <!-- TAB Oculta para editar recursos existentes si es necesario -->
                 <form id="form-add-link" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Asociar a (Proyecto o Cliente) (Opcional)</label>
+                            <label>Asociar a (Proyecto o Cliente)</label>
                             <select id="link-relation" class="form-control">
                                 <option value="">General (Sin asociar)</option>
                             </select>
@@ -565,7 +565,7 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small" id="btn-submit-link"><i data-lucide="upload-cloud" size="16"></i> Subir Recurso</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-link"><i data-lucide="upload-cloud" size="16"></i> Actualizar Recurso</button>
                     </div>
                 </form>
 
@@ -612,6 +612,7 @@
             <div class="data-entry-body" style="background: var(--bg); display: flex; flex-direction: column; gap: var(--space-4);">
                 
                 <div id="summary-client-info-container" class="card" style="display: none; background: #FFF; border-left: 3px solid var(--text-dim);"></div>
+
                 <div id="summary-projects-list-container" class="card" style="display: none;"></div>
 
                 <div id="summary-internal-notes-container" class="card" style="display: none; background: var(--brand-primary-glow); border-color: transparent; border-left: 3px solid var(--brand-primary);">
@@ -696,7 +697,7 @@
                 <a href="javascript:void(0)" class="nav-item" data-view="marketing" onclick="navigateTo('marketing')"><i data-lucide="megaphone"></i> Marketing</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="proyectos" onclick="navigateTo('proyectos')"><i data-lucide="folder-kanban"></i> Proyectos</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="clientes" onclick="navigateTo('clientes')"><i data-lucide="users"></i> Clientes</a>
-                <a href="javascript:void(0)" class="nav-item" data-view="recursos" onclick="navigateTo('recursos')"><i data-lucide="cloud"></i> Recursos</a>
+                <!-- Pestaña Recursos eliminada del menú lateral -->
             </nav>
             <div class="user-profile-nav">
                 <div class="avatar" id="nav-avatar">S</div>
@@ -743,33 +744,13 @@
                                     <i data-lucide="sparkles" size="16" style="color: #FDE68A;"></i>
                                 </h2>
                             </div>
-                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 150px; max-height: 300px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
+                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 150px; max-height: 400px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
                                 <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Cargando ideas...</div>
                             </div>
                             
                             <form id="form-add-idea" style="display: flex; gap: var(--space-2); margin-top: var(--space-4); align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--space-3);">
                                 <input type="text" id="idea-input" class="form-control" placeholder="¡Tengo una idea brillante!..." required autocomplete="off" style="flex-grow: 1; background: rgba(255,255,255,0.9); border: none; color: var(--text);">
                                 <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0; background: #FDE68A; color: var(--brand-primary-deep);"><i data-lucide="plus" size="18"></i></button>
-                            </form>
-                        </div>
-
-                        <!-- CHAT GLOBAL -->
-                        <div class="card" style="background: var(--bg-card); border-top: 4px solid var(--brand-primary);">
-                            <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
-                                <h2 class="card-title"><i data-lucide="message-circle"></i> Tablón de Avisos y Chat</h2>
-                            </div>
-                            <div class="notes-list" id="firebase-notes-list" style="min-height: 250px; max-height: 400px; padding: 10px; background: #FAFAFA; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-grow: 1; overflow-y: auto;">
-                                <div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Cargando mensajes...</div>
-                            </div>
-                            
-                            <form id="form-add-note" style="display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-2);">
-                                <div style="display: flex; gap: var(--space-2); align-items: center;">
-                                    <select id="note-relation" class="form-control" style="font-size: 0.75rem; width: 30%; max-width: 200px;">
-                                        <option value="">General</option>
-                                    </select>
-                                    <input type="text" id="note-input" class="form-control" placeholder="Escribe un mensaje..." required autocomplete="off" style="flex-grow: 1;">
-                                    <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="16"></i></button>
-                                </div>
                             </form>
                         </div>
                     </div>
@@ -832,10 +813,11 @@
                                     <th>Concepto / Servicio</th>
                                     <th style="width: 150px;">Categoría</th>
                                     <th style="width: 120px; text-align: right;">Monto</th>
+                                    <th style="width: 70px; text-align: center;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="firebase-gastos-list">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando gastos...</td></tr>
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando gastos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -859,10 +841,11 @@
                                     <th style="width: 120px;">Fecha</th>
                                     <th>Pieza & Copy / Detalle</th>
                                     <th style="width: 220px;">Status Visual</th>
+                                    <th style="width: 70px; text-align: center;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="firebase-marketing-list">
-                                <tr><td colspan="4" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -907,17 +890,6 @@
                 </div>
             </div>
 
-            <!-- VISTA: RECURSOS -->
-            <div id="view-recursos" class="view-section">
-                <div class="card" id="recursos">
-                    <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
-                        <h2 class="card-title"><i data-lucide="cloud"></i> Repositorio General</h2>
-                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-recurso', false)"><i data-lucide="plus" size="16"></i> Subir Recurso</button>
-                    </div>
-                    <div class="data-list" id="firebase-links-list"></div>
-                </div>
-            </div>
-
         </main>
     </div>
 
@@ -943,7 +915,7 @@
         let unsubscribers = [];
         
         let idProyectoEnEdicion = null; let idClienteEnEdicion = null; let idRecursoEnEdicion = null; 
-        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null; let idIdeaEnEdicion = null; let idEventoEnEdicion = null; let idGastoEnEdicion = null;
+        let idInternoEnEdicion = null; let idNotaEnEdicion = null; let idMarketingEnEdicion = null; let idIdeaEnEdicion = null; let idEventoEnEdicion = null; let idGastoEnEdicion = null; let idBitacoraEnEdicion = null;
         let currentSummaryProjectId = null; 
         let currentSummaryRelationId = null;
 
@@ -1031,6 +1003,7 @@
                 modal.style.display = 'none';
                 currentSummaryProjectId = null;
                 currentSummaryRelationId = null;
+                idBitacoraEnEdicion = null;
             }, 300);
         };
 
@@ -1261,12 +1234,21 @@
 
         window.editarNota = (noteId) => {
             const n = allNotes.find(x => x.id === noteId); if(!n) return;
-            idNotaEnEdicion = noteId;
-            window.closeSummaryModal(); navigateTo('inicio'); 
-            const input = document.getElementById('note-input'); const select = document.getElementById('note-relation');
+            // No cerramos el modal porque capaz la nota está adentro del proyecto
+            const input = document.getElementById('summary-note-input');
             if(input) { input.value = n.text || ''; input.focus(); }
-            if(select) select.value = n.relationId || '';
-            window.showToast('Editando mensaje...');
+            // Guardamos el id de la nota que estamos editando en una variable global
+            window.idNotaEnEdicionResumen = noteId;
+            window.showToast('Editando nota (chat)...');
+        };
+
+        window.editarBitacora = (bitId) => {
+            const b = allBitacoras.find(x => x.id === bitId); if(!b) return;
+            document.getElementById('bit-date').value = b.date || '';
+            document.getElementById('bit-detail').value = b.detail || '';
+            document.getElementById('bit-status').value = b.status || 'Trabajando';
+            idBitacoraEnEdicion = bitId;
+            window.showToast('Editando bitácora...');
         };
 
         window.editarIdea = (ideaId) => {
@@ -1402,24 +1384,6 @@
             } catch (err) { window.handleFirebaseError(err); }
         });
 
-        document.getElementById('form-add-note').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            const text = document.getElementById('note-input').value.trim();
-            if (!text) return;
-            try {
-                const relationId = document.getElementById('note-relation').value;
-                if (idNotaEnEdicion) {
-                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "notas_compartidas", idNotaEnEdicion), { relationId: relationId, text: text, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
-                    window.showToast('Nota actualizada'); idNotaEnEdicion = null;
-                } else {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { relationId: relationId, text: text, addedBy: localUser, createdAt: Date.now() });
-                }
-                document.getElementById('note-input').value = '';
-            } catch (err) { window.handleFirebaseError(err); }
-        });
-
         document.getElementById('form-add-idea').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
@@ -1445,7 +1409,12 @@
             const text = document.getElementById('summary-note-input').value.trim();
             if (!text) return;
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { relationId: currentSummaryRelationId, text: text, addedBy: localUser, createdAt: Date.now() });
+                if (window.idNotaEnEdicionResumen) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "notas_compartidas", window.idNotaEnEdicionResumen), { text: text, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                    window.showToast('Nota actualizada'); window.idNotaEnEdicionResumen = null;
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'notas_compartidas'), { relationId: currentSummaryRelationId, text: text, addedBy: localUser, createdAt: Date.now() });
+                }
                 document.getElementById('summary-note-input').value = '';
             } catch (err) { window.handleFirebaseError(err); }
         });
@@ -1457,8 +1426,14 @@
             if (!currentSummaryProjectId) return;
             const data = { projectId: currentSummaryProjectId, date: document.getElementById('bit-date').value, detail: document.getElementById('bit-detail').value.trim(), status: document.getElementById('bit-status').value, addedBy: localUser, createdAt: Date.now() };
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras'), data);
-                document.getElementById('bit-detail').value = ''; window.showToast('Registro guardado');
+                if(idBitacoraEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "bitacoras", idBitacoraEnEdicion), { ...data, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                    window.showToast('Bitácora actualizada'); idBitacoraEnEdicion = null;
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras'), data);
+                    window.showToast('Registro guardado');
+                }
+                document.getElementById('bit-detail').value = ''; 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
@@ -1536,7 +1511,7 @@
                 try {
                     allLinks = []; snapshot.forEach(doc => allLinks.push({ id: doc.id, ...doc.data() }));
                     allLinks.sort((a, b) => getTimestamp(b.createdAt) - getTimestamp(a.createdAt));
-                    renderLinks(allLinks); if (currentSummaryRelationId) renderSummaryLinks(currentSummaryRelationId);
+                    if (currentSummaryRelationId) renderSummaryLinks(currentSummaryRelationId);
                 } catch(e) { console.error("Error cargando links", e); }
             }));
 
@@ -1544,16 +1519,8 @@
                 try {
                     allNotes = []; snapshot.forEach(doc => allNotes.push({ id: doc.id, ...doc.data() }));
                     allNotes.sort((a, b) => getTimestamp(a.createdAt) - getTimestamp(b.createdAt)); 
-                    renderNotes(allNotes);
                     if (currentSummaryRelationId) renderSummaryNotes(currentSummaryRelationId);
-                } catch(e) { 
-                    console.error("Error cargando notas", e); 
-                    const list = document.getElementById('firebase-notes-list');
-                    if(list) list.innerHTML = `<div style="text-align: center; color: red; padding: 10px; font-size: 12px;">Se recuperaron notas, pero ocurrió un error interno al dibujarlas.</div>`;
-                }
-            }, (error) => {
-                console.error("Error de Firebase leyendo notas:", error);
-                window.showErrorToast("Permisos insuficientes para leer notas");
+                } catch(e) { console.error("Error cargando notas", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'ideas')), (snapshot) => {
@@ -1585,8 +1552,6 @@
                 allClients.forEach(c => optionsHTML += `<option value="C_${c.id}">${c.company} (${c.name})</option>`);
                 optionsHTML += '</optgroup>';
             }
-            const linkSelect = document.getElementById('link-relation'); if(linkSelect) linkSelect.innerHTML = optionsHTML;
-            const noteSelect = document.getElementById('note-relation'); if(noteSelect) noteSelect.innerHTML = optionsHTML;
 
             const projClientSelect = document.getElementById('proj-client');
             let clientOptions = '<option value="">Ninguno / Proyecto Personal</option>';
@@ -1650,8 +1615,10 @@
                             <td style="width: 80px; font-size: 0.75rem; color: var(--text-dim); vertical-align: top; padding: 10px 4px;">${formatStageDate(b.date)}</td>
                             <td style="font-size: var(--text-sm); vertical-align: top; padding: 10px 4px; color: var(--text);">${b.detail}</td>
                             <td style="width: 100px; vertical-align: top; padding: 10px 4px; text-align: center;">${badge}</td>
-                            <td style="width: 30px; text-align: right; vertical-align: top; padding: 10px 4px;">
-                                ${b.addedBy === localUser ? `<i data-lucide="trash-2" style="color:var(--alert-danger); cursor:pointer;" size="14" onclick="deleteDocument('bitacoras', '${b.id}')" title="Borrar registro"></i>` : ''}
+                            <td style="width: 50px; text-align: right; vertical-align: top; padding: 10px 4px; white-space: nowrap;">
+                                ${b.addedBy === localUser ? `
+                                <i data-lucide="pencil" style="color:var(--brand-primary); cursor:pointer; margin-right:4px;" size="14" onclick="editarBitacora('${b.id}')" title="Editar"></i>
+                                <i data-lucide="trash-2" style="color:var(--alert-danger); cursor:pointer;" size="14" onclick="deleteDocument('bitacoras', '${b.id}')" title="Borrar registro"></i>` : ''}
                             </td>
                         </tr>
                     `;
@@ -1690,6 +1657,7 @@
                                     
                                     ${isMe ? `
                                     <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
+                                        <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor: pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
                                         <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor: pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
                                     </div>
                                     ` : ''}
@@ -1718,7 +1686,16 @@
                                 : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${link.url}</span>`;
 
                             const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
-                            div.innerHTML = `<div class="data-info"><i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> <div class="data-details"><span class="data-title">${link.title}</span>${actionHtml}</div></div>`;
+                            div.innerHTML = `
+                                <div class="data-info">
+                                    <i data-lucide="link" size="16" style="color:var(--brand-primary); margin-top:2px;"></i> 
+                                    <div class="data-details"><span class="data-title">${link.title}</span>${actionHtml}</div>
+                                </div>
+                                <div style="display: flex; gap: 4px;">
+                                    <i data-lucide="pencil" style="color: var(--brand-primary); cursor: pointer;" size="14" onclick="editarRecurso('${link.id}')" title="Editar"></i>
+                                    <i data-lucide="trash-2" style="color: var(--alert-danger); cursor: pointer;" size="14" onclick="deleteDocument('recursos_compartidos', '${link.id}')" title="Borrar"></i>
+                                </div>
+                            `;
                             linksContainer.appendChild(div);
                         } catch(e) { console.error(e); }
                     });
@@ -1753,7 +1730,14 @@
                         const c = allClients.find(x => x.company === p.client);
                         if (c) {
                             clientInfoContainer.innerHTML = `
-                                <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 4px;">Cliente Asociado</h3>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); display: flex; align-items: center; gap: 4px;">
+                                        <i data-lucide="user" size="16"></i> Cliente Asociado
+                                    </h3>
+                                    <button class="btn-icon" style="padding: 0; color: var(--brand-primary);" onclick="closeSummaryModal(); editarCliente('${c.id}')" title="Editar Cliente">
+                                        <i data-lucide="pencil" size="14"></i>
+                                    </button>
+                                </div>
                                 <div style="font-weight: 600; color: var(--text);">${c.company}</div>
                                 <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 4px;">
                                     ${c.name ? `<span style="display:inline-block; margin-right:8px;"><i data-lucide="user" size="12" style="display:inline;"></i> ${c.name}</span>` : ''}
@@ -2029,50 +2013,6 @@
             initSortable('firebase-clients-list', 'clientes');
         }
 
-        function renderLinks(links) {
-            const list = document.getElementById('firebase-links-list');
-            if (!list) return;
-            if (links.length === 0) { list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">Sin recursos guardados.</div>`; return; }
-            list.innerHTML = '';
-            const typeConfig = { 'imagen': { icon: 'image', color: '#9A7B3D', bg: 'rgba(154,123,61,0.12)' }, 'documento': { icon: 'file-text', color: '#684B45', bg: '#EFE9DB' }, 'enlace': { icon: 'link', color: '#918671', bg: '#F8F9FA' } };
-
-            links.forEach(link => {
-                try {
-                    const config = typeConfig[link.type] || typeConfig['enlace'];
-                    const relationName = getRelationName(link.relationId);
-                    const badgeColor = getColorForString(relationName);
-                    
-                    const urlStr = String(link.url || '');
-                    const titleStr = String(link.title || 'Recurso sin título');
-
-                    let isWebLink = /^https?:\/\//i.test(urlStr) || /^www\./i.test(urlStr);
-                    let actionHtml = isWebLink 
-                        ? `<a href="${urlStr.startsWith('http') ? urlStr : 'https://'+urlStr}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Recurso &rarr;</a>`
-                        : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${urlStr}</span>`;
-
-                    const div = document.createElement('div'); div.className = 'data-row';
-                    div.innerHTML = `
-                        <div class="data-row-top">
-                            <div class="data-info">
-                                <div class="data-icon" style="color: ${config.color}; background: ${config.bg};"><i data-lucide="${config.icon}" size="20"></i></div>
-                                <div class="data-details">
-                                    <span class="badge" style="width: max-content; margin-bottom: 4px; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border};">${relationName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span>
-                                    <span class="data-title">${titleStr}</span>
-                                    ${actionHtml}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="data-footer" style="justify-content: flex-end;">
-                            <button class="btn-icon" title="Editar" onclick="editarRecurso('${link.id}')" style="color: var(--brand-primary);"><i data-lucide="pencil" size="16"></i></button>
-                            <button class="btn-icon" title="Eliminar" onclick="deleteDocument('recursos_compartidos', '${link.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
-                        </div>
-                    `;
-                    list.appendChild(div);
-                } catch(e) { console.error("Error resource row", e); }
-            });
-            lucide.createIcons();
-        }
-
         function renderInternalLinks(links) {
             const list = document.getElementById('firebase-internal-links');
             if (!list) return;
@@ -2141,65 +2081,6 @@
                 } catch(e) { console.error("Error al renderizar idea", e); }
             });
             lucide.createIcons();
-        }
-
-        function renderNotes(notes) {
-            const list = document.getElementById('firebase-notes-list');
-            if (!list) return;
-            
-            if (!Array.isArray(notes)) notes = [];
-
-            if (notes.length === 0) { 
-                list.innerHTML = `<div style="text-align: center; color: var(--text-dim); padding: var(--space-4); font-size: var(--text-sm);">El Tablón está vacío. Escribe algo abajo para empezar.</div>`; 
-                return; 
-            }
-            list.innerHTML = '';
-            
-            notes.forEach(note => {
-                try {
-                    const author = String(note.addedBy || 'Sistema');
-                    
-                    const ts = getTimestamp(note.createdAt);
-                    const dateText = ts > 0 ? new Date(ts).toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'}) : '--:--';
-
-                    const isMe = author === localUser;
-                    const uColor = getUserColor(author);
-                    
-                    const relId = note.relationId || '';
-                    const relName = relId ? getRelationName(relId) : '';
-                    const badgeColor = getColorForString(relName);
-                    
-                    const relationBadge = (relId && relName !== 'General') ? `<span style="font-size: 0.6rem; background: ${badgeColor.bg}; color: ${badgeColor.text}; border: 1px solid ${badgeColor.border}; padding: 2px 6px; border-radius: 4px; margin-bottom: 4px; display: inline-block; font-weight: 600;">${relName.replace('Proyecto: ', '').replace('Cliente: ', '')}</span><br>` : '';
-
-                    const div = document.createElement('div'); 
-                    div.style.cssText = `display: flex; gap: 8px; margin-bottom: 12px; position: relative; ${isMe ? 'flex-direction: row-reverse;' : ''}`;
-                    
-                    div.innerHTML = `
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${uColor.bg}; color: ${uColor.text}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; flex-shrink: 0;">
-                            ${author.charAt(0).toUpperCase()}
-                        </div>
-                        <div style="background: ${isMe ? 'var(--brand-primary-glow)' : 'var(--bg-card)'}; border: 1px solid ${isMe ? 'transparent' : 'var(--border-light)'}; padding: 10px 12px; border-radius: ${isMe ? '8px 0 8px 8px' : '0 8px 8px 8px'}; max-width: 85%; box-shadow: var(--shadow-sm); position: relative;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; gap: 16px;">
-                                <span style="font-size: 0.7rem; font-weight: 600; color: ${uColor.text};">${author}</span>
-                                <span style="font-size: 0.65rem; color: var(--text-dim);">${dateText}</span>
-                            </div>
-                            ${relationBadge}
-                            <p style="font-size: var(--text-sm); color: var(--text); margin: 0; line-height: 1.4; padding-bottom: ${isMe ? '12px' : '0'}; text-align: left; word-break: break-word;">${note.text || ''}</p>
-                            
-                            ${isMe ? `
-                            <div style="position: absolute; bottom: 4px; right: 8px; display: flex; gap: 4px;">
-                                <i data-lucide="pencil" class="note-delete" style="color: var(--brand-primary); cursor:pointer;" size="12" onclick="editarNota('${note.id}')" title="Editar"></i>
-                                <i data-lucide="trash-2" class="note-delete" style="color: var(--alert-danger); cursor:pointer;" size="12" onclick="deleteDocument('notas_compartidas', '${note.id}')" title="Borrar"></i>
-                            </div>
-                            ` : ''}
-                        </div>
-                    `;
-                    list.appendChild(div);
-                } catch(e) { console.error("Error al renderizar nota de chat", e); }
-            });
-            lucide.createIcons();
-            
-            setTimeout(() => { list.scrollTop = list.scrollHeight; }, 100);
         }
 
         function initDashboardUI() {
