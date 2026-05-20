@@ -275,14 +275,13 @@
         .data-details { display: flex; flex-direction: column; overflow: hidden; }
         .data-title { font-weight: 600; font-size: var(--text-sm); word-break: break-word; }
         .data-subtitle { font-size: 0.75rem; color: var(--text-dim); }
+        .data-footer { display: flex; justify-content: flex-end; align-items: center; border-top: 1px dashed var(--border-light); padding-top: var(--space-2); margin-top: var(--space-1); gap: 4px; }
+        .data-meta { font-size: 0.7rem; color: var(--text-dim); margin-right: auto;}
 
         .internal-link { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px dashed var(--border-light); background: var(--bg-card);}
         .internal-link:last-child { border: none; }
         .internal-link-icon { color: var(--brand-primary); }
         .internal-link-title { font-size: var(--text-sm); font-weight: 500; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-
-        .mkt-checkbox-label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: var(--text-sm); }
-        .mkt-checkbox-label input { width: 16px; height: 16px; accent-color: var(--brand-primary); }
 
         @media (max-width: 768px) { .greeting { display: none; } }
         @media (max-width: 1024px) {
@@ -295,6 +294,7 @@
         @media (min-width: 768px) {
             .data-row { flex-direction: row; justify-content: space-between; align-items: center; }
             .data-row-top { flex-grow: 1; align-items: center; }
+            .data-footer { border-top: none; padding-top: 0; margin-top: 0; }
             .greeting h1 { font-size: var(--text-2xl); }
         }
         @media (min-width: 1025px) {
@@ -376,7 +376,6 @@
                 <div class="entry-tab" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
                 <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
                 <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento</div>
-                <!-- Eliminado el Tab global de Recursos para evitar confusiones. Se hace desde el Proyecto. -->
             </div>
 
             <div class="data-entry-body">
@@ -468,11 +467,11 @@
                         </div>
                         
                         <div class="form-group" style="grid-column: 1 / -1; display: flex; gap: var(--space-6); background: var(--bg); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-                            <label class="mkt-checkbox-label">
-                                <input type="checkbox" id="mkt-designed"> Pieza Diseñada
+                            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: var(--text-sm);">
+                                <input type="checkbox" id="mkt-designed" style="width: 16px; height: 16px; accent-color: var(--brand-primary);"> Pieza Diseñada
                             </label>
-                            <label class="mkt-checkbox-label">
-                                <input type="checkbox" id="mkt-published"> Pieza Publicada
+                            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: var(--text-sm);">
+                                <input type="checkbox" id="mkt-published" style="width: 16px; height: 16px; accent-color: var(--brand-primary);"> Pieza Publicada
                             </label>
                         </div>
                     </div>
@@ -538,7 +537,7 @@
                     </div>
                 </form>
 
-                <!-- TAB Oculta para editar recursos existentes si es necesario -->
+                <!-- TAB OCULTA PARA EDITAR RECURSOS DESDE LA FICHA -->
                 <form id="form-add-link" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group" style="grid-column: 1 / -1;">
@@ -569,7 +568,7 @@
                     </div>
                 </form>
 
-                <!-- TAB: RECURSO INTERNO -->
+                <!-- TAB: RECURSO INTERNO (TALENTO) -->
                 <form id="form-add-internal" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
@@ -637,7 +636,7 @@
                             <option value="Bloqueado">Bloqueado</option>
                             <option value="Resuelto">Resuelto</option>
                         </select>
-                        <button type="submit" class="btn-primary btn-small" style="width: auto; padding: 8px 12px;" title="Agregar a bitácora"><i data-lucide="plus" size="18"></i></button>
+                        <button type="submit" class="btn-primary btn-small" style="width: auto; padding: 8px 12px;" title="Guardar bitácora"><i data-lucide="save" size="18"></i></button>
                     </form>
                     <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
                         <table style="width: 100%; min-width: 400px; border-collapse: collapse;">
@@ -667,11 +666,11 @@
                 </div>
 
                 <!-- NOTAS EN LA FICHA -->
-                <div class="card" id="summary-notes-card">
-                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Actividad</h3>
+                <div class="card" id="summary-notes-card" style="display:none;">
+                    <h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: var(--space-2);">Chat y Notas del Proyecto</h3>
                     <div class="notes-list" id="summary-notes-list" style="min-height: 100px; max-height: 250px; padding: 0; overflow-y: auto;"></div>
                     <form id="form-add-summary-note" style="display: flex; gap: 8px; margin-top: 12px; align-items: center;">
-                        <input type="text" id="summary-note-input" class="form-control" placeholder="Escribe un mensaje aquí..." required autocomplete="off" style="flex-grow: 1;">
+                        <input type="text" id="summary-note-input" class="form-control" placeholder="Escribe una nota aquí..." required autocomplete="off" style="flex-grow: 1;">
                         <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0;"><i data-lucide="send" size="14"></i></button>
                     </form>
                 </div>
@@ -697,7 +696,6 @@
                 <a href="javascript:void(0)" class="nav-item" data-view="marketing" onclick="navigateTo('marketing')"><i data-lucide="megaphone"></i> Marketing</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="proyectos" onclick="navigateTo('proyectos')"><i data-lucide="folder-kanban"></i> Proyectos</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="clientes" onclick="navigateTo('clientes')"><i data-lucide="users"></i> Clientes</a>
-                <!-- Pestaña Recursos eliminada del menú lateral -->
             </nav>
             <div class="user-profile-nav">
                 <div class="avatar" id="nav-avatar">S</div>
@@ -737,14 +735,14 @@
                 <div class="dashboard-grid">
                     <div class="col-main">
                         <!-- BRAINSTORMING -->
-                        <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none; margin-bottom: var(--space-6);">
+                        <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none; height: 100%;">
                             <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: var(--space-3); margin-bottom: var(--space-3);">
                                 <h2 class="card-title" style="color: white; font-weight: 700;">
                                     <i data-lucide="lightbulb" style="color: #FDE68A;"></i> Brainstorming & Ideas 
                                     <i data-lucide="sparkles" size="16" style="color: #FDE68A;"></i>
                                 </h2>
                             </div>
-                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 150px; max-height: 400px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
+                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 250px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
                                 <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Cargando ideas...</div>
                             </div>
                             
@@ -796,28 +794,28 @@
             </div>
 
             <!-- VISTA: GASTOS -->
-            <!-- 3. VISTA: PROYECTOS -->
-            <div id="view-proyectos" class="view-section">
-                <div class="card" id="proyectos">
+            <div id="view-gastos" class="view-section">
+                <div class="card" id="gastos">
                     <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
                         <div style="display: flex; align-items: center; gap: var(--space-3);">
-                            <h2 class="card-title"><i data-lucide="kanban"></i> Tablero de Proyectos</h2>
+                            <h2 class="card-title" style="color: var(--alert-danger);"><i data-lucide="receipt"></i> Registro de Gastos</h2>
                         </div>
-                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto', false)"><i data-lucide="plus" size="16"></i> Nuevo Proyecto</button>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-gasto', false)"><i data-lucide="plus" size="16"></i> Nuevo Gasto</button>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
                                     <th style="width:30px;"></th>
-                                    <th>Proyecto</th>
-                                    <th>Cliente</th>
-                                    <th style="width: 150px; text-align: center;">Estado (Bitácora)</th>
-                                    <th style="width: 140px;">Progreso Global</th>
+                                    <th style="width: 120px;">Fecha</th>
+                                    <th>Concepto / Servicio</th>
+                                    <th style="width: 150px;">Categoría</th>
+                                    <th style="width: 120px; text-align: right;">Monto</th>
+                                    <th style="width: 70px; text-align: center;">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="firebase-projects-list">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
+                            <tbody id="firebase-gastos-list">
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando gastos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -864,13 +862,14 @@
                             <thead>
                                 <tr>
                                     <th style="width:30px;"></th>
-                                    <th>Proyecto & Detalles</th>
-                                    <th style="width: 130px; text-align: center;">Estado (Bitácora)</th>
-                                    <th style="width: 130px;">Progreso Global</th>
+                                    <th>Proyecto</th>
+                                    <th>Cliente</th>
+                                    <th style="width: 150px; text-align: center;">Estado (Bitácora)</th>
+                                    <th style="width: 140px;">Progreso Global</th>
                                 </tr>
                             </thead>
                             <tbody id="firebase-projects-list">
-                                <tr><td colspan="4" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1002,6 +1001,7 @@
                 currentSummaryProjectId = null;
                 currentSummaryRelationId = null;
                 idBitacoraEnEdicion = null;
+                window.idNotaEnEdicionResumen = null;
             }, 300);
         };
 
@@ -1180,7 +1180,7 @@
             idMarketingEnEdicion = mktId;
             document.getElementById('mkt-title').value = m.title || ''; document.getElementById('mkt-type').value = m.type || 'Post'; document.getElementById('mkt-detail').value = m.detail || '';
             document.getElementById('mkt-designed').checked = m.designed || false; document.getElementById('mkt-published').checked = m.published || false;
-            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Marketing';
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Pieza';
             const btnSubmit = document.getElementById('btn-submit-marketing'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Pieza';
             lucide.createIcons(); window.openEntryModal('tab-marketing', true);
         };
@@ -1196,7 +1196,7 @@
             
             document.getElementById('proj-name').value = p.name || ''; document.getElementById('proj-client').value = p.client || '';
             document.getElementById('proj-progress').value = p.progress || 0; document.getElementById('proj-notes').value = p.notes || '';
-            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Info Base';
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Info Base del Proyecto';
             const btnSubmit = document.getElementById('btn-submit-project'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Proyecto';
             lucide.createIcons(); window.openEntryModal('tab-proyecto', true);
         };
@@ -1218,7 +1218,7 @@
             document.getElementById('link-title').value = l.title || ''; document.getElementById('link-url').value = l.url || '';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Recurso';
             const btnSubmit = document.getElementById('btn-submit-link'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Recurso';
-            lucide.createIcons(); window.openEntryModal('tab-recurso', true);
+            lucide.createIcons(); window.openEntryModal('tab-recurso', true); // Abre tab-recurso que esta oculta pero funciona
         };
 
         window.editarEnlaceInterno = (internalId) => {
@@ -1232,12 +1232,10 @@
 
         window.editarNota = (noteId) => {
             const n = allNotes.find(x => x.id === noteId); if(!n) return;
-            // No cerramos el modal porque capaz la nota está adentro del proyecto
             const input = document.getElementById('summary-note-input');
             if(input) { input.value = n.text || ''; input.focus(); }
-            // Guardamos el id de la nota que estamos editando en una variable global
             window.idNotaEnEdicionResumen = noteId;
-            window.showToast('Editando nota (chat)...');
+            window.showToast('Editando nota de chat...');
         };
 
         window.editarBitacora = (bitId) => {
@@ -1550,6 +1548,8 @@
                 allClients.forEach(c => optionsHTML += `<option value="C_${c.id}">${c.company} (${c.name})</option>`);
                 optionsHTML += '</optgroup>';
             }
+            const linkSelect = document.getElementById('link-relation'); if(linkSelect) linkSelect.innerHTML = optionsHTML;
+            const noteSelect = document.getElementById('note-relation'); if(noteSelect) noteSelect.innerHTML = optionsHTML;
 
             const projClientSelect = document.getElementById('proj-client');
             let clientOptions = '<option value="">Ninguno / Proyecto Personal</option>';
@@ -1629,7 +1629,7 @@
             const filteredNotes = allNotes.filter(n => n.relationId === relationId);
             const notesContainer = document.getElementById('summary-notes-list');
             if (notesContainer) {
-                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px; text-align: center;">El historial de chat está vacío.</div>';
+                if(filteredNotes.length === 0) notesContainer.innerHTML = '<div style="font-size:0.8rem; color:var(--text-dim); padding:8px; text-align: center;">El historial de notas está vacío.</div>';
                 else {
                     notesContainer.innerHTML = '';
                     filteredNotes.forEach(note => {
@@ -1678,10 +1678,11 @@
                     linksContainer.innerHTML = '';
                     filteredLinks.forEach(link => {
                         try {
-                            let isWebLink = /^https?:\/\//i.test(link.url) || /^www\./i.test(link.url);
+                            const urlStr = String(link.url || '');
+                            let isWebLink = /^https?:\/\//i.test(urlStr) || /^www\./i.test(urlStr);
                             let actionHtml = isWebLink 
-                                ? `<a href="${link.url.startsWith('http') ? link.url : 'https://'+link.url}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Enlace &rarr;</a>`
-                                : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${link.url}</span>`;
+                                ? `<a href="${urlStr.startsWith('http') ? urlStr : 'https://'+urlStr}" target="_blank" class="data-subtitle" style="color: var(--brand-primary); font-weight: 500;">Abrir Enlace &rarr;</a>`
+                                : `<span class="data-subtitle" style="color: var(--text-dim); word-break: break-all;" title="Ubicación local"><i data-lucide="hard-drive" size="12" style="display:inline; margin-bottom:-2px; margin-right:2px;"></i> ${urlStr}</span>`;
 
                             const div = document.createElement('div'); div.className = 'data-row'; div.style.padding = '8px';
                             div.innerHTML = `
@@ -1715,8 +1716,9 @@
             const projectsListContainer = document.getElementById('summary-projects-list-container');
             const bitacoraContainer = document.getElementById('summary-bitacora-container');
             const recursosContainer = document.getElementById('summary-recursos-container');
+            const notesCardContainer = document.getElementById('summary-notes-card');
 
-            clientInfoContainer.style.display = 'none'; projectsListContainer.style.display = 'none'; bitacoraContainer.style.display = 'none'; recursosContainer.style.display = 'none';
+            clientInfoContainer.style.display = 'none'; projectsListContainer.style.display = 'none'; bitacoraContainer.style.display = 'none'; recursosContainer.style.display = 'none'; notesCardContainer.style.display = 'none';
             
             currentSummaryProjectId = null;
             currentSummaryRelationId = relationId;
@@ -1749,6 +1751,7 @@
                     }
                     bitacoraContainer.style.display = 'block';
                     recursosContainer.style.display = 'block';
+                    notesCardContainer.style.display = 'flex';
                     const bitDateInput = document.getElementById('bit-date');
                     if(bitDateInput) bitDateInput.value = new Date().toISOString().split('T')[0];
                     renderSummaryBitacora(id);
@@ -1758,6 +1761,7 @@
                 if(c) { 
                     entityName = c.company; entityBadge = 'Cliente'; 
                     recursosContainer.style.display = 'block';
+                    notesCardContainer.style.display = 'flex';
                     const relatedProjects = allProjects.filter(p => p.client === c.company);
                     if(relatedProjects.length > 0) {
                         let projListHtml = `<h3 style="font-size: var(--text-sm); color: var(--text-dim); margin-bottom: 8px;">Proyectos Activos</h3><ul style="list-style:none; padding:0; margin:0; font-size: 0.85rem;">`;
@@ -2161,8 +2165,6 @@
             for (let i = 0; i < firstDay; i++) { const emptyDiv = document.createElement('div'); emptyDiv.className = 'calendar-day empty'; grid.appendChild(emptyDiv); }
             for (let i = 1; i <= daysInMonth; i++) {
                 const currentDayString = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
-                // Verificar si hay eventos en este dia
                 const hasEvent = allEventos.some(e => e.date === currentDayString);
 
                 const dayDiv = document.createElement('div');
@@ -2174,7 +2176,6 @@
                 } else {
                     dayDiv.textContent = i;
                 }
-                
                 grid.appendChild(dayDiv);
             }
         }
