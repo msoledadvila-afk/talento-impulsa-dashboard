@@ -448,8 +448,8 @@
                 <form id="form-add-marketing" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
-                            <label>Fecha de Publicación *</label>
-                            <input type="date" id="mkt-date" class="form-control" required>
+                            <label>Título de la Pieza *</label>
+                            <input type="text" id="mkt-title" class="form-control" placeholder="Ej: Reel Tips Emprendedores" required>
                         </div>
                         <div class="form-group">
                             <label>Tipo de Pieza *</label>
@@ -463,8 +463,8 @@
                             </select>
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
-                            <label>Detalle / Copy de la Pieza *</label>
-                            <textarea id="mkt-detail" class="form-control" rows="3" placeholder="Describe la idea, el copy, o las instrucciones de diseño..." required></textarea>
+                            <label>Copy / CTA / Detalle (Se verá al abrir la pieza) *</label>
+                            <textarea id="mkt-detail" class="form-control" rows="3" placeholder="Escribe aquí el texto de la publicación, el llamado a la acción..." required></textarea>
                         </div>
                         
                         <div class="form-group" style="grid-column: 1 / -1; display: flex; gap: var(--space-6); background: var(--bg); padding: var(--space-3); border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
@@ -796,28 +796,28 @@
             </div>
 
             <!-- VISTA: GASTOS -->
-            <div id="view-gastos" class="view-section">
-                <div class="card" id="gastos">
+            <!-- 3. VISTA: PROYECTOS -->
+            <div id="view-proyectos" class="view-section">
+                <div class="card" id="proyectos">
                     <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
                         <div style="display: flex; align-items: center; gap: var(--space-3);">
-                            <h2 class="card-title" style="color: var(--alert-danger);"><i data-lucide="receipt"></i> Registro de Gastos</h2>
+                            <h2 class="card-title"><i data-lucide="kanban"></i> Tablero de Proyectos</h2>
                         </div>
-                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-gasto', false)"><i data-lucide="plus" size="16"></i> Nuevo Gasto</button>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-proyecto', false)"><i data-lucide="plus" size="16"></i> Nuevo Proyecto</button>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
                                     <th style="width:30px;"></th>
-                                    <th style="width: 120px;">Fecha</th>
-                                    <th>Concepto / Servicio</th>
-                                    <th style="width: 150px;">Categoría</th>
-                                    <th style="width: 120px; text-align: right;">Monto</th>
-                                    <th style="width: 70px; text-align: center;">Acciones</th>
+                                    <th>Proyecto</th>
+                                    <th>Cliente</th>
+                                    <th style="width: 150px; text-align: center;">Estado (Bitácora)</th>
+                                    <th style="width: 140px;">Progreso Global</th>
                                 </tr>
                             </thead>
-                            <tbody id="firebase-gastos-list">
-                                <tr><td colspan="6" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando gastos...</td></tr>
+                            <tbody id="firebase-projects-list">
+                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando proyectos...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -838,14 +838,12 @@
                             <thead>
                                 <tr>
                                     <th style="width:30px;"></th>
-                                    <th style="width: 120px;">Fecha</th>
-                                    <th>Pieza & Copy / Detalle</th>
-                                    <th style="width: 220px;">Status Visual</th>
-                                    <th style="width: 70px; text-align: center;">Acciones</th>
+                                    <th>Pieza (Título y Tipo)</th>
+                                    <th style="width: 220px;">Estado de Trabajo</th>
                                 </tr>
                             </thead>
                             <tbody id="firebase-marketing-list">
-                                <tr><td colspan="5" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
+                                <tr><td colspan="3" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando piezas de marketing...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1180,7 +1178,7 @@
         window.editarMarketing = (mktId) => {
             const m = allMarketing.find(x => x.id === mktId); if(!m) return;
             idMarketingEnEdicion = mktId;
-            document.getElementById('mkt-date').value = m.date || ''; document.getElementById('mkt-type').value = m.type || 'Post'; document.getElementById('mkt-detail').value = m.detail || '';
+            document.getElementById('mkt-title').value = m.title || ''; document.getElementById('mkt-type').value = m.type || 'Post'; document.getElementById('mkt-detail').value = m.detail || '';
             document.getElementById('mkt-designed').checked = m.designed || false; document.getElementById('mkt-published').checked = m.published || false;
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Marketing';
             const btnSubmit = document.getElementById('btn-submit-marketing'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Pieza';
@@ -1327,7 +1325,7 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            const data = { date: document.getElementById('mkt-date').value, type: document.getElementById('mkt-type').value, detail: document.getElementById('mkt-detail').value.trim(), designed: document.getElementById('mkt-designed').checked, published: document.getElementById('mkt-published').checked, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
+            const data = { title: document.getElementById('mkt-title').value.trim(), type: document.getElementById('mkt-type').value, detail: document.getElementById('mkt-detail').value.trim(), designed: document.getElementById('mkt-designed').checked, published: document.getElementById('mkt-published').checked, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
             try {
                 if (idMarketingEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "marketing", idMarketingEnEdicion), data); window.showToast('Pieza actualizada'); } 
                 else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'marketing'), data); window.showToast('Pieza guardada'); }
@@ -1711,6 +1709,7 @@
 
             const [type, id] = relationId.split('_');
             let entityName = '', entityBadge = '', entityNotes = '';
+            let notesTitle = "Notas Fijas / Accesos";
             
             const clientInfoContainer = document.getElementById('summary-client-info-container');
             const projectsListContainer = document.getElementById('summary-projects-list-container');
@@ -1754,7 +1753,7 @@
                     if(bitDateInput) bitDateInput.value = new Date().toISOString().split('T')[0];
                     renderSummaryBitacora(id);
                 }
-            } else {
+            } else if(type === 'C') {
                 const c = allClients.find(x => x.id === id);
                 if(c) { 
                     entityName = c.company; entityBadge = 'Cliente'; 
@@ -1770,12 +1769,33 @@
                         projectsListContainer.innerHTML = projListHtml; projectsListContainer.style.display = 'block';
                     }
                 }
+            } else if(type === 'M') {
+                const m = allMarketing.find(x => x.id === id);
+                if(m) {
+                    entityName = m.title || 'Sin Título'; 
+                    entityBadge = 'Pieza de Marketing'; 
+                    entityNotes = m.detail || '';
+                    notesTitle = "Copy / Detalles de la Publicación";
+                    
+                    const typeColor = getMktColor(m.type);
+                    clientInfoContainer.innerHTML = `
+                        <div style="font-weight: 600; color: var(--text);">Tipo de pieza</div>
+                        <div style="margin-top: 4px;"><span style="font-size: 0.75rem; font-weight: 600; padding: 4px 8px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; display: inline-block;">${m.type}</span></div>
+                    `;
+                    clientInfoContainer.style.display = 'block';
+                }
             }
 
             const summaryTitle = document.getElementById('summary-title');
             if (summaryTitle) {
-                const btnEditHtml = `<button class="btn-icon" style="margin-left: 8px; color: var(--brand-primary);" onclick="closeSummaryModal(); ${type === 'P' ? `editarProyecto('${id}')` : `editarCliente('${id}')`}" title="Editar Info Base"><i data-lucide="pencil" size="18"></i></button>`;
-                const btnDeleteHtml = `<button class="btn-icon" style="margin-left: 4px; color: var(--alert-danger);" onclick="closeSummaryModal(); deleteDocument('${type === 'P' ? 'proyectos' : 'clientes'}', '${id}')" title="Eliminar"><i data-lucide="trash-2" size="18"></i></button>`;
+                let editFn = '';
+                let colName = '';
+                if (type === 'P') { editFn = `editarProyecto('${id}')`; colName = 'proyectos'; }
+                else if (type === 'C') { editFn = `editarCliente('${id}')`; colName = 'clientes'; }
+                else if (type === 'M') { editFn = `editarMarketing('${id}')`; colName = 'marketing'; }
+
+                const btnEditHtml = `<button class="btn-icon" style="margin-left: 8px; color: var(--brand-primary);" onclick="closeSummaryModal(); ${editFn}" title="Editar Info Base"><i data-lucide="pencil" size="18"></i></button>`;
+                const btnDeleteHtml = `<button class="btn-icon" style="margin-left: 4px; color: var(--alert-danger);" onclick="closeSummaryModal(); deleteDocument('${colName}', '${id}')" title="Eliminar"><i data-lucide="trash-2" size="18"></i></button>`;
                 summaryTitle.innerHTML = `${entityName} <div style="display:inline-flex; align-items:center;">${btnEditHtml} ${btnDeleteHtml}</div>`;
             }
             
@@ -1783,13 +1803,18 @@
             if (summaryBadge) {
                 summaryBadge.textContent = entityBadge;
                 if(type === 'C') { summaryBadge.style.background = '#EFE9DB'; summaryBadge.style.color = '#684B45'; } 
+                else if (type === 'M') { summaryBadge.style.background = '#FCE7F3'; summaryBadge.style.color = '#DB2777'; }
                 else { summaryBadge.style.background = '#CFE2FF'; summaryBadge.style.color = '#084298'; }
             }
 
             const internalNotesContainer = document.getElementById('summary-internal-notes-container');
             const internalNotesText = document.getElementById('summary-internal-notes-text');
             if (internalNotesContainer && internalNotesText) {
-                if (entityNotes.trim() !== '') { internalNotesText.textContent = entityNotes; internalNotesContainer.style.display = 'block'; } 
+                if (entityNotes.trim() !== '') { 
+                    internalNotesContainer.querySelector('h3').innerHTML = `<i data-lucide="align-left" size="16"></i> ${notesTitle}`;
+                    internalNotesText.textContent = entityNotes; 
+                    internalNotesContainer.style.display = 'block'; 
+                } 
                 else { internalNotesContainer.style.display = 'none'; }
             }
 
@@ -1885,26 +1910,27 @@
         function renderMarketing(marketingList) {
             const tbody = document.getElementById('firebase-marketing-list');
             if (!tbody) return;
-            if (marketingList.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay piezas de marketing programadas.</td></tr>`; return; }
+            if (marketingList.length === 0) { tbody.innerHTML = `<tr><td colspan="3" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay piezas de marketing programadas.</td></tr>`; return; }
             tbody.innerHTML = '';
             
             marketingList.forEach(m => {
                 try {
                     const typeColor = getMktColor(m.type);
-                    const isOverdue = new Date(m.date + 'T12:00:00') < new Date() && (!m.published || !m.designed);
-                    const dateClass = isOverdue ? 'color: var(--alert-danger); font-weight: bold;' : 'color: var(--text-dim);';
                     
                     const tr = document.createElement('tr');
                     tr.setAttribute('data-id', m.id);
                     const sortOrder = m.order !== undefined ? m.order : -getTimestamp(m.createdAt);
                     tr.setAttribute('data-order', sortOrder);
                     
+                    const hasCopy = m.detail && m.detail.trim() !== '' ? `<i data-lucide="align-left" size="14" style="color: var(--brand-primary); margin-left: 6px; display: inline;" title="Tiene Copy"></i>` : '';
+
                     tr.innerHTML = `
                         <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
-                        <td style="${dateClass}">${formatStageDate(m.date)}</td>
                         <td>
-                            <span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; margin-bottom: 4px; display: inline-block;">${m.type}</span>
-                            <div style="font-size: var(--text-sm); color: var(--text); line-height: 1.4; white-space: pre-wrap;">${m.detail}</div>
+                            <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('M_${m.id}')" title="Ver Detalle/Copy de la Pieza">
+                                ${m.title || 'Sin Título'} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${hasCopy}
+                            </div>
+                            <span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${typeColor.bg}; color: ${typeColor.text}; border: 1px solid ${typeColor.border}; margin-top: 4px; display: inline-block;">${m.type}</span>
                         </td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -1915,10 +1941,6 @@
                                     <i data-lucide="send" size="10" style="margin-right:4px;"></i> ${m.published ? 'Publicado' : 'Pend. Publicación'}
                                 </span>
                             </div>
-                        </td>
-                        <td style="text-align: center; white-space: nowrap;">
-                            <button class="btn-icon" title="Editar" onclick="editarMarketing('${m.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
-                            <button class="btn-icon" title="Eliminar" onclick="deleteDocument('marketing', '${m.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1931,7 +1953,7 @@
         function renderProjects(projects) {
             const tbody = document.getElementById('firebase-projects-list');
             if (!tbody) return;
-            if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
+            if (projects.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay proyectos activos.</td></tr>`; return; }
             tbody.innerHTML = '';
             
             projects.forEach(p => {
@@ -1941,7 +1963,7 @@
                     const statusBadge = getBitacoraBadge(statusText);
                     
                     const cColor = getColorForString(p.client);
-                    const clientHtml = p.client ? `<div style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${cColor.bg}; color: ${cColor.text}; border: 1px solid ${cColor.border}; width: max-content; margin-top: 4px;"><i data-lucide="user" size="10" style="display:inline; margin-right:2px;"></i> ${p.client}</div>` : '';
+                    const clientHtml = p.client ? `<span style="font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: ${cColor.bg}; color: ${cColor.text}; border: 1px solid ${cColor.border}; width: max-content; display: inline-flex; align-items: center;"><i data-lucide="user" size="10" style="margin-right:4px;"></i> ${p.client}</span>` : '<span style="color: var(--text-dim); font-size: 0.75rem;">-</span>';
                     const notasIcon = p.notes ? `<i data-lucide="align-left" size="14" style="color: var(--brand-primary); margin-left: 6px; display: inline;" title="Tiene notas fijas"></i>` : '';
 
                     const tr = document.createElement('tr');
@@ -1955,8 +1977,8 @@
                             <div style="font-weight: 600; font-size: var(--text-sm); cursor:pointer; color: var(--text); display: flex; align-items: center;" onclick="openSummary('P_${p.id}')" title="Ver Ficha de Proyecto">
                                 ${p.name || 'Sin nombre'} <i data-lucide="external-link" size="12" style="color: var(--brand-primary); margin-left: 6px;"></i> ${notasIcon}
                             </div>
-                            ${clientHtml}
                         </td>
+                        <td>${clientHtml}</td>
                         <td style="text-align: center;">${statusBadge}</td>
                         <td>
                             <div style="display: flex; align-items: center; gap: 8px;">
