@@ -1002,6 +1002,9 @@
                 currentSummaryRelationId = null;
                 idBitacoraEnEdicion = null;
                 window.idNotaEnEdicionResumen = null;
+                window.idRecursoEnEdicionResumen = null;
+                const btnRecurso = document.querySelector('#form-add-summary-recurso button');
+                if (btnRecurso) { btnRecurso.innerHTML = '<i data-lucide="upload-cloud" size="18"></i>'; lucide.createIcons(); }
             }, 300);
         };
 
@@ -1213,12 +1216,16 @@
 
         window.editarRecurso = (linkId) => {
             const l = allLinks.find(x => x.id === linkId); if(!l) return;
-            idRecursoEnEdicion = linkId;
-            document.getElementById('link-relation').value = l.relationId || ''; document.getElementById('link-type').value = l.type || 'enlace';
-            document.getElementById('link-title').value = l.title || ''; document.getElementById('link-url').value = l.url || '';
-            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Recurso';
-            const btnSubmit = document.getElementById('btn-submit-link'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Recurso';
-            lucide.createIcons(); window.openEntryModal('tab-recurso', true); // Abre tab-recurso que esta oculta pero funciona
+            const titleInput = document.getElementById('summary-recurso-title');
+            const urlInput = document.getElementById('summary-recurso-url');
+            const typeInput = document.getElementById('summary-recurso-type');
+            if(titleInput) { titleInput.value = l.title || ''; titleInput.focus(); }
+            if(urlInput) { urlInput.value = l.url || ''; }
+            if(typeInput) { typeInput.value = l.type || 'enlace'; }
+            window.idRecursoEnEdicionResumen = linkId;
+            window.showToast('Editando recurso...');
+            const btn = document.querySelector('#form-add-summary-recurso button');
+            if(btn) { btn.innerHTML = '<i data-lucide="refresh-cw" size="18"></i>'; lucide.createIcons(); }
         };
 
         window.editarEnlaceInterno = (internalId) => {
@@ -1442,14 +1449,24 @@
                 type: document.getElementById('summary-recurso-type').value, 
                 title: document.getElementById('summary-recurso-title').value.trim(), 
                 url: document.getElementById('summary-recurso-url').value.trim(), 
-                addedBy: localUser, 
-                createdAt: Date.now() 
+                lastUpdatedBy: localUser, 
+                lastUpdatedAt: Date.now() 
             };
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), data);
+                if (window.idRecursoEnEdicionResumen) {
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos', window.idRecursoEnEdicionResumen), data);
+                    window.showToast('Recurso actualizado');
+                    window.idRecursoEnEdicionResumen = null;
+                    const btn = document.querySelector('#form-add-summary-recurso button');
+                    if(btn) { btn.innerHTML = '<i data-lucide="upload-cloud" size="18"></i>'; lucide.createIcons(); }
+                } else {
+                    data.addedBy = localUser;
+                    data.createdAt = Date.now();
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'recursos_compartidos'), data);
+                    window.showToast('Recurso añadido');
+                }
                 document.getElementById('summary-recurso-title').value = '';
                 document.getElementById('summary-recurso-url').value = '';
-                window.showToast('Recurso añadido');
             } catch (err) { window.handleFirebaseError(err); }
         });
 
