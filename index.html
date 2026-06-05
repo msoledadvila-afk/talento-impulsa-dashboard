@@ -371,12 +371,13 @@
             
             <div class="data-entry-tabs" id="data-entry-tabs-container">
                 <div class="entry-tab active" data-tab="tab-evento" onclick="switchTab('tab-evento')">Agenda</div>
-                <div class="entry-tab" data-tab="tab-gasto" onclick="switchTab('tab-gasto')">Gasto</div>
+                <div class="entry-tab" data-tab="tab-gasto" onclick="switchTab('tab-gasto')">Finanzas</div>
                 <div class="entry-tab" data-tab="tab-marketing" onclick="switchTab('tab-marketing')">Marketing</div>
                 <div class="entry-tab" data-tab="tab-proyecto" onclick="switchTab('tab-proyecto')">Proyecto</div>
                 <div class="entry-tab" data-tab="tab-cliente" onclick="switchTab('tab-cliente')">Cliente</div>
                 <div class="entry-tab" data-tab="tab-potencial" onclick="switchTab('tab-potencial')">Prospecto</div>
                 <div class="entry-tab" data-tab="tab-interno" onclick="switchTab('tab-interno')">Talento</div>
+                <div class="entry-tab" data-tab="tab-bitacora" onclick="switchTab('tab-bitacora')">Bitácora</div>
             </div>
 
             <div class="data-entry-body">
@@ -400,22 +401,70 @@
                             <label>Enlace (Google Meet, Zoom, etc.)</label>
                             <input type="text" id="evento-link" class="form-control" placeholder="https://meet.google.com/...">
                         </div>
+                        <div class="form-group">
+                            <label>Estado *</label>
+                            <select id="evento-status" class="form-control" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="Realizada">Realizada</option>
+                            </select>
+                        </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
                         <button type="submit" class="btn-primary btn-small" id="btn-submit-evento"><i data-lucide="save" size="16"></i> Agendar Evento</button>
                     </div>
                 </form>
 
-                <!-- TAB: GASTOS -->
+                <!-- TAB: BITÁCORA (MODAL) -->
+                <form id="form-add-bitacora-modal" class="form-section">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+                        <div class="form-group">
+                            <label>Fecha *</label>
+                            <input type="date" id="modal-bit-date" class="form-control" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Detalle *</label>
+                            <input type="text" id="modal-bit-detail" class="form-control" placeholder="¿Qué avance se hizo?" required>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Proyecto / Cliente Asociado (Opcional)</label>
+                            <select id="modal-bit-project" class="form-control">
+                                <option value="">-- Sin asignar --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado *</label>
+                            <select id="modal-bit-status" class="form-control" required>
+                                <option value="Trabajando">Trabajando</option>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="A confirmar">A confirmar</option>
+                                <option value="Bloqueado">Bloqueado</option>
+                                <option value="Resuelto">Resuelto</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-bitacora"><i data-lucide="save" size="16"></i> Guardar Bitácora</button>
+                    </div>
+                </form>
+
+                <!-- TAB: FINANZAS (INGRESOS Y GASTOS) -->
                 <form id="form-add-gasto" class="form-section">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
                         <div class="form-group">
-                            <label>Fecha del Gasto *</label>
+                            <label>Tipo de Movimiento *</label>
+                            <select id="gasto-tipo" class="form-control" required>
+                                <option value="ingreso">Ingreso (+)</option>
+                                <option value="gasto">Gasto (-)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha *</label>
                             <input type="date" id="gasto-date" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Categoría *</label>
-                            <select id="gasto-category" class="form-control" required>
+                            <label>Categoría</label>
+                            <select id="gasto-category" class="form-control">
+                                <option value="Servicios">Servicios / Proyectos (Ingreso)</option>
                                 <option value="Suscripciones">Suscripciones (Software/Tools)</option>
                                 <option value="Publicidad">Publicidad (Ads)</option>
                                 <option value="Honorarios">Honorarios Profesionales</option>
@@ -423,9 +472,13 @@
                                 <option value="Varios">Varios / Otros</option>
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label>Cliente / Origen (Ej: Cliente Fulanito)</label>
+                            <input type="text" id="gasto-cliente" class="form-control" placeholder="De quién ingresa o a quién se paga">
+                        </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Concepto / Detalle *</label>
-                            <input type="text" id="gasto-concept" class="form-control" placeholder="Ej: Suscripción Canva Pro Mensual" required>
+                            <input type="text" id="gasto-concept" class="form-control" placeholder="Ej: Anticipo Web / Canva Pro" required>
                         </div>
                         <div class="form-group">
                             <label>Monto *</label>
@@ -440,7 +493,7 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; margin-top: var(--space-4); border-top: 1px solid var(--border-light); padding-top: var(--space-4);">
-                        <button type="submit" class="btn-primary btn-small" id="btn-submit-gasto"><i data-lucide="save" size="16"></i> Guardar Gasto</button>
+                        <button type="submit" class="btn-primary btn-small" id="btn-submit-gasto"><i data-lucide="save" size="16"></i> Guardar Movimiento</button>
                     </div>
                 </form>
 
@@ -698,7 +751,7 @@
             </div>
             <nav class="nav-menu">
                 <a href="javascript:void(0)" class="nav-item active" data-view="inicio" onclick="navigateTo('inicio')"><i data-lucide="layout-dashboard"></i> Inicio</a>
-                <a href="javascript:void(0)" class="nav-item" data-view="gastos" onclick="navigateTo('gastos')"><i data-lucide="receipt"></i> Gastos</a>
+                <a href="javascript:void(0)" class="nav-item" data-view="gastos" onclick="navigateTo('gastos')"><i data-lucide="arrow-right-left"></i> Ingresos/Gastos</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="marketing" onclick="navigateTo('marketing')"><i data-lucide="megaphone"></i> Marketing</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="proyectos" onclick="navigateTo('proyectos')"><i data-lucide="folder-kanban"></i> Proyectos</a>
                 <a href="javascript:void(0)" class="nav-item" data-view="clientes" onclick="navigateTo('clientes')"><i data-lucide="users"></i> Clientes</a>
@@ -723,6 +776,24 @@
                     </div>
                 </div>
                 
+                <div id="pending-counters" style="display:flex; gap:16px; margin-top:8px; align-items:center; padding:8px 0;">
+                    <div style="font-size:0.9rem; color:var(--text-dim); display:flex; gap:6px; align-items:center;">
+                        <span style="font-weight:600; color:var(--text);">Pendientes</span>
+                    </div>
+                    <div class="badge info" id="pending-projects" title="Proyectos/Bitácoras pendientes" style="background:#FFF2CC; color:#92400E; padding:8px 12px; border-radius:14px; display:flex; gap:8px; align-items:center; cursor:pointer; font-size:1rem;">
+                        <span style="font-weight:600;">Proyectos</span>
+                        <span id="pending-projects-count" style="font-weight:700; font-size:1.2rem;">0</span>
+                    </div>
+                    <div class="badge info" id="pending-potenciales" title="Prospectos" style="background:#FFE4E6; color:#7C0B45; padding:8px 12px; border-radius:14px; display:flex; gap:8px; align-items:center; cursor:pointer; font-size:1rem;">
+                        <span style="font-weight:600;">Potenciales</span>
+                        <span id="pending-potenciales-count" style="font-weight:700; font-size:1.2rem;">0</span>
+                    </div>
+                    <div class="badge info" id="pending-reuniones" title="Reuniones pendientes" style="background:#E0F2FE; color:#075985; padding:8px 12px; border-radius:14px; display:flex; gap:8px; align-items:center; cursor:pointer; font-size:1rem;">
+                        <span style="font-weight:600;">Reuniones</span>
+                        <span id="pending-reuniones-count" style="font-weight:700; font-size:1.2rem;">0</span>
+                    </div>
+                </div>
+                
                 <div class="search-container">
                     <i data-lucide="search" class="search-icon" size="18"></i>
                     <input type="search" id="global-search" class="search-input" placeholder="Buscar proyecto o cliente..." autocomplete="off">
@@ -741,22 +812,44 @@
             <div id="view-inicio" class="view-section active">
                 <div class="dashboard-grid">
                     <div class="col-main">
-                        <!-- BRAINSTORMING -->
-                        <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none; height: 100%;">
-                            <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: var(--space-3); margin-bottom: var(--space-3);">
-                                <h2 class="card-title" style="color: white; font-weight: 700;">
-                                    <i data-lucide="lightbulb" style="color: #FDE68A;"></i> Brainstorming & Ideas 
-                                    <i data-lucide="sparkles" size="16" style="color: #FDE68A;"></i>
+                        <!-- PANEL DE PENDIENTES (Proyectos y Bitácoras) -->
+                        <div class="card" style="height: auto;">
+                            <div class="card-header">
+                                <h2 class="card-title" style="color: var(--brand-primary); font-weight: 700;">
+                                    <i data-lucide="list-todo"></i> Tareas y Proyectos Pendientes
                                 </h2>
                             </div>
-                            <div class="notes-list" id="firebase-ideas-list" style="min-height: 250px; padding-right: 10px; flex-grow: 1; overflow-y: auto;">
-                                <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-4); font-size: var(--text-sm);">Cargando ideas...</div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                                <th style="width: 120px;">Tipo</th>
+                                                <th>Descripción / Cliente</th>
+                                                <th style="width: 180px;">Proyecto / Cliente</th>
+                                                <th style="width: 150px;">Estado</th>
+                                            </tr>
+                                    </thead>
+                                    <tbody id="firebase-pendientes-list">
+                                        <tr><td colspan="4" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando pendientes...</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            
-                            <form id="form-add-idea" style="display: flex; gap: var(--space-2); margin-top: var(--space-4); align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--space-3);">
-                                <input type="text" id="idea-input" class="form-control" placeholder="¡Tengo una idea brillante!..." required autocomplete="off" style="flex-grow: 1; background: rgba(255,255,255,0.9); border: none; color: var(--text);">
-                                <button type="submit" class="btn-primary" style="padding: 0; width: 45px; height: 35px; flex-shrink: 0; background: #FDE68A; color: var(--brand-primary-deep);"><i data-lucide="plus" size="18"></i></button>
+                        </div>
+
+                        <!-- IDEAS (Más compacto) -->
+                        <div class="card" style="background: linear-gradient(135deg, var(--brand-primary-deep) 0%, #3b2a21 100%); color: white; border: none;">
+                            <div class="card-header" style="border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: var(--space-2); margin-bottom: var(--space-2);">
+                                <h2 class="card-title" style="color: white; font-weight: 700; font-size: var(--text-sm);">
+                                    <i data-lucide="lightbulb" style="color: #FDE68A; height: 18px;"></i> Notas rápidas & Ideas
+                                </h2>
+                            </div>
+                            <form id="form-add-idea" style="display: flex; gap: var(--space-2); align-items: center;">
+                                <input type="text" id="idea-input" class="form-control" placeholder="Anota algo rápido..." required autocomplete="off" style="flex-grow: 1; background: rgba(255,255,255,0.9); border: none; color: var(--text);">
+                                <button type="submit" class="btn-primary" style="padding: 0; width: 40px; height: 35px; flex-shrink: 0; background: #FDE68A; color: var(--brand-primary-deep);"><i data-lucide="plus" size="18"></i></button>
                             </form>
+                            <div class="notes-list" id="firebase-ideas-list" style="max-height: 150px; margin-top: 10px; overflow-y: auto; font-size: var(--text-sm);">
+                                <div style="text-align: center; color: rgba(255,255,255,0.6); padding: var(--space-2);">Cargando...</div>
+                            </div>
                         </div>
                     </div>
 
@@ -771,7 +864,7 @@
                             </div>
                         </div>
                         
-                        <div class="card">
+                        <div class="card" id="calendar-section">
                             <div class="card-header">
                                 <h2 class="card-title"><i data-lucide="calendar"></i> Calendario y Meets</h2>
                                 <button class="btn-icon" onclick="openEntryModal('tab-evento', false)" title="Agendar Reunión"><i data-lucide="plus" size="16"></i></button>
@@ -800,29 +893,42 @@
                 </div>
             </div>
 
-            <!-- VISTA: GASTOS -->
+            <!-- VISTA: INGRESOS Y GASTOS -->
             <div id="view-gastos" class="view-section">
+                <!-- Cajas de Resumen Financiero -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+                    <div class="card" style="background: var(--alert-success-bg); border-color: #BADBCC; padding: var(--space-3) var(--space-4);">
+                        <div style="font-size: var(--text-sm); color: var(--alert-success); font-weight: 600;">Ingresos Totales</div>
+                        <div style="font-size: var(--text-xl); color: var(--alert-success); font-weight: 800; font-family: var(--font-display);"><span id="resumen-ingresos">ARS 0.00 / USD 0.00</span></div>
+                    </div>
+                    <div class="card" style="background: var(--alert-danger-bg); border-color: #F5C2C7; padding: var(--space-3) var(--space-4);">
+                        <div style="font-size: var(--text-sm); color: var(--alert-danger); font-weight: 600;">Gastos Totales</div>
+                        <div style="font-size: var(--text-xl); color: var(--alert-danger); font-weight: 800; font-family: var(--font-display);"><span id="resumen-gastos">ARS 0.00 / USD 0.00</span></div>
+                    </div>
+                </div>
+
                 <div class="card" id="gastos">
                     <div class="card-header" style="flex-wrap: wrap; gap: var(--space-2);">
                         <div style="display: flex; align-items: center; gap: var(--space-3);">
-                            <h2 class="card-title" style="color: var(--alert-danger);"><i data-lucide="receipt"></i> Registro de Gastos</h2>
+                            <h2 class="card-title" style="color: var(--brand-primary-deep);"><i data-lucide="arrow-right-left"></i> Registro de Movimientos</h2>
                         </div>
-                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-gasto', false)"><i data-lucide="plus" size="16"></i> Nuevo Gasto</button>
+                        <button class="btn-primary btn-small" onclick="openEntryModal('tab-gasto', false)"><i data-lucide="plus" size="16"></i> Nuevo Registro</button>
                     </div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th style="width:30px;"></th>
-                                    <th style="width: 120px;">Fecha</th>
-                                    <th>Concepto / Servicio</th>
-                                    <th style="width: 150px;">Categoría</th>
-                                    <th style="width: 120px; text-align: right;">Monto</th>
+                                    <th style="width: 100px;">Fecha</th>
+                                    <th style="width: 80px;">Tipo</th>
+                                    <th>Cliente / Origen</th>
+                                    <th>Concepto / Categoría</th>
+                                <th style="width: 120px; text-align: right;">Monto ARS</th>
+                                <th style="width: 120px; text-align: right;">Monto USD</th>
                                     <th style="width: 70px; text-align: center;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="firebase-gastos-list">
-                                <tr><td colspan="6" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando gastos...</td></tr>
+                                <tr><td colspan="7" style="text-align: center; color: var(--text-dim); font-size: var(--text-sm);">Cargando finanzas...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -974,7 +1080,7 @@
                 const btnSubmitI = document.getElementById('btn-submit-internal'); if(btnSubmitI) btnSubmitI.innerHTML = '<i data-lucide="link" size="16"></i> Guardar Enlace Propio';
                 const btnSubmitM = document.getElementById('btn-submit-marketing'); if(btnSubmitM) btnSubmitM.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Pieza';
                 const btnSubmitE = document.getElementById('btn-submit-evento'); if(btnSubmitE) btnSubmitE.innerHTML = '<i data-lucide="save" size="16"></i> Agendar Evento';
-                const btnSubmitG = document.getElementById('btn-submit-gasto'); if(btnSubmitG) btnSubmitG.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Gasto';
+                const btnSubmitG = document.getElementById('btn-submit-gasto'); if(btnSubmitG) btnSubmitG.innerHTML = '<i data-lucide="save" size="16"></i> Guardar Movimiento';
                 lucide.createIcons();
             }
 
@@ -997,7 +1103,7 @@
         window.switchTab = (tabId) => {
             const formIdMap = { 
                 'tab-proyecto': 'form-add-project', 'tab-cliente': 'form-add-client', 'tab-potencial': 'form-add-potencial', 'tab-recurso': 'form-add-link', 
-                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing', 'tab-evento': 'form-add-evento', 'tab-gasto': 'form-add-gasto'
+                'tab-interno': 'form-add-internal', 'tab-marketing': 'form-add-marketing', 'tab-evento': 'form-add-evento', 'tab-gasto': 'form-add-gasto', 'tab-bitacora': 'form-add-bitacora-modal'
             };
             document.querySelectorAll('.entry-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
@@ -1035,6 +1141,15 @@
             if(targetNav) targetNav.classList.add('active');
             
             if (window.innerWidth <= 1024) toggleSidebar();
+        };
+
+        window.goToCalendar = (dateString) => {
+            if (!dateString) return;
+            navigateTo('inicio');
+            currentDate = new Date(dateString);
+            renderCalendar(currentDate);
+            const calSection = document.getElementById('calendar-section');
+            if (calSection) calSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         const userColors = {
@@ -1286,11 +1401,41 @@
 
         window.editarBitacora = (bitId) => {
             const b = allBitacoras.find(x => x.id === bitId); if(!b) return;
-            document.getElementById('bit-date').value = b.date || '';
-            document.getElementById('bit-detail').value = b.detail || '';
-            document.getElementById('bit-status').value = b.status || 'Trabajando';
+            const dateEl = document.getElementById('bit-date');
+            const detailEl = document.getElementById('bit-detail');
+            const statusEl = document.getElementById('bit-status');
+            if (dateEl) dateEl.value = b.date || '';
+            if (detailEl) { detailEl.value = b.detail || ''; detailEl.focus(); }
+            if (statusEl) statusEl.value = b.status || 'Trabajando';
             idBitacoraEnEdicion = bitId;
             window.showToast('Editando bitácora...');
+
+            // Asegurarse de que el usuario vea la sección de bitácora en el dashboard
+            try {
+                navigateTo('inicio');
+                currentSummaryProjectId = b.projectId || null;
+                const bitacoraContainer = document.getElementById('summary-bitacora-container');
+                if (bitacoraContainer) {
+                    bitacoraContainer.style.display = 'block';
+                    bitacoraContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                // Renderizar la lista de bitácoras del proyecto (o las no asignadas si corresponde)
+                if (typeof renderSummaryBitacora === 'function') renderSummaryBitacora(b.projectId || null);
+            } catch (e) { console.error('Error al mostrar bitácora en edición', e); }
+            // También abrir el modal de edición para bitácora
+            try {
+                const modalDate = document.getElementById('modal-bit-date');
+                const modalDetail = document.getElementById('modal-bit-detail');
+                const modalStatus = document.getElementById('modal-bit-status');
+                const modalProject = document.getElementById('modal-bit-project');
+                if (modalDate) modalDate.value = b.date || '';
+                if (modalDetail) { modalDetail.value = b.detail || ''; }
+                if (modalStatus) modalStatus.value = b.status || 'Trabajando';
+                if (modalProject) { populateProjectDropdowns(); modalProject.value = b.projectId || ''; }
+                const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Bitácora';
+                const btnSubmit = document.getElementById('btn-submit-bitacora'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Bitácora';
+                lucide.createIcons(); window.openEntryModal('tab-bitacora', true);
+            } catch (e) { console.error('Error al abrir modal bitácora', e); }
         };
 
         window.editarIdea = (ideaId) => {
@@ -1306,6 +1451,7 @@
             idEventoEnEdicion = evtId;
             document.getElementById('evento-title').value = eObj.title || ''; document.getElementById('evento-date').value = eObj.date || '';
             document.getElementById('evento-time').value = eObj.time || ''; document.getElementById('evento-link').value = eObj.meetLink || '';
+            document.getElementById('evento-status').value = eObj.status || 'Pendiente';
             const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Evento';
             const btnSubmit = document.getElementById('btn-submit-evento'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Evento';
             lucide.createIcons(); window.openEntryModal('tab-evento', true);
@@ -1314,14 +1460,16 @@
         window.editarGasto = (gastoId) => {
             const g = allGastos.find(x => x.id === gastoId); if(!g) return;
             idGastoEnEdicion = gastoId;
+            document.getElementById('gasto-tipo').value = g.tipo || 'gasto';
+            document.getElementById('gasto-cliente').value = g.cliente || '';
             document.getElementById('gasto-date').value = g.date || '';
             document.getElementById('gasto-category').value = g.category || 'Varios';
             document.getElementById('gasto-concept').value = g.concept || '';
             document.getElementById('gasto-amount').value = g.amount || '';
-            document.getElementById('gasto-currency').value = g.currency || 'ARS';
+            document.getElementById('gasto-currency').value = (g.currency || 'ARS').toUpperCase();
 
-            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Gasto';
-            const btnSubmit = document.getElementById('btn-submit-gasto'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Gasto';
+            const titleText = document.getElementById('modal-title-text'); if(titleText) titleText.textContent = 'Editar Movimiento';
+            const btnSubmit = document.getElementById('btn-submit-gasto'); if(btnSubmit) btnSubmit.innerHTML = '<i data-lucide="refresh-cw" size="16"></i> Actualizar Movimiento';
             lucide.createIcons(); window.openEntryModal('tab-gasto', true);
         };
 
@@ -1336,7 +1484,15 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            const data = { title: document.getElementById('evento-title').value.trim(), date: document.getElementById('evento-date').value, time: document.getElementById('evento-time').value, meetLink: document.getElementById('evento-link').value.trim() || '', lastUpdatedBy: localUser, lastUpdatedAt: Date.now() };
+            const data = {
+                title: document.getElementById('evento-title').value.trim(),
+                date: document.getElementById('evento-date').value,
+                time: document.getElementById('evento-time').value,
+                meetLink: document.getElementById('evento-link').value.trim() || '',
+                status: document.getElementById('evento-status').value || 'Pendiente',
+                lastUpdatedBy: localUser,
+                lastUpdatedAt: Date.now()
+            };
             try {
                 if (idEventoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "eventos", idEventoEnEdicion), data); window.showToast('Evento actualizado'); } 
                 else { data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'eventos'), data); window.showToast('Evento guardado'); }
@@ -1346,22 +1502,35 @@
 
         document.getElementById('form-add-gasto').addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!db) { window.showErrorToast('⚠️ Configura las claves de Firebase primero'); return; }
-            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
             
-            const data = { 
+                let currencyVal = (document.getElementById('gasto-currency').value || 'ARS').toUpperCase();
+                if (currencyVal !== 'ARS' && currencyVal !== 'USD') currencyVal = 'ARS';
+                const data = { 
+                tipo: document.getElementById('gasto-tipo').value, // 'ingreso' o 'gasto'
+                cliente: document.getElementById('gasto-cliente').value.trim(), // Nuevo campo
                 date: document.getElementById('gasto-date').value, 
                 category: document.getElementById('gasto-category').value, 
                 concept: document.getElementById('gasto-concept').value.trim(), 
                 amount: parseFloat(document.getElementById('gasto-amount').value) || 0,
-                currency: document.getElementById('gasto-currency').value,
-                lastUpdatedBy: localUser, lastUpdatedAt: Date.now() 
+                currency: currencyVal,
+                lastUpdatedBy: localUser, 
+                lastUpdatedAt: Date.now() 
             };
 
             try {
-                if (idGastoEnEdicion) { await updateDoc(doc(db, "artifacts", appId, "public", "data", "gastos", idGastoEnEdicion), data); window.showToast('Gasto actualizado'); } 
-                else { data.order = -Date.now(); data.addedBy = localUser; data.createdAt = Date.now(); await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gastos'), data); window.showToast('Gasto guardado'); }
-                document.getElementById('form-add-gasto').reset(); window.closeEntryModal(); 
+                if (idGastoEnEdicion) { 
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "gastos", idGastoEnEdicion), data); 
+                    window.showToast('Movimiento actualizado'); 
+                } else { 
+                    data.order = -Date.now(); 
+                    data.addedBy = localUser; 
+                    data.createdAt = Date.now(); 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gastos'), data); 
+                    window.showToast('Movimiento guardado'); 
+                }
+                document.getElementById('form-add-gasto').reset(); 
+                window.closeEntryModal(); 
             } catch (err) { window.handleFirebaseError(err); }
         });
 
@@ -1472,8 +1641,7 @@
             e.preventDefault();
             if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
             if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
-            if (!currentSummaryProjectId) return;
-            const data = { projectId: currentSummaryProjectId, date: document.getElementById('bit-date').value, detail: document.getElementById('bit-detail').value.trim(), status: document.getElementById('bit-status').value, addedBy: localUser, createdAt: Date.now() };
+            const data = { projectId: currentSummaryProjectId || null, date: document.getElementById('bit-date').value, detail: document.getElementById('bit-detail').value.trim(), status: document.getElementById('bit-status').value, addedBy: localUser, createdAt: Date.now() };
             try {
                 if(idBitacoraEnEdicion) {
                     await updateDoc(doc(db, "artifacts", appId, "public", "data", "bitacoras", idBitacoraEnEdicion), { ...data, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
@@ -1483,6 +1651,27 @@
                     window.showToast('Registro guardado');
                 }
                 document.getElementById('bit-detail').value = ''; 
+            } catch (err) { window.handleFirebaseError(err); }
+        });
+
+        // Modal bitácora form handler
+        const modalBitForm = document.getElementById('form-add-bitacora-modal');
+        if (modalBitForm) modalBitForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
+            if (!firebaseUser) { window.showErrorToast('⚠️ Firebase no conectado'); return; }
+            const selectedProjectId = document.getElementById('modal-bit-project') ? document.getElementById('modal-bit-project').value : (currentSummaryProjectId || null);
+            const data = { projectId: selectedProjectId || null, date: document.getElementById('modal-bit-date').value, detail: document.getElementById('modal-bit-detail').value.trim(), status: document.getElementById('modal-bit-status').value, addedBy: localUser, createdAt: Date.now() };
+            try {
+                if(idBitacoraEnEdicion) {
+                    await updateDoc(doc(db, "artifacts", appId, "public", "data", "bitacoras", idBitacoraEnEdicion), { ...data, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                    window.showToast('Bitácora actualizada'); idBitacoraEnEdicion = null;
+                } else {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras'), data);
+                    window.showToast('Registro guardado');
+                }
+                // close modal after save
+                window.closeEntryModal();
             } catch (err) { window.handleFirebaseError(err); }
         });
 
@@ -1523,7 +1712,8 @@
                 try {
                     allEventos = []; snapshot.forEach(doc => allEventos.push({ id: doc.id, ...doc.data() }));
                     allEventos.sort((a, b) => new Date(a.date+'T'+(a.time||'00:00')) - new Date(b.date+'T'+(b.time||'00:00')));
-                    renderEventosList(allEventos); renderCalendar(currentDate); 
+                    renderEventosList(allEventos); renderCalendar(currentDate); renderPendientes();
+                    if (typeof updatePendingCounters === 'function') updatePendingCounters();
                 } catch(e) { console.error("Error cargando eventos", e); }
             }));
             
@@ -1531,15 +1721,16 @@
                 try {
                     allGastos = []; snapshot.forEach(doc => allGastos.push({ id: doc.id, ...doc.data() }));
                     allGastos.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
-                    renderGastos(allGastos);
+                    renderGastos(allGastos); renderPendientes();
                 } catch(e) { console.error("Error cargando gastos", e); }
             }));
 
             unsubscribers.push(onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'bitacoras')), (snapshot) => {
                 try {
                     allBitacoras = []; snapshot.forEach(doc => allBitacoras.push({ id: doc.id, ...doc.data() }));
-                    renderProjects(allProjects); 
-                    if(currentSummaryProjectId) renderSummaryBitacora(currentSummaryProjectId);
+                    renderProjects(allProjects); renderPendientes();
+                    if(currentSummaryProjectId) { renderSummaryBitacora(currentSummaryProjectId); renderPendientes(); }
+                    if (typeof updatePendingCounters === 'function') updatePendingCounters();
                 } catch(e) { console.error("Error cargando bitacoras", e); }
             }));
 
@@ -1555,7 +1746,8 @@
                 try {
                     allProjects = []; snapshot.forEach(doc => allProjects.push({ id: doc.id, ...doc.data() }));
                     allProjects.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
-                    renderProjects(allProjects); updateDropdowns();
+                    renderProjects(allProjects); updateDropdowns(); renderPendientes();
+                    if (typeof updatePendingCounters === 'function') updatePendingCounters();
                 } catch(e) { console.error("Error cargando proyectos", e); }
             }));
 
@@ -1572,6 +1764,7 @@
                     allPotenciales = []; snapshot.forEach(doc => allPotenciales.push({ id: doc.id, ...doc.data() }));
                     allPotenciales.sort((a, b) => { const oA = a.order !== undefined ? a.order : -getTimestamp(a.createdAt); const oB = b.order !== undefined ? b.order : -getTimestamp(b.createdAt); return oA - oB; });
                     renderPotenciales(allPotenciales);
+                    if (typeof updatePendingCounters === 'function') updatePendingCounters();
                 } catch(e) { console.error("Error cargando potenciales", e); }
             }));
 
@@ -1684,7 +1877,10 @@
         function renderSummaryBitacora(projectId) {
             const list = document.getElementById('summary-bitacora-list');
             if(!list) return;
-            const projBits = allBitacoras.filter(b => b.projectId === projectId).sort((a,b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+            const projBits = allBitacoras.filter(b => {
+                if (projectId === null || projectId === undefined) return !b.projectId;
+                return b.projectId === projectId;
+            }).sort((a,b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
             
             if(projBits.length === 0) { 
                 list.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-dim); padding:10px; font-size: var(--text-sm);">Aún no hay registros en la bitácora.</td></tr>'; 
@@ -1711,6 +1907,43 @@
             });
             lucide.createIcons();
         }
+
+        // Actualiza los contadores que aparecen en la cabecera
+        function updatePendingCounters() {
+            try {
+                // Proyectos: contar proyectos cuyo último estado de bitácora sea Pendiente o Trabajando
+                let projectsCount = 0;
+                allProjects.forEach(p => {
+                    const projBits = allBitacoras.filter(b => b.projectId === p.id).sort((a,b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+                    const statusText = projBits.length > 0 ? projBits[0].status : 'Nuevo';
+                    if (statusText === 'Pendiente' || statusText === 'Trabajando') projectsCount++;
+                });
+
+                // Potenciales: contar todos los prospectos (si hay un campo específico para pendientes, adaptar aquí)
+                const potencialesCount = allPotenciales ? allPotenciales.length : 0;
+
+                // Reuniones: eventos con status Pendiente
+                const reunionesCount = (allEventos || []).filter(evt => (evt.status || 'Pendiente') === 'Pendiente').length;
+
+                const elProj = document.getElementById('pending-projects-count'); if (elProj) elProj.textContent = projectsCount;
+                const elPot = document.getElementById('pending-potenciales-count'); if (elPot) elPot.textContent = potencialesCount;
+                const elReu = document.getElementById('pending-reuniones-count'); if (elReu) elReu.textContent = reunionesCount;
+            } catch (e) { console.error('Error calculando contadores pendientes', e); }
+        }
+
+        window.populateProjectDropdowns = () => {
+            const dropdown = document.getElementById('modal-bit-project');
+            if (!dropdown) return;
+            const current = dropdown.value;
+            dropdown.innerHTML = '<option value="">-- Sin asignar --</option>';
+            allProjects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.client ? `${p.name} — ${p.client}` : p.name || 'Sin nombre';
+                dropdown.appendChild(opt);
+            });
+            if (current) dropdown.value = current;
+        };
 
         window.renderSummaryNotes = (relationId) => {
             const filteredNotes = allNotes.filter(n => n.relationId === relationId);
@@ -1957,37 +2190,55 @@
             return new Date(dateString + 'T12:00:00').toLocaleDateString('es-AR', { day: '2-digit', month: 'short' });
         }
 
+        async function toggleEventoStatus(eventId, newStatus) {
+            if (!db || !firebaseUser) return;
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'eventos', eventId), { status: newStatus, lastUpdatedBy: localUser, lastUpdatedAt: Date.now() });
+                window.showToast(`Evento marcado como ${newStatus}`);
+            } catch (err) {
+                window.handleFirebaseError(err);
+            }
+        }
+
         function renderEventosList(eventos) {
             const list = document.getElementById('firebase-eventos-list');
             if (!list) return;
 
             const todayStr = new Date().toISOString().split('T')[0];
-            const futureEvents = eventos.filter(e => e.date >= todayStr);
+            const events = [...eventos].sort((a, b) => (a.date + 'T' + (a.time || '00:00')).localeCompare(b.date + 'T' + (b.time || '00:00')));
 
-            if (futureEvents.length === 0) { 
-                list.innerHTML = `<div style="text-align: center; color: var(--text-dim); font-size: var(--text-sm); padding: var(--space-2);">Sin reuniones próximas.</div>`; 
-                return; 
+            if (events.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: var(--text-dim); font-size: var(--text-sm); padding: var(--space-2);">Sin reuniones agendadas.</div>`;
+                return;
             }
-            
+
             list.innerHTML = '';
-            futureEvents.forEach(evt => {
+            events.forEach(evt => {
+                const status = (evt.status || 'Pendiente');
+                const statusColor = status === 'Realizada' ? 'var(--alert-success)' : 'var(--alert-warning)';
+                const isPast = evt.date < todayStr;
+                const overdueHtml = isPast && status === 'Pendiente' ? `<span class="badge" style="background: #F8D7DA; color: #842029; border: 1px solid #F5C2C7; font-size:0.65rem; text-transform:none;">Atrasado</span>` : '';
                 let actionHtml = '';
-                if(evt.meetLink) {
+                if (evt.meetLink) {
                     let url = evt.meetLink.startsWith('http') ? evt.meetLink : 'https://' + evt.meetLink;
                     actionHtml = `<a href="${url}" target="_blank" class="badge" style="background: var(--brand-primary-glow); color: var(--brand-primary); cursor:pointer; font-size: 0.6rem; text-transform:none; text-decoration:none;"><i data-lucide="video" size="10" style="margin-right:4px;"></i> Unirse a Meet</a>`;
                 }
 
+                const toggleLabel = status === 'Pendiente' ? 'Marcar realizada' : 'Marcar pendiente';
+                const toggleStatus = status === 'Pendiente' ? 'Realizada' : 'Pendiente';
+
                 const div = document.createElement('div');
-                div.style.cssText = `display: flex; flex-direction: column; gap: 4px; padding: var(--space-3) 0; border-bottom: 1px dashed var(--border-light); position: relative;`;
+                div.style.cssText = `display: flex; flex-direction: column; gap: 6px; padding: var(--space-3) 0; border-bottom: 1px dashed var(--border-light); position: relative;`;
                 div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <span style="font-weight: 600; font-size: var(--text-sm); color: var(--text);">${evt.title}</span>
-                        <div style="display: flex; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;"><span style="font-weight: 600; font-size: var(--text-sm); color: var(--text);">${evt.title}</span><span class="badge" style="background: var(--bg); color: ${statusColor}; border: 1px solid var(--border-light); font-size:0.65rem; text-transform:none;">${status}</span>${overdueHtml}</div>
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn-secondary btn-small" type="button" onclick="toggleEventoStatus('${evt.id}','${toggleStatus}')">${toggleLabel}</button>
                             <i data-lucide="pencil" style="color: var(--brand-primary); cursor: pointer;" size="14" onclick="editarEvento('${evt.id}')" title="Editar"></i>
                             <i data-lucide="trash-2" style="color: var(--alert-danger); cursor: pointer;" size="14" onclick="deleteDocument('eventos', '${evt.id}')" title="Borrar"></i>
                         </div>
                     </div>
-                    <div style="font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="font-size: 0.75rem; color: var(--text-dim); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
                         <span><i data-lucide="clock" size="12" style="display:inline; margin-bottom:-2px;"></i> ${formatStageDate(evt.date)} a las ${evt.time || '--:--'}</span>
                         ${actionHtml}
                     </div>
@@ -2000,24 +2251,45 @@
         function renderGastos(gastos) {
             const tbody = document.getElementById('firebase-gastos-list');
             if (!tbody) return;
-            if (gastos.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay gastos registrados.</td></tr>`; return; }
+
+            // calcular resúmenes por moneda
+            const totals = { ingresos: { ARS: 0, USD: 0 }, gastos: { ARS: 0, USD: 0 } };
+            gastos.forEach(g => {
+                const amt = parseFloat(g.amount) || 0;
+                const cur = (g.currency || 'ARS').toUpperCase();
+                if (cur !== 'ARS' && cur !== 'USD') return; // solo ARS y USD
+                if (g.tipo === 'ingreso') totals.ingresos[cur] = (totals.ingresos[cur] || 0) + amt;
+                else totals.gastos[cur] = (totals.gastos[cur] || 0) + amt;
+            });
+
+            const fmtARS = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+            const fmtUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+            const rIng = document.getElementById('resumen-ingresos'); if (rIng) rIng.textContent = `${fmtARS.format(totals.ingresos.ARS || 0)} / ${fmtUSD.format(totals.ingresos.USD || 0)}`;
+            const rGas = document.getElementById('resumen-gastos'); if (rGas) rGas.textContent = `${fmtARS.format(totals.gastos.ARS || 0)} / ${fmtUSD.format(totals.gastos.USD || 0)}`;
+
+            if (gastos.length === 0) { tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-dim); padding: var(--space-4);">No hay movimientos registrados.</td></tr>`; return; }
             tbody.innerHTML = '';
-            
+
             gastos.forEach(g => {
                 try {
                     const tr = document.createElement('tr');
                     tr.setAttribute('data-id', g.id);
                     const sortOrder = g.order !== undefined ? g.order : -getTimestamp(g.createdAt);
                     tr.setAttribute('data-order', sortOrder);
-                    
-                    const formatMonto = new Intl.NumberFormat('es-AR', { style: 'currency', currency: g.currency || 'ARS' }).format(g.amount || 0);
+
+                    const cur = (g.currency || 'ARS').toUpperCase();
+                    const formatARS = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(g.amount && (cur === 'ARS') ? g.amount : 0);
+                    const formatUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(g.amount && (cur === 'USD') ? g.amount : 0);
+                    const tipoLabel = g.tipo === 'ingreso' ? 'Ingreso' : 'Gasto';
+                    const tipoColor = g.tipo === 'ingreso' ? 'var(--alert-success)' : 'var(--alert-danger)';
 
                     tr.innerHTML = `
-                        <td style="width: 30px; text-align: center;"><i data-lucide="grip-vertical" class="drag-handle" size="16"></i></td>
                         <td style="color: var(--text-dim);">${formatStageDate(g.date)}</td>
-                        <td style="font-weight: 500; color: var(--text);">${g.concept || 'Sin concepto'}</td>
-                        <td><span class="badge" style="background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); text-transform:none;">${g.category || 'Varios'}</span></td>
-                        <td style="text-align: right; font-weight: 600; color: var(--alert-danger);">${formatMonto}</td>
+                        <td style="font-weight: 600; color: ${tipoColor};">${tipoLabel}</td>
+                        <td style="color: var(--text);">${g.cliente || '-'}</td>
+                        <td><span class="badge" style="background: var(--bg); color: var(--text-dim); border: 1px solid var(--border-light); text-transform:none;">${g.concept || 'Sin concepto'} · ${g.category || 'Varios'}</span></td>
+                        <td style="text-align: right; font-weight: 600; color: ${cur === 'ARS' ? (g.tipo === 'ingreso' ? 'var(--alert-success)' : 'var(--alert-danger)') : 'var(--text-dim)'};">${cur === 'ARS' ? formatARS : '-'}</td>
+                        <td style="text-align: right; font-weight: 600; color: ${cur === 'USD' ? (g.tipo === 'ingreso' ? 'var(--alert-success)' : 'var(--alert-danger)') : 'var(--text-dim)'};">${cur === 'USD' ? formatUSD : '-'}</td>
                         <td style="text-align: center; white-space: nowrap;">
                             <button class="btn-icon" title="Editar" onclick="editarGasto('${g.id}')" style="color: var(--brand-primary); margin-right: 4px;"><i data-lucide="pencil" size="16"></i></button>
                             <button class="btn-icon" title="Eliminar" onclick="deleteDocument('gastos', '${g.id}')" style="color: var(--alert-danger);"><i data-lucide="trash-2" size="16"></i></button>
@@ -2117,6 +2389,73 @@
             initSortable('firebase-projects-list', 'proyectos');
         }
 
+        function renderPendientes() {
+            const tbody = document.getElementById('firebase-pendientes-list');
+            if (!tbody) return;
+            const items = [];
+
+            // Proyectos con estado en bitácora
+            allProjects.forEach(p => {
+                const projBits = allBitacoras.filter(b => b.projectId === p.id).sort((a,b) => new Date(b.date) - new Date(a.date) || b.createdAt - a.createdAt);
+                const statusText = projBits.length > 0 ? projBits[0].status : 'Nuevo';
+                if (statusText === 'Pendiente' || statusText === 'Trabajando') {
+                    const displayName = p.client ? p.client : p.name || 'Sin nombre';
+                    items.push({ tipo: 'Proyecto', desc: `${p.name || 'Sin nombre'}${p.client ? ' — ' + p.client : ''}`, status: statusText, projectId: p.id, projectName: p.name, clientName: p.client || '', displayName });
+                }
+            });
+
+            // Entradas de bitácora sueltas
+            allBitacoras.forEach(b => {
+                if (b.status === 'Pendiente' || b.status === 'Trabajando') {
+                    const proj = allProjects.find(x => x.id === b.projectId);
+                    const displayName = proj ? (proj.client ? proj.client : proj.name || 'Sin nombre') : 'Sin asignar';
+                    items.push({ tipo: 'Bitácora', desc: (b.detail || '').slice(0, 120) || 'Sin detalle', status: b.status, projectId: b.projectId || null, projectName: proj ? proj.name : '', clientName: proj ? proj.client : '', displayName, bitacoraId: b.id });
+                }
+            });
+
+            // Eventos pendientes
+            allEventos.forEach(evt => {
+                const evtStatus = evt.status || 'Pendiente';
+                if (evtStatus === 'Pendiente') {
+                    items.push({ tipo: 'Evento', desc: `${evt.title}${evt.time ? ' a las ' + evt.time : ''}`, status: evtStatus, projectId: null, projectName: '', clientName: '', displayName: evt.title || 'Evento pendiente', eventDate: evt.date });
+                }
+            });
+
+            // Opcional: incluir tareas o ideas en trabajo si aplica (no implementado aquí)
+
+            if (items.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-dim); font-size:var(--text-sm); padding: var(--space-3);">No hay pendientes.</td></tr>`; return; }
+            // ordenar por proyecto/cliente
+            items.sort((a,b) => {
+                const keyA = (a.displayName || a.projectName || a.clientName || '').toLowerCase();
+                const keyB = (b.displayName || b.projectName || b.clientName || '').toLowerCase();
+                if (keyA < keyB) return -1; if (keyA > keyB) return 1; return 0;
+            });
+            tbody.innerHTML = '';
+            items.forEach(it => {
+                try {
+                    const tr = document.createElement('tr');
+                    const displayText = it.displayName || it.projectName || it.clientName || '-';
+                    let projectHtml = displayText;
+                    if (it.tipo === 'Evento' && it.eventDate) {
+                        projectHtml = `<a href="javascript:void(0)" onclick="goToCalendar('${it.eventDate}')">${displayText}</a>`;
+                    } else if (it.projectId) {
+                        projectHtml = `<a href="javascript:void(0)" onclick="openSummary('P_${it.projectId}')">${displayText}</a>`;
+                    } else if (it.tipo === 'Bitácora' && it.bitacoraId) {
+                        projectHtml = `<a href="javascript:void(0)" onclick="editarBitacora('${it.bitacoraId}')">${displayText}</a>`;
+                    }
+                    tr.innerHTML = `
+                        <td style="width: 120px; font-weight:600;">${it.tipo}</td>
+                        <td>${it.desc}</td>
+                        <td style="width: 180px; text-align: left;">${projectHtml}</td>
+                        <td style="width: 150px; text-align: center;">${getBitacoraBadge(it.status)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                } catch(e) { console.error('Error render pendientes', e); }
+            });
+            // actualizar contadores resumen
+            if (typeof updatePendingCounters === 'function') updatePendingCounters();
+        }
+
         function renderClients(clients) {
             const list = document.getElementById('firebase-clients-list');
             if (!list) return;
@@ -2188,6 +2527,9 @@
                                 </div>
                             </div>
                         </div>
+                        <div style="display:flex; justify-content: flex-end; padding: 8px; gap:8px;">
+                            <button class="btn-primary btn-small" onclick="convertirPotencial('${pot.id}'); event.stopPropagation();" title="Convertir a Cliente"><i data-lucide="user-check" size="14"></i> Convertir</button>
+                        </div>
                     `;
                     list.appendChild(div);
                 } catch(e) { console.error("Error prospecto row", e); }
@@ -2195,6 +2537,18 @@
             lucide.createIcons();
             initSortable('firebase-potenciales-list', 'potenciales');
         }
+
+        window.convertirPotencial = async (potId) => {
+            if (!db) { window.showErrorToast('⚠️ Configura Firebase primero'); return; }
+            try {
+                const pot = allPotenciales.find(x => x.id === potId); if(!pot) { window.showErrorToast('Prospecto no encontrado'); return; }
+                const fullName = `${pot.nombre || ''} ${pot.apellido || ''}`.trim() || 'Sin Nombre';
+                const clientData = { name: fullName, email: pot.email || '', phone: pot.phone || '', addedBy: localUser, createdAt: Date.now(), origin: 'potencial', potencialId: potId };
+                const ref = await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'clientes'), clientData);
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'potenciales', potId), { converted: true, convertedClientId: ref.id, convertedAt: Date.now() });
+                window.showToast('Prospecto convertido a cliente');
+            } catch(err) { window.handleFirebaseError(err); }
+        };
 
         function renderInternalLinks(links) {
             const list = document.getElementById('firebase-internal-links');
