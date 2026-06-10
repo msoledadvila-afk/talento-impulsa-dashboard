@@ -345,6 +345,35 @@
         .btn-convertir{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700;background:linear-gradient(135deg,var(--brand-green) 0%,#0a5a46 100%);color:white;border:none;cursor:pointer;transition:opacity .2s}
         .btn-convertir:hover{opacity:.9}
         .pipeline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-4)}
+
+        /* ── MARKETING ─────────────────────────────────── */
+        .mkt-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);transition:box-shadow .15s}
+        .mkt-card:hover{box-shadow:var(--shadow-sm)}
+        .mkt-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3);margin-bottom:var(--space-2)}
+        .mkt-card-title{font-weight:700;font-size:var(--text-sm);color:var(--text)}
+        .mkt-card-sub{font-size:var(--text-xs);color:var(--text-dim);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+        .mkt-copy{font-size:var(--text-sm);color:var(--text);line-height:1.6;background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:var(--space-3);margin-top:var(--space-2);white-space:pre-wrap;word-break:break-word}
+        .mkt-estado{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700}
+        .mkt-estado.disenada{background:#DBEAFE;color:#1E40AF}
+        .mkt-estado.publicada{background:#DCFCE7;color:#166534}
+        .mkt-estado.pendiente{background:#F1F5F9;color:#475569}
+        .mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-4)}
+        .mkt-tipo-badge{font-size:var(--text-xs);font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);background:var(--brand-primary-glow);color:var(--brand-primary)}
+
+        /* ── CLIENTE FICHA EXPANDIDA ────────────────────── */
+        .cli-contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-2);margin-bottom:var(--space-3)}
+        .cli-contact-item{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--text-dim)}
+        .cli-contact-item a{color:var(--brand-primary);font-weight:600}
+        .cli-proyectos-list{display:flex;flex-direction:column;gap:var(--space-2)}
+        .cli-proyecto-item{display:flex;justify-content:space-between;align-items:center;padding:var(--space-2) var(--space-3);background:var(--bg);border-radius:var(--radius-md);border:1px solid var(--border-light);cursor:pointer;transition:background .15s}
+        .cli-proyecto-item:hover{background:var(--brand-primary-glow)}
+
+        /* ── EDICIÓN INLINE ─────────────────────────────── */
+        .edit-modal-box{max-width:640px}
+        .reunion-estado-select{font-family:var(--font-body);font-size:var(--text-xs);font-weight:600;padding:3px 8px;border-radius:var(--radius-pill);border:1px solid var(--border);cursor:pointer;background:var(--bg)}
+        .reunion-estado-select.pendiente{background:#FEF9C3;color:#854D0E;border-color:#FDE68A}
+        .reunion-estado-select.cumplimentada{background:#DCFCE7;color:#166534;border-color:#BBF7D0}
+        .reunion-estado-select.cancelada{background:#FEE2E2;color:#B91C1C;border-color:#FECACA}
     </style>
 </head>
 <body>
@@ -354,7 +383,7 @@
 <div id="login-overlay" class="overlay-fullscreen">
     <div class="login-card">
         <div class="login-logo"><i data-lucide="sparkles" size="22"></i> Talento Impulsa</div>
-        <p class="login-subtitle">Dashboard Operativo · Fase 1</p>
+        <p class="login-subtitle">Dashboard Operativo</p>
         <div id="login-error"></div>
         <form id="login-form" style="display:flex;flex-direction:column;gap:var(--space-4)">
             <div class="form-group" style="text-align:left"><label>Perfil</label>
@@ -724,6 +753,195 @@
     </div>
 </div>
 
+<!-- MODAL MARKETING -->
+<div id="modal-mkt" class="modal-overlay">
+    <div class="modal-box edit-modal-box">
+        <div class="modal-header">
+            <span class="modal-title" id="mkt-modal-title">Nueva Pieza</span>
+            <button class="btn-icon" id="btn-close-mkt-modal"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-add-mkt" class="form-grid form-grid-2">
+                <input type="hidden" id="mkt-edit-id">
+                <div class="form-group"><label>Nombre de la pieza</label><input type="text" id="mkt-nombre" class="form-control" required placeholder="Ej: Post lanzamiento Núcleo PCA"></div>
+                <div class="form-group"><label>Tipo de publicación</label>
+                    <select id="mkt-tipo" class="form-control">
+                        <option value="feed">Feed Instagram</option><option value="story">Story</option>
+                        <option value="reel">Reel</option><option value="linkedin">LinkedIn</option>
+                        <option value="email">Email / Newsletter</option><option value="whatsapp">WhatsApp</option><option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="mkt-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="disenada">Pieza diseñada</option>
+                        <option value="publicada">Publicada</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Fecha programada</label><input type="date" id="mkt-fecha" class="form-control"></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Texto del post / copy</label>
+                    <textarea id="mkt-copy" class="form-control" rows="4" placeholder="Escribí o pegá el texto del post..."></textarea>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>Link diseño (Canva/Figma)</label><input type="url" id="mkt-url" class="form-control" placeholder="https://canva.com/..."></div>
+                <div class="form-footer" style="grid-column:1/-1">
+                    <button type="submit" class="btn-primary" id="btn-mkt-submit"><i data-lucide="save" size="16"></i> Guardar pieza</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR IDEA -->
+<div id="modal-edit-idea" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title">Editar Idea</span>
+            <button class="btn-icon" id="btn-close-edit-idea"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-idea" class="form-grid">
+                <input type="hidden" id="edit-idea-id">
+                <div class="form-group"><label>Título</label><input type="text" id="edit-idea-titulo" class="form-control" required></div>
+                <div class="form-group"><label>Categoría</label>
+                    <select id="edit-idea-categoria" class="form-control">
+                        <option value="producto">Producto / Servicio nuevo</option><option value="marketing">Marketing & Contenido</option>
+                        <option value="proceso">Proceso interno</option><option value="tecnologia">Tecnología / Tool</option><option value="otro">Otra</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Desarrollo</label><textarea id="edit-idea-cuerpo" class="form-control" rows="5"></textarea></div>
+                <div class="form-footer"><button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR BITÁCORA -->
+<div id="modal-edit-bit" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title">Editar Registro</span>
+            <button class="btn-icon" id="btn-close-edit-bit"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-bit" class="form-grid form-grid-2">
+                <input type="hidden" id="edit-bit-id">
+                <div class="form-group" style="grid-column:1/-1"><label>Detalle</label><textarea id="edit-bit-detail" class="form-control" rows="3" required></textarea></div>
+                <div class="form-group"><label>Horas</label>
+                    <select id="edit-bit-hours" class="form-control">
+                        <option value="0.25">0.25 hs</option><option value="0.5">0.5 hs</option><option value="1">1 hs</option>
+                        <option value="1.5">1.5 hs</option><option value="2">2 hs</option><option value="3">3 hs</option>
+                        <option value="4">4 hs</option><option value="6">6 hs</option><option value="8">8 hs</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="edit-bit-status" class="form-control">
+                        <option value="in-progress">En progreso</option><option value="done">Completado</option>
+                        <option value="pending">Pendiente</option><option value="blocked">Bloqueado</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Fecha</label><input type="date" id="edit-bit-date" class="form-control"></div>
+                <div class="form-footer" style="grid-column:1/-1"><button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR PROYECTO -->
+<div id="modal-edit-proyecto" class="modal-overlay">
+    <div class="modal-box edit-modal-box">
+        <div class="modal-header">
+            <span class="modal-title">Editar Proyecto</span>
+            <button class="btn-icon" id="btn-close-edit-proyecto"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-proyecto" class="form-grid form-grid-2">
+                <input type="hidden" id="edit-proj-id">
+                <div class="form-group"><label>Nombre</label><input type="text" id="edit-proj-name" class="form-control" required></div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="edit-proj-status" class="form-control">
+                        <option value="active">En progreso</option><option value="pending">Pendiente</option>
+                        <option value="done">Completado</option><option value="paused">Pausado</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Progreso (%)</label><input type="number" id="edit-proj-progress" class="form-control" min="0" max="100"></div>
+                <div class="form-group"><label>Cliente</label>
+                    <select id="edit-proj-client" class="form-control"><option value="">— Sin cliente (Talento) —</option></select>
+                </div>
+                <div class="form-group"><label>Kickoff</label><input type="date" id="edit-proj-kickoff" class="form-control"></div>
+                <div class="form-group"><label>Entrega</label><input type="date" id="edit-proj-delivery" class="form-control"></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Descripción / Notas</label><textarea id="edit-proj-desc" class="form-control" rows="3"></textarea></div>
+                <div class="form-footer" style="grid-column:1/-1"><button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR CLIENTE -->
+<div id="modal-edit-cliente" class="modal-overlay">
+    <div class="modal-box edit-modal-box">
+        <div class="modal-header">
+            <span class="modal-title">Editar Cliente</span>
+            <button class="btn-icon" id="btn-close-edit-cliente"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-cliente" class="form-grid form-grid-2">
+                <input type="hidden" id="edit-cli-id">
+                <div class="form-group"><label>Nombre / Empresa</label><input type="text" id="edit-cli-name" class="form-control" required></div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="edit-cli-status" class="form-control">
+                        <option value="active">Activo</option><option value="lead">Lead</option>
+                        <option value="paused">Pausado</option><option value="done">Cerrado</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>WhatsApp / Teléfono</label><input type="text" id="edit-cli-whatsapp" class="form-control" placeholder="+54911..."></div>
+                <div class="form-group"><label>Email</label><input type="email" id="edit-cli-email" class="form-control" placeholder="contacto@empresa.com"></div>
+                <div class="form-group"><label>Instagram</label><input type="text" id="edit-cli-instagram" class="form-control" placeholder="@usuario"></div>
+                <div class="form-group"><label>LinkedIn</label><input type="text" id="edit-cli-linkedin" class="form-control" placeholder="linkedin.com/in/..."></div>
+                <div class="form-group"><label>Sitio Web</label><input type="text" id="edit-cli-web" class="form-control" placeholder="https://..."></div>
+                <div class="form-group"><label>Rubro</label><input type="text" id="edit-cli-rubro" class="form-control"></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Notas</label><textarea id="edit-cli-notes" class="form-control" rows="3"></textarea></div>
+                <div class="form-footer" style="grid-column:1/-1"><button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ACCESO RÁPIDO -->
+<div id="modal-acceso" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+            <span class="modal-title" id="acceso-modal-title">Nuevo Enlace</span>
+            <button class="btn-icon" id="btn-close-acceso-modal"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-add-acceso" class="form-grid form-grid-2">
+                <input type="hidden" id="acceso-edit-id">
+                <div class="form-group"><label>Título</label><input type="text" id="acc-titulo" class="form-control" required placeholder="Ej: Instagram Talento"></div>
+                <div class="form-group"><label>Tipo</label>
+                    <select id="acc-tipo" class="form-control">
+                        <option value="web">Sitio Web</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="whatsapp">WhatsApp / Grupo</option>
+                        <option value="canva">Canva</option>
+                        <option value="github">GitHub</option>
+                        <option value="drive">Google Drive</option>
+                        <option value="calendly">Calendly</option>
+                        <option value="notion">Notion</option>
+                        <option value="repo">Repositorio</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>URL</label><input type="url" id="acc-url" class="form-control" required placeholder="https://..."></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Descripción (opcional)</label><input type="text" id="acc-desc" class="form-control" placeholder="Ej: Perfil oficial de la marca"></div>
+                <div class="form-footer" style="grid-column:1/-1">
+                    <button type="submit" class="btn-primary" id="btn-acceso-submit"><i data-lucide="link" size="16"></i> Guardar enlace</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- APP LAYOUT -->
 <div id="app-layout">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -745,8 +963,10 @@
             <div class="nav-item" data-view="view-recursos"><i data-lucide="cloud" size="16"></i> Recursos</div>
             <div class="nav-section-label">Comercial & Ideas</div>
             <div class="nav-item" data-view="view-potenciales"><i data-lucide="user-search" size="16"></i> Potenciales</div>
+            <div class="nav-item" data-view="view-marketing"><i data-lucide="megaphone" size="16"></i> Marketing</div>
             <div class="nav-item" data-view="view-reuniones"><i data-lucide="calendar" size="16"></i> Reuniones</div>
             <div class="nav-item" data-view="view-brainstorming"><i data-lucide="lightbulb" size="16"></i> Ideas</div>
+            <div class="nav-item" data-view="view-accesos"><i data-lucide="link-2" size="16"></i> Accesos Rápidos</div>
         </nav>
         <div class="user-profile-nav">
             <div class="avatar" id="nav-avatar">S</div>
@@ -956,6 +1176,55 @@
             <div class="card"><div class="data-list" id="resources-list"></div></div>
         </section>
 
+        <!-- ACCESOS RÁPIDOS -->
+        <section id="view-accesos" class="view">
+            <div class="view-header">
+                <div>
+                    <div class="view-title">Accesos Rápidos</div>
+                    <p style="font-size:var(--text-sm);color:var(--text-dim);margin-top:4px">Links importantes de Talento Impulsa</p>
+                </div>
+                <button class="btn-primary" id="btn-open-acceso-modal"><i data-lucide="plus" size="16"></i> Agregar enlace</button>
+            </div>
+            <div id="accesos-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--space-4)">
+                <div class="empty-state" style="grid-column:1/-1"><i data-lucide="link-2" size="32"></i>Sin enlaces cargados aún.</div>
+            </div>
+        </section>
+
+        <!-- MARKETING TALENTO -->
+        <section id="view-marketing" class="view">
+            <div class="view-header">
+                <div>
+                    <div class="view-title">Marketing · Talento Impulsa</div>
+                    <p style="font-size:var(--text-sm);color:var(--text-dim);margin-top:4px">Piezas y contenido de la marca propia</p>
+                </div>
+                <button class="btn-primary" id="btn-open-mkt-modal"><i data-lucide="plus" size="16"></i> Nueva pieza</button>
+            </div>
+            <!-- Filtro rápido por estado -->
+            <div class="filtros-bar">
+                <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
+                <select id="flt-mkt-estado">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="disenada">Pieza diseñada</option>
+                    <option value="publicada">Publicada</option>
+                </select>
+                <select id="flt-mkt-tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="feed">Feed Instagram</option>
+                    <option value="story">Story</option>
+                    <option value="reel">Reel</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="email">Email / Newsletter</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="otro">Otro</option>
+                </select>
+                <button class="btn-secondary btn-sm" id="btn-clear-mkt-filters"><i data-lucide="x" size="12"></i> Limpiar</button>
+            </div>
+            <div class="mkt-grid" id="marketing-list">
+                <div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas de marketing aún.</div>
+            </div>
+        </section>
+
         <!-- POTENCIALES -->
         <section id="view-potenciales" class="view">
             <div class="view-header">
@@ -998,7 +1267,7 @@ const APP_ID="talento-impulsa-default";
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.firestore();
 let firebaseUser=null,localUser=null,unsubscribers=[];
-let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[];
+let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[],allMarketing=[],allAccesos=[];
 const col=n=>db.collection(["artifacts",APP_ID,"public","data",n].join("/"));
 
 function getTodayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
@@ -1007,6 +1276,7 @@ function tsToDateStr(ts){if(!ts)return getTodayStr();const d=new Date(typeof ts=
 function formatDateLabel(ds){const t=getTodayStr(),yd=(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`})();if(ds===t)return "Hoy";if(ds===yd)return "Ayer";const[y,m,d]=ds.split("-");return `${d}/${m}/${y}`}
 function hsLabel(v){const n=parseFloat(v)||0;return n===1?"1 hs":`${n} hs`}
 function projName(id){const p=allProjects.find(x=>x.id===id);return p?p.name:id||"Sin proyecto"}
+function clientDisplayName(c){return c.name||c.company||"Sin nombre"}
 function stLabel(s){return{in_progress:"En progreso","in-progress":"En progreso",done:"Completado",pending:"Pendiente",blocked:"Bloqueado",active:"Activo",lead:"Lead",paused:"Pausado"}[s]||s}
 function stDot(s){return{"in-progress":"","in_progress":"",done:"done",pending:"pending",blocked:"blocked"}[s]||""}
 
@@ -1027,14 +1297,18 @@ function openSummaryModal(type,id){
     if(!item)return;
     document.getElementById("summary-badge").textContent=isP?"Proyecto":"Cliente";
     document.getElementById("summary-badge").className=`badge ${isP?"info":"active"}`;
-    document.getElementById("summary-title").textContent=item.name;
+    document.getElementById("summary-title").textContent=item.name||item.company||"Sin nombre";
     const meta=document.getElementById("summary-meta");
-    if(isP){meta.innerHTML=`<span class="badge ${item.status||"active"}">${stLabel(item.status)}</span>${item.deliveryDate?`<span style="font-size:var(--text-xs);color:var(--text-dim)">Entrega: ${item.deliveryDate}</span>`:""}`}
+    if(isP){
+        const delivShow=item.deliveryDate||item.dates?.delivery||"";
+        const clientShow=item.clientId?allClients.find(c=>c.id===item.clientId)?.name||"":item.client||"";
+        meta.innerHTML=`<span class="badge ${item.status||"active"}">${stLabel(item.status)}</span>${clientShow?`<span style="font-size:var(--text-xs);color:var(--text-dim)">Cliente: ${clientShow}</span>`:""}${delivShow?`<span style="font-size:var(--text-xs);color:var(--text-dim)">Entrega: ${delivShow}</span>`:""}`;
+    }
     else{meta.innerHTML=`<span class="badge ${item.status||"active"}">${stLabel(item.status)}</span>${item.contact?`<span style="font-size:var(--text-xs);color:var(--text-dim)">${item.contact}</span>`:""}`}
     document.getElementById("summary-bit-detail").dataset.projectId=id;
     if(isP){renderSummaryBitacora(id);renderActivosPanel(id);}
     else document.getElementById("summary-bitacora-list").innerHTML="<div class='empty-state' style='padding:12px 0'>Bitácora disponible solo en proyectos.</div>";
-    const links=allLinks.filter(l=>l.projectId===id);
+    const links=allLinks.filter(l=>l.projectId===id||l.relationId==="P_"+id||l.relationId==="C_"+id);
     const lEl=document.getElementById("summary-links-list");
     lEl.innerHTML=links.length===0?`<div class="empty-state" style="padding:12px 0"><i data-lucide="link" size="20"></i>Sin recursos.</div>`:links.map(l=>`<div class="data-item"><div><div class="data-item-name">${l.title}</div><div class="data-item-sub">${l.type||""}</div></div><a href="${l.url}" target="_blank" class="btn-secondary btn-sm">Abrir →</a></div>`).join("");
     document.getElementById("modal-summary").classList.add("open");
@@ -1159,6 +1433,8 @@ function startRealtimeListeners(){
     unsubscribers.push(listen("potenciales",arr=>{allPotenciales=arr},renderPotenciales));
     unsubscribers.push(listen("reuniones",arr=>{allReuniones=arr},renderReuniones));
     unsubscribers.push(listen("ideas",arr=>{allIdeas=arr},renderIdeas));
+    unsubscribers.push(listen("marketing_talento",arr=>{allMarketing=arr},renderMarketing));
+    unsubscribers.push(listen("accesos_rapidos",arr=>{allAccesos=arr},renderAccesos));
 }
 
 function updateHoyStats(){
@@ -1238,16 +1514,18 @@ function renderEntregasProximas(){
     const el=document.getElementById("entregas-list");if(!el)return;
     const today=getTodayStr();
     const proximas=allProjects
-        .filter(p=>p.deliveryDate&&p.deliveryDate>=today&&p.status!=="done")
-        .sort((a,b)=>a.deliveryDate.localeCompare(b.deliveryDate))
+        .filter(p=>{const d=p.deliveryDate||p.dates?.delivery;return d&&d>=today&&p.status!=="done"})
+        .sort((a,b)=>{const da=a.deliveryDate||a.dates?.delivery||"",db2=b.deliveryDate||b.dates?.delivery||"";return da.localeCompare(db2)})
         .slice(0,4);
     if(proximas.length===0){el.innerHTML=`<div style="font-size:var(--text-sm);color:var(--text-muted)">Sin entregas próximas.</div>`;return}
     el.innerHTML=proximas.map(p=>{
-        const[y,m,d]=p.deliveryDate.split("-");
+        const delivDate=p.deliveryDate||p.dates?.delivery||"";
+        const[y,m,d]=delivDate.split("-");
         const dt=new Date(parseInt(y),parseInt(m)-1,parseInt(d));
         const t=new Date();t.setHours(0,0,0,0);
         const diff=Math.ceil((dt-t)/86400000);
         const urgente=diff<=7;
+        const displayDate=delivDate||"";
         return `<div class="atencion-item" data-action="open-summary" data-type="project" data-id="${p.id}">
             <div class="atencion-dot" style="background:${urgente?"#E97316":"var(--brand-gold)"}"></div>
             <div class="atencion-item-body">
@@ -1282,7 +1560,7 @@ function renderSummaryBitacora(pid){
     const bits=allBitacoras.filter(b=>b.projectId===pid).slice(0,10);
     const el=document.getElementById("summary-bitacora-list");
     if(bits.length===0){el.innerHTML=`<div class="empty-state" style="padding:12px 0"><i data-lucide="book-open" size="20"></i>Sin registros en este proyecto.</div>`;lucide.createIcons();return}
-    el.innerHTML=bits.map(b=>`<div class="bit-entry"><div class="bit-dot ${stDot(b.status)}"></div><div class="bit-body"><div class="bit-detail">${b.detail}</div><div class="bit-meta"><span class="bit-hours">${hsLabel(b.hours)}</span><span class="bit-status">· ${stLabel(b.status)}</span><span class="bit-user">· ${b.addedBy||""}</span></div></div><button class="bit-delete btn-icon" data-action="delete-bit" data-id="${b.id}"><i data-lucide="trash-2" size="14"></i></button></div>`).join("");
+    el.innerHTML=bits.map(b=>`<div class="bit-entry"><div class="bit-dot ${stDot(b.status)}"></div><div class="bit-body"><div class="bit-detail">${b.detail}</div><div class="bit-meta"><span class="bit-hours">${hsLabel(b.hours)}</span><span class="bit-status">· ${stLabel(b.status)}</span><span class="bit-user">· ${b.addedBy||""}</span></div></div><button class="bit-delete btn-icon" data-action="edit-bit" data-id="${b.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button><button class="bit-delete btn-icon" data-action="delete-bit" data-id="${b.id}"><i data-lucide="trash-2" size="14"></i></button></div>`).join("");
     lucide.createIcons()
 }
 
@@ -1312,7 +1590,7 @@ function renderBitacoraFull(){
     bits.forEach(b=>{const d=b.date||tsToDateStr(b.createdAt);if(!groups[d])groups[d]=[];groups[d].push(b)});
     el.innerHTML=Object.entries(groups).map(([date,items])=>{
         const totalHs=items.reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
-        return `<div style="margin-bottom:var(--space-5)"><div class="bit-group-header"><span class="bit-group-date">${formatDateLabel(date)} <span style="font-size:var(--text-xs);color:var(--text-muted)">${date}</span></span><span class="bit-group-total">${hsLabel(totalHs)} · ${items.length} registro${items.length>1?"s":""}</span></div>${items.map(b=>`<div class="bit-entry"><div class="bit-dot ${stDot(b.status)}"></div><div class="bit-body"><div class="bit-project">${projName(b.projectId)}</div><div class="bit-detail">${b.detail}</div><div class="bit-meta"><span class="bit-hours">${hsLabel(b.hours)}</span><span class="bit-status">· ${stLabel(b.status)}</span><span class="bit-user">· ${b.addedBy||""}</span></div></div><button class="bit-delete btn-icon" data-action="delete-bit" data-id="${b.id}"><i data-lucide="trash-2" size="14"></i></button></div>`).join("")}</div>`
+        return `<div style="margin-bottom:var(--space-5)"><div class="bit-group-header"><span class="bit-group-date">${formatDateLabel(date)} <span style="font-size:var(--text-xs);color:var(--text-muted)">${date}</span></span><span class="bit-group-total">${hsLabel(totalHs)} · ${items.length} registro${items.length>1?"s":""}</span></div>${items.map(b=>`<div class="bit-entry"><div class="bit-dot ${stDot(b.status)}"></div><div class="bit-body"><div class="bit-project">${projName(b.projectId)}</div><div class="bit-detail">${b.detail}</div><div class="bit-meta"><span class="bit-hours">${hsLabel(b.hours)}</span><span class="bit-status">· ${stLabel(b.status)}</span><span class="bit-user">· ${b.addedBy||""}</span></div></div><button class="bit-delete btn-icon" data-action="edit-bit" data-id="${b.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button><button class="bit-delete btn-icon" data-action="delete-bit" data-id="${b.id}"><i data-lucide="trash-2" size="14"></i></button></div>`).join("")}</div>`
     }).join("");
     lucide.createIcons()
 }
@@ -1323,7 +1601,9 @@ function renderProjectsTable(){
     const hsP=pid=>wb.filter(b=>b.projectId===pid).reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
     const da=ds=>{if(!ds)return{cls:"",txt:"—"};const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds+"T00:00:00");const diff=Math.ceil((d-t)/86400000);if(diff<0)return{cls:"badge warn",txt:"Vencida"};if(diff<=7)return{cls:"badge warn",txt:`${diff}d`};const[y,m,dy]=ds.split("-");return{cls:"",txt:`${dy}/${m}`}};
     const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
-    const row=p=>{const hs=hsP(p.id),d=da(p.deliveryDate),pr=p.progress||0;return `<tr><td><div style="font-weight:600">${p.name}</div></td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px"><button class="btn-icon" data-action="open-summary" data-type="project" data-id="${p.id}"><i data-lucide="eye" size="16"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
+    const row=p=>{const hs=hsP(p.id),d=da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
+        const clientLabel=p.clientId?allClients.find(c=>c.id===p.clientId)?.name||"":p.client||"";
+        return `<tr><td><div style="font-weight:600">${p.name}</div>${clientLabel?`<div style="font-size:var(--text-xs);color:var(--text-dim)">${clientLabel}</div>`:""}</td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px"><button class="btn-icon" data-action="open-summary" data-type="project" data-id="${p.id}"><i data-lucide="eye" size="16"></i></button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
     const bi=document.getElementById("projects-table-inicio"),bf=document.getElementById("projects-table-full");
     if(bi)bi.innerHTML=allProjects.filter(p=>p.status==="active").map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos activos.</td></tr>`;
     if(bf)bf.innerHTML=allProjects.map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos.</td></tr>`;
@@ -1375,6 +1655,42 @@ document.addEventListener("click",async e=>{
     if(ac==="delete-potencial"&&confirm("¿Eliminar este potencial?")){await deleteItem("potenciales",id);showToast("Potencial eliminado")}
     if(ac==="delete-reunion"&&confirm("¿Eliminar esta reunión?")){await deleteItem("reuniones",id);showToast("Reunión eliminada")}
     if(ac==="delete-idea"&&confirm("¿Eliminar esta idea?")){await deleteItem("ideas",id);showToast("Idea eliminada")}
+    if(ac==="edit-idea"){const i=allIdeas.find(x=>x.id===id);if(!i)return;document.getElementById("edit-idea-id").value=i.id;document.getElementById("edit-idea-titulo").value=i.titulo||"";document.getElementById("edit-idea-categoria").value=i.categoria||"producto";document.getElementById("edit-idea-cuerpo").value=i.cuerpo||"";document.getElementById("modal-edit-idea").classList.add("open");}
+    if(ac==="edit-bit"){const b=allBitacoras.find(x=>x.id===id);if(!b)return;document.getElementById("edit-bit-id").value=b.id;document.getElementById("edit-bit-detail").value=b.detail||"";document.getElementById("edit-bit-hours").value=b.hours||1;document.getElementById("edit-bit-status").value=b.status||"in-progress";document.getElementById("edit-bit-date").value=b.date||tsToDateStr(b.createdAt);document.getElementById("modal-edit-bit").classList.add("open");}
+    if(ac==="edit-proyecto"){
+        const p=allProjects.find(x=>x.id===id);if(!p)return;
+        document.getElementById("edit-proj-id").value=p.id;
+        document.getElementById("edit-proj-name").value=p.name||"";
+        document.getElementById("edit-proj-status").value=p.status||"active";
+        document.getElementById("edit-proj-progress").value=p.progress||0;
+        document.getElementById("edit-proj-kickoff").value=p.kickoffDate||p.dates?.kickoff||"";
+        document.getElementById("edit-proj-delivery").value=p.deliveryDate||p.dates?.delivery||"";
+        document.getElementById("edit-proj-desc").value=p.description||p.notes||"";
+        // poblar select cliente
+        const csel=document.getElementById("edit-proj-client");
+        csel.innerHTML=`<option value="">— Sin cliente (Talento) —</option>`;
+        allClients.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=clientDisplayName(c);csel.appendChild(o)});
+        csel.value=p.clientId||"";
+        document.getElementById("modal-edit-proyecto").classList.add("open");
+    }
+    if(ac==="edit-cliente"){
+        const c=allClients.find(x=>x.id===id);if(!c)return;
+        document.getElementById("edit-cli-id").value=c.id;
+        document.getElementById("edit-cli-name").value=clientDisplayName(c);
+        document.getElementById("edit-cli-status").value=c.status||"active";
+        document.getElementById("edit-cli-whatsapp").value=c.whatsapp||c.contact||"";
+        document.getElementById("edit-cli-email").value=c.email||"";
+        document.getElementById("edit-cli-instagram").value=c.instagram||"";
+        document.getElementById("edit-cli-linkedin").value=c.linkedin||"";
+        document.getElementById("edit-cli-web").value=c.web||"";
+        document.getElementById("edit-cli-rubro").value=c.rubro||"";
+        document.getElementById("edit-cli-notes").value=c.notes||"";
+        document.getElementById("modal-edit-cliente").classList.add("open");
+    }
+    if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||"";document.getElementById("mkt-tipo").value=m.tipo||"feed";document.getElementById("mkt-estado").value=m.estado||"pendiente";document.getElementById("mkt-fecha").value=m.fecha||"";document.getElementById("mkt-copy").value=m.copy||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("modal-mkt").classList.add("open");}
+    if(ac==="delete-mkt"&&confirm("¿Eliminar esta pieza?")){await deleteItem("marketing_talento",id);showToast("Pieza eliminada")}
+    if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.titulo||"";document.getElementById("acc-tipo").value=a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
+    if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("accesos_rapidos",id);showToast("Enlace eliminado")}
     if(ac==="convertir-potencial"){
         if(!confirm(`¿Convertir "${btn.dataset.nombre}" a cliente activo?`))return;
         // Crear cliente
@@ -1523,7 +1839,12 @@ function renderReuniones(){
                 </div>
                 ${r.notas?`<div class="meeting-notes">${r.notas}</div>`:""}
             </div>
-            <div class="meeting-actions">
+            <div class="meeting-actions" style="opacity:1;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+                <select class="reunion-estado-select ${r.estado||'pendiente'}" data-action="change-reunion-estado" data-id="${r.id}">
+                    <option value="pendiente" ${(r.estado||'pendiente')==='pendiente'?'selected':''}>Pendiente</option>
+                    <option value="cumplimentada" ${r.estado==='cumplimentada'?'selected':''}>Cumplimentada</option>
+                    <option value="cancelada" ${r.estado==='cancelada'?'selected':''}>Cancelada</option>
+                </select>
                 <button class="btn-icon" data-action="delete-reunion" data-id="${r.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
             </div>
         </div>`;
@@ -1549,6 +1870,7 @@ function renderIdeas(){
                 ${i.categoria?`<span class="idea-tag">${catMap[i.categoria]||i.categoria}</span>`:""}
                 <span class="idea-card-date">${formatDateLabel(tsToDateStr(i.createdAt))}</span>
                 <div class="idea-card-actions">
+                    <button class="btn-icon" data-action="edit-idea" data-id="${i.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>
                     <button class="btn-icon" data-action="delete-idea" data-id="${i.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
                 </div>
             </div>
@@ -1587,6 +1909,180 @@ document.getElementById("btn-close-reunion-modal")?.addEventListener("click",()=
 document.getElementById("btn-open-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.add("open"));
 document.getElementById("btn-close-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.remove("open"));
 ["modal-potencial","modal-reunion","modal-idea"].forEach(id=>{document.getElementById(id)?.addEventListener("click",e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove("open")})});
+
+// ══════════════════════════════════════════════════════════════════
+// MARKETING TALENTO
+// ══════════════════════════════════════════════════════════════════
+function renderMarketing(){
+    const el=document.getElementById("marketing-list");if(!el)return;
+    const fltEstado=document.getElementById("flt-mkt-estado")?.value||"";
+    const fltTipo=document.getElementById("flt-mkt-tipo")?.value||"";
+    let items=[...allMarketing];
+    if(fltEstado)items=items.filter(m=>m.estado===fltEstado);
+    if(fltTipo)items=items.filter(m=>m.tipo===fltTipo);
+    items.sort((a,b)=>{const da=a.fecha||"",db2=b.fecha||"";return db2.localeCompare(da)});
+    if(!items.length){el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas${fltEstado||fltTipo?" con esos filtros":""} aún.</div>`;lucide.createIcons();return}
+    const tipoLabel={feed:"Feed IG",story:"Story",reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
+    const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",publicada:"Publicada"};
+    el.innerHTML=items.map(m=>`
+        <div class="mkt-card">
+            <div class="mkt-card-header">
+                <div>
+                    <div class="mkt-card-title">${m.nombre}</div>
+                    <div class="mkt-card-sub">
+                        <span class="mkt-tipo-badge">${tipoLabel[m.tipo]||m.tipo}</span>
+                        <span class="mkt-estado ${m.estado||"pendiente"}">${estadoLabel[m.estado]||m.estado}</span>
+                        ${m.fecha?`<span style="font-size:var(--text-xs);color:var(--text-muted)">${m.fecha}</span>`:""}
+                    </div>
+                </div>
+                <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
+                    ${m.url?`<a href="${m.url}" target="_blank" class="btn-secondary btn-sm">Diseño →</a>`:""}
+                    <button class="btn-icon" data-action="copy-text" data-copy="${encodeURIComponent(m.copy||"")}"><i data-lucide="copy" size="14"></i></button>
+                    <button class="btn-icon" data-action="edit-mkt" data-id="${m.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>
+                    <button class="btn-icon" data-action="delete-mkt" data-id="${m.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
+                </div>
+            </div>
+            ${m.copy?`<div class="mkt-copy">${m.copy}</div>`:""}
+        </div>`).join("");
+    lucide.createIcons();
+}
+document.getElementById("flt-mkt-estado")?.addEventListener("change",renderMarketing);
+document.getElementById("flt-mkt-tipo")?.addEventListener("change",renderMarketing);
+document.getElementById("btn-clear-mkt-filters")?.addEventListener("click",()=>{
+    const fe=document.getElementById("flt-mkt-estado"),ft=document.getElementById("flt-mkt-tipo");
+    if(fe)fe.value="";if(ft)ft.value="";renderMarketing();
+});
+
+// ══════════════════════════════════════════════════════════════════
+// FORMS MARKETING
+// ══════════════════════════════════════════════════════════════════
+document.getElementById("btn-open-mkt-modal")?.addEventListener("click",()=>{
+    document.getElementById("mkt-edit-id").value="";
+    document.getElementById("mkt-modal-title").textContent="Nueva Pieza";
+    document.getElementById("form-add-mkt").reset();
+    document.getElementById("modal-mkt").classList.add("open");
+});
+document.getElementById("btn-close-mkt-modal")?.addEventListener("click",()=>document.getElementById("modal-mkt").classList.remove("open"));
+document.getElementById("modal-mkt")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-mkt"))document.getElementById("modal-mkt").classList.remove("open")});
+
+document.getElementById("form-add-mkt")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const editId=document.getElementById("mkt-edit-id").value;
+    const data={nombre:document.getElementById("mkt-nombre").value.trim(),tipo:document.getElementById("mkt-tipo").value,estado:document.getElementById("mkt-estado").value,fecha:document.getElementById("mkt-fecha").value,copy:document.getElementById("mkt-copy").value.trim(),url:document.getElementById("mkt-url").value.trim(),addedBy:localUser,updatedAt:Date.now()};
+    if(editId){await col("marketing_talento").doc(editId).update(data);}
+    else{data.createdAt=Date.now();await col("marketing_talento").add(data);}
+    document.getElementById("form-add-mkt").reset();document.getElementById("modal-mkt").classList.remove("open");
+    showToast(editId?"Pieza actualizada ✓":"Pieza guardada ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// EDITAR IDEA
+// ══════════════════════════════════════════════════════════════════
+document.getElementById("btn-close-edit-idea")?.addEventListener("click",()=>document.getElementById("modal-edit-idea").classList.remove("open"));
+document.getElementById("modal-edit-idea")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-idea"))document.getElementById("modal-edit-idea").classList.remove("open")});
+document.getElementById("form-edit-idea")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-idea-id").value;
+    await col("ideas").doc(id).update({titulo:document.getElementById("edit-idea-titulo").value.trim(),categoria:document.getElementById("edit-idea-categoria").value,cuerpo:document.getElementById("edit-idea-cuerpo").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-idea").classList.remove("open");showToast("Idea actualizada ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// EDITAR BITÁCORA
+// ══════════════════════════════════════════════════════════════════
+document.getElementById("btn-close-edit-bit")?.addEventListener("click",()=>document.getElementById("modal-edit-bit").classList.remove("open"));
+document.getElementById("modal-edit-bit")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-bit"))document.getElementById("modal-edit-bit").classList.remove("open")});
+document.getElementById("form-edit-bit")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-bit-id").value;
+    await col("bitacoras").doc(id).update({detail:document.getElementById("edit-bit-detail").value.trim(),hours:parseFloat(document.getElementById("edit-bit-hours").value)||1,status:document.getElementById("edit-bit-status").value,date:document.getElementById("edit-bit-date").value,updatedAt:Date.now()});
+    document.getElementById("modal-edit-bit").classList.remove("open");showToast("Registro actualizado ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// EDITAR PROYECTO
+// ══════════════════════════════════════════════════════════════════
+document.getElementById("btn-close-edit-proyecto")?.addEventListener("click",()=>document.getElementById("modal-edit-proyecto").classList.remove("open"));
+document.getElementById("modal-edit-proyecto")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-proyecto"))document.getElementById("modal-edit-proyecto").classList.remove("open")});
+document.getElementById("form-edit-proyecto")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-proj-id").value;
+    await col("proyectos").doc(id).update({name:document.getElementById("edit-proj-name").value.trim(),status:document.getElementById("edit-proj-status").value,progress:parseInt(document.getElementById("edit-proj-progress").value)||0,clientId:document.getElementById("edit-proj-client").value||null,kickoffDate:document.getElementById("edit-proj-kickoff").value||null,deliveryDate:document.getElementById("edit-proj-delivery").value||null,description:document.getElementById("edit-proj-desc").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-proyecto").classList.remove("open");showToast("Proyecto actualizado ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// EDITAR CLIENTE
+// ══════════════════════════════════════════════════════════════════
+document.getElementById("btn-close-edit-cliente")?.addEventListener("click",()=>document.getElementById("modal-edit-cliente").classList.remove("open"));
+document.getElementById("modal-edit-cliente")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-cliente"))document.getElementById("modal-edit-cliente").classList.remove("open")});
+document.getElementById("form-edit-cliente")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-cli-id").value;
+    await col("clientes").doc(id).update({name:document.getElementById("edit-cli-name").value.trim(),status:document.getElementById("edit-cli-status").value,whatsapp:document.getElementById("edit-cli-whatsapp").value.trim(),email:document.getElementById("edit-cli-email").value.trim(),instagram:document.getElementById("edit-cli-instagram").value.trim(),linkedin:document.getElementById("edit-cli-linkedin").value.trim(),web:document.getElementById("edit-cli-web").value.trim(),rubro:document.getElementById("edit-cli-rubro").value.trim(),notes:document.getElementById("edit-cli-notes").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-cliente").classList.remove("open");showToast("Cliente actualizado ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// DROPDOWN ESTADO REUNIÓN (change event delegation)
+// ══════════════════════════════════════════════════════════════════
+document.addEventListener("change",async e=>{
+    const sel=e.target.closest("[data-action='change-reunion-estado']");
+    if(!sel)return;
+    const id=sel.dataset.id,estado=sel.value;
+    sel.className=`reunion-estado-select ${estado}`;
+    await col("reuniones").doc(id).update({estado,updatedAt:Date.now()});
+    showToast("Estado actualizado ✓");
+});
+
+// ══════════════════════════════════════════════════════════════════
+// ACCESOS RÁPIDOS
+// ══════════════════════════════════════════════════════════════════
+function renderAccesos(){
+    const el=document.getElementById("accesos-list");if(!el)return;
+    if(!allAccesos.length){
+        el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="link-2" size="32"></i>Sin enlaces cargados aún.</div>`;
+        lucide.createIcons();return;
+    }
+    const iconMap={web:"globe",instagram:"instagram",linkedin:"linkedin",whatsapp:"message-circle",canva:"image",github:"github",drive:"hard-drive",calendly:"calendar",notion:"file-text",repo:"git-branch",otro:"link"};
+    const colorMap={web:"#1A1814",instagram:"#E1306C",linkedin:"#0A66C2",whatsapp:"#25D366",canva:"#7C3AED",github:"#1A1814",drive:"#4285F4",calendly:"#006BFF",notion:"#1A1814",repo:"#475569",otro:"var(--brand-primary)"};
+    el.innerHTML=allAccesos.map(a=>`
+        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3);transition:box-shadow .15s;cursor:pointer;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
+            <div style="width:42px;height:42px;border-radius:var(--radius-md);background:${colorMap[a.tipo]||"var(--brand-primary)"}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${colorMap[a.tipo]||"var(--brand-primary)"}">
+                <i data-lucide="${iconMap[a.tipo]||"link"}" size="20"></i>
+            </div>
+            <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:var(--text-sm);color:var(--text)">${a.titulo}</div>
+                ${a.desc?`<div style="font-size:var(--text-xs);color:var(--text-dim);margin-top:2px">${a.desc}</div>`:""}
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
+                <a href="${a.url}" target="_blank" class="btn-primary btn-sm" style="text-decoration:none">Abrir →</a>
+                <button class="btn-icon" data-action="edit-acceso" data-id="${a.id}"><i data-lucide="pencil" size="13"></i></button>
+                <button class="btn-icon" data-action="delete-acceso" data-id="${a.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>
+            </div>
+        </div>`).join("");
+    lucide.createIcons();
+}
+
+document.getElementById("btn-open-acceso-modal")?.addEventListener("click",()=>{
+    document.getElementById("acceso-edit-id").value="";
+    document.getElementById("acceso-modal-title").textContent="Nuevo Enlace";
+    document.getElementById("form-add-acceso").reset();
+    document.getElementById("modal-acceso").classList.add("open");
+});
+document.getElementById("btn-close-acceso-modal")?.addEventListener("click",()=>document.getElementById("modal-acceso").classList.remove("open"));
+document.getElementById("modal-acceso")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-acceso"))document.getElementById("modal-acceso").classList.remove("open")});
+
+document.getElementById("form-add-acceso")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const editId=document.getElementById("acceso-edit-id").value;
+    const data={titulo:document.getElementById("acc-titulo").value.trim(),tipo:document.getElementById("acc-tipo").value,url:document.getElementById("acc-url").value.trim(),desc:document.getElementById("acc-desc").value.trim(),addedBy:localUser,updatedAt:Date.now()};
+    if(editId){await col("accesos_rapidos").doc(editId).update(data);}
+    else{data.createdAt=Date.now();await col("accesos_rapidos").add(data);}
+    document.getElementById("form-add-acceso").reset();
+    document.getElementById("modal-acceso").classList.remove("open");
+    showToast(editId?"Enlace actualizado ✓":"Enlace guardado ✓");
+});
 auth.onAuthStateChanged(user=>{firebaseUser=user;if(user&&localUser)startRealtimeListeners()});
 lucide.createIcons();
 </script>
