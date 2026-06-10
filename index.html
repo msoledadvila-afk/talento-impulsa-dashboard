@@ -374,6 +374,59 @@
         .reunion-estado-select.pendiente{background:#FEF9C3;color:#854D0E;border-color:#FDE68A}
         .reunion-estado-select.cumplimentada{background:#DCFCE7;color:#166534;border-color:#BBF7D0}
         .reunion-estado-select.cancelada{background:#FEE2E2;color:#B91C1C;border-color:#FECACA}
+
+        /* ── VISTA DETALLE PROYECTO ──────────────────────── */
+        .proj-detalle-header{
+            background:var(--bg-card);border:1px solid var(--border-light);
+            border-radius:var(--radius-lg);padding:var(--space-5) var(--space-6);
+            display:flex;justify-content:space-between;align-items:flex-start;
+            flex-wrap:wrap;gap:var(--space-4);
+        }
+        .proj-detalle-title{font-family:var(--font-display);font-size:var(--text-xl);font-weight:800;color:var(--text)}
+        .proj-detalle-meta{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;margin-top:var(--space-2)}
+        .proj-detalle-meta span{font-size:var(--text-xs);color:var(--text-dim)}
+
+        .proj-detalle-tabs{
+            display:flex;gap:0;border-bottom:2px solid var(--border-light);
+            overflow-x:auto;margin-bottom:var(--space-5);
+        }
+        .proj-detalle-tab{
+            padding:12px var(--space-5);font-size:var(--text-sm);font-weight:600;
+            color:var(--text-dim);cursor:pointer;border-bottom:3px solid transparent;
+            margin-bottom:-2px;transition:all .2s;white-space:nowrap;
+            display:flex;align-items:center;gap:var(--space-2);
+        }
+        .proj-detalle-tab:hover{color:var(--brand-primary)}
+        .proj-detalle-tab.active{color:var(--brand-primary);border-bottom-color:var(--brand-primary)}
+        .proj-detalle-panel{display:none}
+        .proj-detalle-panel.active{display:block;animation:fadeIn .2s var(--ease-std)}
+
+        /* ── RECURSOS AGRUPADOS ──────────────────────────── */
+        .recursos-grupo{margin-bottom:var(--space-6)}
+        .recursos-grupo-header{
+            display:flex;align-items:center;gap:var(--space-3);
+            padding:var(--space-2) var(--space-3);
+            background:var(--brand-primary-glow);border-radius:var(--radius-md);
+            margin-bottom:var(--space-3);border-left:3px solid var(--brand-primary);
+        }
+        .recursos-grupo-titulo{font-size:var(--text-sm);font-weight:700;color:var(--brand-primary-deep)}
+        .recursos-grupo-count{font-size:var(--text-xs);color:var(--brand-primary);margin-left:auto}
+        .recurso-card{
+            display:flex;align-items:center;gap:var(--space-3);
+            padding:var(--space-3) var(--space-4);
+            background:var(--bg-card);border:1px solid var(--border-light);
+            border-radius:var(--radius-md);margin-bottom:var(--space-2);
+            transition:box-shadow .15s;
+        }
+        .recurso-card:hover{box-shadow:var(--shadow-sm)}
+        .recurso-card-icon{
+            width:36px;height:36px;border-radius:var(--radius-md);
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+            background:var(--bg);color:var(--text-dim);
+        }
+        .recurso-card-body{flex:1;min-width:0}
+        .recurso-card-title{font-weight:600;font-size:var(--text-sm);color:var(--text)}
+        .recurso-card-meta{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px}
     </style>
 </head>
 <body>
@@ -1095,14 +1148,14 @@
                             <div style="font-size:var(--text-sm);color:var(--text-muted);padding:var(--space-2) 0">Sin registros esta semana.</div>
                         </div>
                     </div>
-                    <!-- Últimos 4 registros semana -->
+                    <!-- Proyectos con más horas esta semana -->
                     <div class="card" style="padding:var(--space-3)">
                         <div style="font-size:var(--text-xs);font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:var(--space-3);display:flex;justify-content:space-between">
-                            <span>Últimos registros</span>
-                            <button class="btn-secondary btn-sm" onclick="switchView('view-bitacora')" style="font-size:0.65rem;padding:2px 8px">Ver todo</button>
+                            <span>Proyectos activos</span>
+                            <button class="btn-secondary btn-sm" onclick="switchView('view-proyectos')" style="font-size:0.65rem;padding:2px 8px">Ver todos</button>
                         </div>
-                        <div id="recent-bitacora-list">
-                            <div style="font-size:var(--text-sm);color:var(--text-muted);">Sin registros aún.</div>
+                        <div id="inicio-proyectos-activos">
+                            <div style="font-size:var(--text-sm);color:var(--text-muted);">Sin proyectos.</div>
                         </div>
                     </div>
                 </div>
@@ -1154,6 +1207,103 @@
                 </div>
             </div>
 
+        </section>
+
+        <!-- DETALLE PROYECTO -->
+        <section id="view-proyecto-detalle" class="view">
+            <!-- Header del proyecto -->
+            <div class="proj-detalle-header" id="pd-header">
+                <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-2)">
+                        <button class="btn-secondary btn-sm" onclick="switchView('view-proyectos')" style="gap:4px">
+                            <i data-lucide="arrow-left" size="14"></i> Proyectos
+                        </button>
+                        <span class="badge active" id="pd-status-badge">—</span>
+                    </div>
+                    <div class="proj-detalle-title" id="pd-title">—</div>
+                    <div class="proj-detalle-meta">
+                        <span id="pd-cliente-label"></span>
+                        <span id="pd-dates-label"></span>
+                        <span id="pd-progress-label"></span>
+                    </div>
+                    <div id="pd-desc" style="font-size:var(--text-sm);color:var(--text-dim);margin-top:var(--space-2);max-width:600px;line-height:1.6"></div>
+                </div>
+                <div style="display:flex;gap:var(--space-2);flex-shrink:0">
+                    <button class="btn-primary btn-sm" id="pd-bit-quick-btn">
+                        <i data-lucide="plus" size="14"></i> Registrar
+                    </button>
+                    <button class="btn-secondary btn-sm" id="pd-edit-btn">
+                        <i data-lucide="pencil" size="14"></i> Editar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="proj-detalle-tabs" id="pd-tabs">
+                <div class="proj-detalle-tab active" data-pdtab="pd-tab-bitacora">
+                    <i data-lucide="book-open" size="14"></i> Bitácora
+                    <span class="nav-badge" id="pd-bit-count" style="display:none;position:static;background:var(--brand-primary)"></span>
+                </div>
+                <div class="proj-detalle-tab" data-pdtab="pd-tab-recursos">
+                    <i data-lucide="link" size="14"></i> Recursos
+                </div>
+                <div class="proj-detalle-tab" data-pdtab="pd-tab-reuniones">
+                    <i data-lucide="calendar" size="14"></i> Reuniones
+                </div>
+                <div class="proj-detalle-tab" data-pdtab="pd-tab-notas">
+                    <i data-lucide="sticky-note" size="14"></i> Notas
+                </div>
+            </div>
+
+            <!-- Panel Bitácora -->
+            <div id="pd-tab-bitacora" class="proj-detalle-panel active">
+                <div class="card" style="margin-bottom:var(--space-4)">
+                    <div class="card-title">Registrar avance</div>
+                    <div class="summary-bit-input-area">
+                        <input type="text" id="pd-bit-detail" class="form-control" placeholder="¿Qué avanzaste? (Enter para guardar)" data-project-id="" style="flex:1">
+                        <select id="pd-bit-hours" class="form-control" style="width:90px">
+                            <option value="0.5">0.5 hs</option><option value="1" selected>1 hs</option>
+                            <option value="1.5">1.5 hs</option><option value="2">2 hs</option>
+                            <option value="3">3 hs</option><option value="4">4 hs</option>
+                        </select>
+                        <select id="pd-bit-status" class="form-control" style="width:130px">
+                            <option value="in-progress">En progreso</option>
+                            <option value="done">Completado</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="blocked">Bloqueado</option>
+                        </select>
+                        <button class="btn-primary btn-sm" id="btn-pd-save-bit"><i data-lucide="send" size="14"></i></button>
+                    </div>
+                </div>
+                <div id="pd-bitacora-list"></div>
+            </div>
+
+            <!-- Panel Recursos -->
+            <div id="pd-tab-recursos" class="proj-detalle-panel">
+                <div style="display:flex;justify-content:flex-end;margin-bottom:var(--space-3)">
+                    <button class="btn-primary btn-sm" id="pd-add-recurso-btn"><i data-lucide="plus" size="14"></i> Agregar recurso</button>
+                </div>
+                <div id="pd-recursos-list"></div>
+            </div>
+
+            <!-- Panel Reuniones -->
+            <div id="pd-tab-reuniones" class="proj-detalle-panel">
+                <div style="display:flex;justify-content:flex-end;margin-bottom:var(--space-3)">
+                    <button class="btn-primary btn-sm" id="pd-add-reunion-btn"><i data-lucide="plus" size="14"></i> Nueva reunión</button>
+                </div>
+                <div id="pd-reuniones-list"></div>
+            </div>
+
+            <!-- Panel Notas -->
+            <div id="pd-tab-notas" class="proj-detalle-panel">
+                <div class="card" style="margin-bottom:var(--space-4)">
+                    <form id="form-pd-nota" style="display:flex;gap:var(--space-2)">
+                        <input type="text" id="pd-nota-input" class="form-control" placeholder="Agregar nota..." style="flex:1">
+                        <button type="submit" class="btn-primary btn-sm"><i data-lucide="send" size="14"></i></button>
+                    </form>
+                </div>
+                <div id="pd-notas-list"></div>
+            </div>
         </section>
 
         <!-- BITÁCORA -->
@@ -1485,10 +1635,10 @@ window.deleteItem=deleteItem;
 function startRealtimeListeners(){
     if(!firebaseUser||!db)return;
     function listen(n,setter,cb){return col(n).onSnapshot(snap=>{const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));arr.sort((a,b)=>b.createdAt-a.createdAt);setter(arr);if(cb)cb(arr)},err=>console.error(n,err))}
-    unsubscribers.push(listen("proyectos",arr=>{allProjects=arr},()=>{renderProjectsTable();updateDropdowns();updateHoyStats();}));
+    unsubscribers.push(listen("proyectos",arr=>{allProjects=arr},()=>{renderProjectsTable();updateDropdowns();updateHoyStats();renderInicioProyectosActivos();}));
     unsubscribers.push(listen("clientes",arr=>{allClients=arr},()=>{renderClientsList();updateDropdowns()}));
-    unsubscribers.push(listen("recursos_compartidos",arr=>{allLinks=arr},()=>{renderResourcesList()}));
-    unsubscribers.push(listen("bitacoras",arr=>{allBitacoras=arr},()=>{updateHoyStats();renderHoursBars();renderRecentBitacora();populateBitFilters();if(document.getElementById("view-bitacora").classList.contains("active"))renderBitacoraFull()}));
+    unsubscribers.push(listen("recursos_compartidos",arr=>{allLinks=arr},()=>{renderResourcesList();renderResourcesGrouped();if(currentProyectoId)renderPdRecursos(currentProyectoId);}));
+    unsubscribers.push(listen("bitacoras",arr=>{allBitacoras=arr},()=>{updateHoyStats();renderHoursBars();renderInicioProyectosActivos();populateBitFilters();if(document.getElementById("view-bitacora").classList.contains("active"))renderBitacoraFull();if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdBitacora(currentProyectoId);}));
     unsubscribers.push(listen("activos_digitales",arr=>{allActivos=arr},()=>{
         const pid=document.getElementById("summary-bit-detail").dataset.projectId;
         if(pid&&document.getElementById("modal-summary").classList.contains("open"))renderActivosPanel(pid);
@@ -1668,7 +1818,7 @@ function renderProjectsTable(){
     const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
     const row=p=>{const hs=hsP(p.id),d=da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
         const clientLabel=p.clientId?allClients.find(c=>c.id===p.clientId)?.name||"":p.client||"";
-        return `<tr><td><div style="font-weight:600">${p.name}</div>${clientLabel?`<div style="font-size:var(--text-xs);color:var(--text-dim)">${clientLabel}</div>`:""}</td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px"><button class="btn-icon" data-action="open-summary" data-type="project" data-id="${p.id}"><i data-lucide="eye" size="16"></i></button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
+        return `<tr><td><div style="font-weight:600">${p.name}</div>${clientLabel?`<div style="font-size:var(--text-xs);color:var(--text-dim)">${clientLabel}</div>`:""}</td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px;align-items:center"><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
     const bi=document.getElementById("projects-table-inicio"),bf=document.getElementById("projects-table-full");
     if(bi)bi.innerHTML=allProjects.filter(p=>p.status==="active").map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos activos.</td></tr>`;
     if(bf)bf.innerHTML=allProjects.map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos.</td></tr>`;
@@ -1740,6 +1890,7 @@ function initGreeting(){
 document.addEventListener("click",async e=>{
     const btn=e.target.closest("[data-action]");if(!btn)return;
     const ac=btn.dataset.action,id=btn.dataset.id;
+    if(ac==="abrir-proyecto"){openProyectoDetalle(id);return;}
     if(ac==="delete-bit"&&confirm("¿Eliminar registro?")){await deleteItem("bitacoras",id);showToast("Registro eliminado")}
     if(ac==="delete-project"&&confirm("¿Eliminar proyecto?")){await deleteItem("proyectos",id);showToast("Proyecto eliminado")}
     if(ac==="delete-client"&&confirm("¿Eliminar cliente?")){await deleteItem("clientes",id);showToast("Cliente eliminado")}
@@ -1928,6 +2079,266 @@ document.getElementById("login-form").addEventListener("submit",async e=>{
     const ov=document.getElementById("login-overlay");ov.style.opacity="0";
     setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners();},300);
 });
+
+// ══════════════════════════════════════════════════════════════
+// VISTA DETALLE PROYECTO
+// ══════════════════════════════════════════════════════════════
+let currentProyectoId = null;
+
+function openProyectoDetalle(pid){
+    currentProyectoId = pid;
+    const p = allProjects.find(x=>x.id===pid);
+    if(!p) return;
+
+    // Header
+    document.getElementById("pd-title").textContent = p.name;
+    const smap={active:"active",pending:"pending",done:"done",paused:"paused"};
+    const slbl={active:"En progreso",pending:"Pendiente",done:"Completado",paused:"Pausado"};
+    const badge=document.getElementById("pd-status-badge");
+    badge.textContent=slbl[p.status]||p.status||"—";
+    badge.className="badge "+(smap[p.status]||"info");
+
+    // Cliente
+    const clientLabel=document.getElementById("pd-cliente-label");
+    const cliName=p.clientId?clientDisplayName(allClients.find(x=>x.id===p.clientId)||{})||"":p.client||"";
+    clientLabel.textContent=cliName?"Cliente: "+cliName:"";
+
+    // Fechas
+    const delivery=p.deliveryDate||p.dates?.delivery||"";
+    const kickoff=p.kickoffDate||p.dates?.kickoff||"";
+    document.getElementById("pd-dates-label").textContent=
+        (kickoff?"Inicio: "+kickoff+" ":"")+(delivery?"· Entrega: "+delivery:"");
+
+    // Progreso
+    document.getElementById("pd-progress-label").textContent=
+        (p.progress||0)+"%  completado";
+
+    // Descripción
+    document.getElementById("pd-desc").textContent=p.description||p.notes||"";
+
+    // Bind project id para quick-add
+    document.getElementById("pd-bit-detail").dataset.projectId=pid;
+
+    // Edit btn
+    document.getElementById("pd-edit-btn").dataset.id=pid;
+    document.getElementById("pd-edit-btn").dataset.action="edit-proyecto";
+
+    // Quick bit btn
+    document.getElementById("pd-bit-quick-btn").onclick=()=>{
+        openBitModal(pid);
+    };
+
+    // Add recurso btn
+    document.getElementById("pd-add-recurso-btn").onclick=()=>{
+        openNuevoModal("tab-recurso");
+        // pre-select project
+        setTimeout(()=>{
+            const sel=document.getElementById("lnk-project");
+            if(sel)sel.value=pid;
+        },100);
+    };
+
+    // Add reunion btn
+    document.getElementById("pd-add-reunion-btn").onclick=()=>{
+        document.getElementById("reu-fecha").value=getTodayStr();
+        document.getElementById("modal-reunion").classList.add("open");
+        setTimeout(()=>{
+            const sel=document.getElementById("reu-proyecto");
+            if(sel)sel.value=pid;
+        },100);
+    };
+
+    // Reset tabs
+    document.querySelectorAll(".proj-detalle-tab").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".proj-detalle-panel").forEach(p=>p.classList.remove("active"));
+    document.querySelector("[data-pdtab='pd-tab-bitacora']").classList.add("active");
+    document.getElementById("pd-tab-bitacora").classList.add("active");
+
+    // Render panels
+    renderPdBitacora(pid);
+    renderPdRecursos(pid);
+    renderPdReuniones(pid);
+    renderPdNotas(pid);
+
+    switchView("view-proyecto-detalle");
+    lucide.createIcons();
+}
+window.openProyectoDetalle=openProyectoDetalle;
+
+// Tab switching inside project detail
+document.getElementById("pd-tabs")?.addEventListener("click",e=>{
+    const tab=e.target.closest(".proj-detalle-tab[data-pdtab]");
+    if(!tab)return;
+    document.querySelectorAll(".proj-detalle-tab").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".proj-detalle-panel").forEach(p=>p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.pdtab)?.classList.add("active");
+});
+
+// ── Bitácora del proyecto ──────────────────────────────────────
+function renderPdBitacora(pid){
+    const el=document.getElementById("pd-bitacora-list");if(!el)return;
+    const bits=allBitacoras.filter(b=>b.projectId===pid).sort((a,b)=>b.createdAt-a.createdAt);
+
+    // Badge count
+    const badge=document.getElementById("pd-bit-count");
+    if(badge){badge.textContent=bits.length;badge.style.display=bits.length?"inline":"none";}
+
+    if(!bits.length){
+        el.innerHTML='<div class="empty-state"><i data-lucide="book-open" size="28"></i>Sin registros en este proyecto.</div>';
+        lucide.createIcons();return;
+    }
+    // Agrupar por fecha
+    const groups={};
+    bits.forEach(b=>{const d=b.date||tsToDateStr(b.createdAt);if(!groups[d])groups[d]=[];groups[d].push(b);});
+    const sortedDates=Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+
+    el.innerHTML=sortedDates.map(date=>{
+        const items=groups[date];
+        const totalHs=items.reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
+        const rows=items.map(b=>{
+            const dotCls={done:"done",pending:"pending",blocked:"blocked"}[b.status]||"";
+            const editBtn='<button class="btn-icon" data-action="edit-bit" data-id="'+b.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button>';
+            const delBtn='<button class="btn-icon" data-action="delete-bit" data-id="'+b.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>';
+            return '<div class="bit-entry"><div class="bit-dot '+dotCls+'"></div><div class="bit-body"><div class="bit-detail">'+b.detail+'</div><div class="bit-meta"><span class="bit-hours">'+hsLabel(b.hours)+'</span><span class="bit-status">· '+stLabel(b.status)+'</span><span class="bit-user">· '+(b.addedBy||"")+'</span></div></div><div style="display:flex;gap:2px;opacity:0;transition:opacity .2s" class="bit-entry-actions">'+editBtn+delBtn+'</div></div>';
+        }).join("");
+        return '<div style="margin-bottom:var(--space-5)"><div class="bit-group-header"><span class="bit-group-date">'+formatDateLabel(date)+'<span style="font-size:var(--text-xs);color:var(--text-muted);margin-left:8px">'+date+'</span></span><span class="bit-group-total">'+hsLabel(totalHs)+' · '+items.length+' registro'+(items.length>1?"s":"")+'</span></div>'+rows+'</div>';
+    }).join("");
+
+    // Show actions on hover via CSS
+    const style=document.createElement("style");
+    style.textContent=".bit-entry:hover .bit-entry-actions{opacity:1!important}";
+    if(!document.getElementById("bit-hover-style")){style.id="bit-hover-style";document.head.appendChild(style);}
+    lucide.createIcons();
+}
+
+// Quick add bitácora desde detalle proyecto
+document.getElementById("btn-pd-save-bit")?.addEventListener("click",async()=>{
+    const detail=document.getElementById("pd-bit-detail").value.trim();
+    const pid=document.getElementById("pd-bit-detail").dataset.projectId;
+    if(!detail||!pid)return;
+    await saveBitacora(pid,detail,document.getElementById("pd-bit-hours").value,document.getElementById("pd-bit-status").value);
+    document.getElementById("pd-bit-detail").value="";
+    renderPdBitacora(pid);showToast("Registrado ✓");
+});
+document.getElementById("pd-bit-detail")?.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){e.preventDefault();document.getElementById("btn-pd-save-bit").click();}
+});
+
+// ── Recursos del proyecto ──────────────────────────────────────
+function renderPdRecursos(pid){
+    const el=document.getElementById("pd-recursos-list");if(!el)return;
+    const links=allLinks.filter(l=>
+        l.projectId===pid||
+        l.relationId==="P_"+pid||
+        (l.relationName&&allProjects.find(p=>p.id===pid)&&l.relationName.includes(allProjects.find(p=>p.id===pid)?.name||"___"))
+    );
+    if(!links.length){
+        el.innerHTML='<div class="empty-state"><i data-lucide="link" size="28"></i>Sin recursos asociados a este proyecto.</div>';
+        lucide.createIcons();return;
+    }
+    const imap={web:"globe",repo:"github",social:"share-2",canva:"image",doc:"file-text",enlace:"link",otro:"link"};
+    el.innerHTML=links.map(l=>{
+        const icon=imap[l.type]||"link";
+        const delBtn='<button class="btn-icon" data-action="delete-link" data-id="'+l.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        return '<div class="recurso-card"><div class="recurso-card-icon"><i data-lucide="'+icon+'" size="18"></i></div><div class="recurso-card-body"><div class="recurso-card-title">'+(l.title||l.name||"Sin título")+'</div><div class="recurso-card-meta">'+(l.type||"")+(l.url?" · "+l.url.slice(0,50)+"...":"")+'</div></div><a href="'+l.url+'" target="_blank" class="btn-primary btn-sm">Abrir →</a>'+delBtn+'</div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+// ── Reuniones del proyecto ─────────────────────────────────────
+function renderPdReuniones(pid){
+    const el=document.getElementById("pd-reuniones-list");if(!el)return;
+    const meets=allReuniones.filter(r=>r.proyectoId===pid||r.proyectoId==="pot_"+pid).sort((a,b)=>{
+        const da=a.fecha||a.date||"",db2=b.fecha||b.date||"";return db2.localeCompare(da);
+    });
+    if(!meets.length){
+        el.innerHTML='<div class="empty-state"><i data-lucide="calendar" size="28"></i>Sin reuniones asociadas.</div>';
+        lucide.createIcons();return;
+    }
+    const tipoLabel={potencial:"Potencial",cliente:"Cliente",proyecto:"Proyecto",interno:"Interno"};
+    el.innerHTML=meets.map(r=>{
+        const fecha=r.fecha||r.date||"";
+        const titulo=r.titulo||r.title||"Sin título";
+        const link=r.link||r.meetLink||"";
+        const estado=r.estado||r.status||"pendiente";
+        const [y,m,d]=(fecha||"0000-00-00").split("-");
+        const mN=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        return '<div class="meeting-card" style="margin-bottom:var(--space-3)"><div class="meeting-date-block"><div class="meeting-date-day">'+(d||"?")+' </div><div class="meeting-date-mon">'+(mN[parseInt(m||1)-1]||"—")+'</div></div><div class="meeting-body"><div class="meeting-title">'+titulo+'</div><div class="meeting-meta">'+(r.hora||r.time?'<span class="meeting-time"><i data-lucide="clock" size="11"></i>'+(r.hora||r.time)+'</span>':'')+'<span class="meeting-tipo '+(r.tipo||"interno")+'">'+(tipoLabel[r.tipo]||"Reunión")+'</span><span class="activo-estado '+estado+'" style="font-size:var(--text-xs)">'+{pendiente:"Pendiente",cumplimentada:"Cumplimentada",cancelada:"Cancelada"}[estado]+'</span>'+(link?'<a href="'+link+'" target="_blank" class="btn-secondary btn-sm" style="font-size:0.65rem;padding:2px 10px"><i data-lucide="video" size="10"></i> Entrar</a>':"")+'</div>'+(r.notas?'<div class="meeting-notes">'+r.notas+'</div>':"")+'</div></div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+// ── Notas del proyecto ─────────────────────────────────────────
+function renderPdNotas(pid){
+    const el=document.getElementById("pd-notas-list");if(!el)return;
+    const notas=(allNotas||[]).filter(n=>n.relationId==="P_"+pid||n.projectId===pid).sort((a,b)=>b.createdAt-a.createdAt);
+    if(!notas.length){
+        el.innerHTML='<div class="empty-state"><i data-lucide="sticky-note" size="28"></i>Sin notas en este proyecto.</div>';
+        lucide.createIcons();return;
+    }
+    el.innerHTML=notas.map(n=>'<div class="note-item" style="margin-bottom:8px"><strong>'+n.addedBy+':</strong> '+n.text+'</div>').join("");
+}
+
+document.getElementById("form-pd-nota")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const text=document.getElementById("pd-nota-input").value.trim();
+    if(!text||!currentProyectoId)return;
+    await col("notas_compartidas").add({text,relationId:"P_"+currentProyectoId,projectId:currentProyectoId,addedBy:localUser,createdAt:Date.now()});
+    document.getElementById("pd-nota-input").value="";
+    renderPdNotas(currentProyectoId);showToast("Nota guardada ✓");
+});
+
+// ══════════════════════════════════════════════════════════════
+// RECURSOS AGRUPADOS
+// ══════════════════════════════════════════════════════════════
+function renderResourcesGrouped(){
+    const el=document.getElementById("resources-grouped-list");if(!el)return;
+    if(!allLinks.length){
+        el.innerHTML='<div class="empty-state"><i data-lucide="link" size="32"></i>Sin recursos cargados.</div>';
+        lucide.createIcons();return;
+    }
+    const imap={web:"globe",repo:"github",social:"share-2",canva:"image",doc:"file-text",enlace:"link",otro:"link"};
+
+    // Agrupar por proyecto/cliente
+    const groups={};
+    allLinks.forEach(l=>{
+        let key="__general",label="General / Talento";
+        if(l.relationName){key=l.relationName;label=l.relationName;}
+        else if(l.projectId){const p=allProjects.find(x=>x.id===l.projectId);if(p){key="P_"+p.id;label="Proyecto: "+p.name;}}
+        else if(l.relationId){
+            if(l.relationId.startsWith("P_")){const p=allProjects.find(x=>x.id===l.relationId.slice(2));if(p){key=l.relationId;label="Proyecto: "+p.name;}}
+            else if(l.relationId.startsWith("C_")){const c=allClients.find(x=>x.id===l.relationId.slice(2));if(c){key=l.relationId;label="Cliente: "+clientDisplayName(c);}}
+        }
+        if(!groups[key])groups[key]={label,items:[]};
+        groups[key].items.push(l);
+    });
+
+    el.innerHTML=Object.entries(groups).map(([key,group])=>{
+        const cards=group.items.map(l=>{
+            const icon=imap[l.type]||"link";
+            const delBtn='<button class="btn-icon" data-action="delete-link" data-id="'+l.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+            return '<div class="recurso-card"><div class="recurso-card-icon"><i data-lucide="'+icon+'" size="18"></i></div><div class="recurso-card-body"><div class="recurso-card-title">'+(l.title||l.name||"Sin título")+'</div><div class="recurso-card-meta">'+(l.type||"")+'</div></div><a href="'+l.url+'" target="_blank" class="btn-primary btn-sm">Abrir →</a>'+delBtn+'</div>';
+        }).join("");
+        return '<div class="recursos-grupo"><div class="recursos-grupo-header"><i data-lucide="'+(key.startsWith("P_")?"folder-kanban":key.startsWith("C_")?"users":"link-2")+'" size="16" style="color:var(--brand-primary)"></i><span class="recursos-grupo-titulo">'+group.label+'</span><span class="recursos-grupo-count">'+group.items.length+' recurso'+(group.items.length>1?"s":"")+'</span></div>'+cards+'</div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+// ══════════════════════════════════════════════════════════════
+// INICIO: proyectos activos compacto
+// ══════════════════════════════════════════════════════════════
+function renderInicioProyectosActivos(){
+    const el=document.getElementById("inicio-proyectos-activos");if(!el)return;
+    const active=allProjects.filter(p=>p.status==="active").slice(0,5);
+    if(!active.length){el.innerHTML='<div style="font-size:var(--text-sm);color:var(--text-muted)">Sin proyectos activos.</div>';return;}
+    const ws=getWeekStart();
+    el.innerHTML=active.map(p=>{
+        const hs=allBitacoras.filter(b=>b.projectId===p.id&&(b.date||tsToDateStr(b.createdAt))>=ws).reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
+        const delivery=p.deliveryDate||p.dates?.delivery||"";
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-weight:600;font-size:var(--text-sm);cursor:pointer;color:var(--brand-primary)" data-action="abrir-proyecto" data-id="'+p.id+'">'+p.name+'</div>'+(delivery?'<div style="font-size:var(--text-xs);color:var(--text-muted)">Entrega: '+delivery+'</div>':'')+'</div><div style="display:flex;gap:var(--space-3);align-items:center"><span style="font-size:var(--text-xs);font-weight:700;color:var(--brand-gold)">'+(hs>0?hsLabel(hs):"—")+'</span><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="'+p.id+'">Abrir</button></div></div>';
+    }).join("");
+}
 auth.onAuthStateChanged(user=>{firebaseUser=user;if(user&&localUser)startRealtimeListeners()});
 lucide.createIcons();
 </script>
