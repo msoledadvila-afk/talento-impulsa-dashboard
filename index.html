@@ -906,6 +906,43 @@
     </div>
 </div>
 
+<!-- MODAL GASTO -->
+<div id="modal-gasto" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+            <span class="modal-title" id="gasto-modal-title">Registrar Gasto</span>
+            <button class="btn-icon" id="btn-close-gasto-modal"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-add-gasto" class="form-grid form-grid-2">
+                <input type="hidden" id="gasto-edit-id">
+                <div class="form-group"><label>Concepto</label><input type="text" id="gasto-concept" class="form-control" required placeholder="Ej: Suscripción Canva"></div>
+                <div class="form-group"><label>Categoría</label>
+                    <select id="gasto-category" class="form-control">
+                        <option value="Suscripciones">Suscripciones</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Servicios">Servicios</option>
+                        <option value="Impuestos">Impuestos / Tasas</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Monto</label><input type="number" id="gasto-amount" class="form-control" required step="0.01" placeholder="0.00"></div>
+                <div class="form-group"><label>Moneda</label>
+                    <select id="gasto-currency" class="form-control">
+                        <option value="ARS">ARS $</option>
+                        <option value="USD">USD u$s</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Fecha</label><input type="date" id="gasto-date" class="form-control" required></div>
+                <div class="form-footer" style="grid-column:1/-1">
+                    <button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar gasto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL ACCESO RÁPIDO -->
 <div id="modal-acceso" class="modal-overlay">
     <div class="modal-box" style="max-width:480px">
@@ -967,6 +1004,7 @@
             <div class="nav-item" data-view="view-reuniones"><i data-lucide="calendar" size="16"></i> Reuniones</div>
             <div class="nav-item" data-view="view-brainstorming"><i data-lucide="lightbulb" size="16"></i> Ideas</div>
             <div class="nav-item" data-view="view-accesos"><i data-lucide="link-2" size="16"></i> Accesos Rápidos</div>
+            <div class="nav-item" data-view="view-gastos"><i data-lucide="wallet" size="16"></i> Gastos</div>
         </nav>
         <div class="user-profile-nav">
             <div class="avatar" id="nav-avatar">S</div>
@@ -1190,6 +1228,30 @@
             </div>
         </section>
 
+        <!-- GASTOS -->
+        <section id="view-gastos" class="view">
+            <div class="view-header">
+                <div>
+                    <div class="view-title">Gastos</div>
+                    <p style="font-size:var(--text-sm);color:var(--text-dim);margin-top:4px">Registro de egresos de Talento Impulsa</p>
+                </div>
+                <button class="btn-primary" id="btn-open-gasto-modal"><i data-lucide="plus" size="16"></i> Registrar gasto</button>
+            </div>
+            <!-- Resumen rápido -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-3)" id="gastos-resumen"></div>
+            <!-- Lista -->
+            <div class="card">
+                <div class="filtros-bar" style="margin-bottom:var(--space-4);padding:var(--space-2) 0;border:none">
+                    <select id="flt-gasto-cat" style="border:1px solid var(--border);border-radius:var(--radius-md);padding:6px 10px;background:var(--bg);font-family:var(--font-body);font-size:var(--text-sm)">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                    <input type="month" id="flt-gasto-mes" style="border:1px solid var(--border);border-radius:var(--radius-md);padding:6px 10px;background:var(--bg);font-family:var(--font-body);font-size:var(--text-sm)">
+                    <button class="btn-secondary btn-sm" id="btn-clear-gastos-filter"><i data-lucide="x" size="12"></i> Limpiar</button>
+                </div>
+                <div id="gastos-list"></div>
+            </div>
+        </section>
+
         <!-- MARKETING TALENTO -->
         <section id="view-marketing" class="view">
             <div class="view-header">
@@ -1267,7 +1329,7 @@ const APP_ID="talento-impulsa-default";
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.firestore();
 let firebaseUser=null,localUser=null,unsubscribers=[];
-let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[],allMarketing=[],allAccesos=[];
+let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[],allMarketing=[],allAccesos=[],allNotas=[],allGastos=[];
 const col=n=>db.collection(["artifacts",APP_ID,"public","data",n].join("/"));
 
 function getTodayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
@@ -1277,6 +1339,9 @@ function formatDateLabel(ds){const t=getTodayStr(),yd=(()=>{const d=new Date();d
 function hsLabel(v){const n=parseFloat(v)||0;return n===1?"1 hs":`${n} hs`}
 function projName(id){const p=allProjects.find(x=>x.id===id);return p?p.name:id||"Sin proyecto"}
 function clientDisplayName(c){return c.name||c.company||"Sin nombre"}
+function clientPhone(c){return c.phone||c.contact||c.whatsapp||""}
+function clientEmail(c){return c.email||""}
+function clientWeb(c){return c.web||""}
 function stLabel(s){return{in_progress:"En progreso","in-progress":"En progreso",done:"Completado",pending:"Pendiente",blocked:"Bloqueado",active:"Activo",lead:"Lead",paused:"Pausado"}[s]||s}
 function stDot(s){return{"in-progress":"","in_progress":"",done:"done",pending:"pending",blocked:"blocked"}[s]||""}
 
@@ -1309,6 +1374,9 @@ function openSummaryModal(type,id){
     if(isP){renderSummaryBitacora(id);renderActivosPanel(id);}
     else document.getElementById("summary-bitacora-list").innerHTML="<div class='empty-state' style='padding:12px 0'>Bitácora disponible solo en proyectos.</div>";
     const links=allLinks.filter(l=>l.projectId===id||l.relationId==="P_"+id||l.relationId==="C_"+id);
+    // Notas del proyecto
+    const allNotes=allNotas||[];
+    const projNotes=allNotes.filter(n=>n.relationId==="P_"+id||n.projectId===id);
     const lEl=document.getElementById("summary-links-list");
     lEl.innerHTML=links.length===0?`<div class="empty-state" style="padding:12px 0"><i data-lucide="link" size="20"></i>Sin recursos.</div>`:links.map(l=>`<div class="data-item"><div><div class="data-item-name">${l.title}</div><div class="data-item-sub">${l.type||""}</div></div><a href="${l.url}" target="_blank" class="btn-secondary btn-sm">Abrir →</a></div>`).join("");
     document.getElementById("modal-summary").classList.add("open");
@@ -1340,57 +1408,52 @@ function redBadge(r){const lbl={general:"General",instagram:"Instagram",linkedin
 
 function renderActivosPanel(pid){
     const activos=allActivos.filter(a=>a.projectId===pid);
-    // Diseños
+
+    function acCard(a){
+        const estado=a.estado||"borrador";
+        const eMap={borrador:"Borrador",listo:"Listo",publicado:"Publicado"};
+        const eBadge='<span class="activo-estado '+estado+'">'+eMap[estado]+'</span>';
+        const openBtn=a.url?'<a href="'+a.url+'" target="_blank" class="btn-secondary btn-sm">Abrir →</a>':"";
+        const delBtn='<button class="btn-icon" data-action="delete-activo" data-id="'+a.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        return '<div class="activo-card"><div class="activo-card-header"><div><div class="activo-card-title">'+a.titulo+'</div><div class="activo-card-sub">'+(a.herramienta||"")+(a.formato?" · "+a.formato:"")+'</div></div><div style="display:flex;align-items:center;gap:8px">'+eBadge+openBtn+delBtn+'</div></div></div>';
+    }
+    function copyCard(a){
+        const estado=a.estado||"borrador";
+        const eMap={borrador:"Borrador",listo:"Listo",publicado:"Publicado"};
+        const rMap={general:"General",instagram:"Instagram",linkedin:"LinkedIn",whatsapp:"WhatsApp",web:"Web",email:"Email"};
+        const eBadge='<span class="activo-estado '+estado+'">'+eMap[estado]+'</span>';
+        const rBadge=a.red?'<span class="red-badge">'+rMap[a.red]+'</span>':"";
+        const copyBtn='<button class="btn-icon" data-action="copy-text" data-copy="'+encodeURIComponent(a.copy||"")+'" title="Copiar"><i data-lucide="copy" size="14"></i></button>';
+        const openBtn=a.url?'<a href="'+a.url+'" target="_blank" class="btn-secondary btn-sm">Diseño →</a>':"";
+        const delBtn='<button class="btn-icon" data-action="delete-activo" data-id="'+a.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        const copyText=a.copy?'<div class="activo-copy">'+a.copy+'</div>':"";
+        return '<div class="activo-card"><div class="activo-card-header"><div><div class="activo-card-title">'+a.titulo+'</div><div class="activo-card-sub" style="display:flex;gap:6px;margin-top:4px">'+rBadge+eBadge+'</div></div><div style="display:flex;align-items:center;gap:8px">'+openBtn+copyBtn+delBtn+'</div></div>'+copyText+'</div>';
+    }
+    function fotoCard(a){
+        const estado=a.estado||"borrador";
+        const eMap={borrador:"Borrador",listo:"Listo",publicado:"Publicado"};
+        const eBadge='<span class="activo-estado '+estado+'">'+eMap[estado]+'</span>';
+        const openBtn=a.url?'<a href="'+a.url+'" target="_blank" class="btn-secondary btn-sm">Abrir →</a>':"";
+        const delBtn='<button class="btn-icon" data-action="delete-activo" data-id="'+a.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        return '<div class="activo-card"><div class="activo-card-header"><div><div class="activo-card-title">'+a.titulo+'</div><div class="activo-card-sub">'+(a.tipo||"")+(a.notas?" · "+a.notas:"")+'</div></div><div style="display:flex;align-items:center;gap:8px">'+eBadge+openBtn+delBtn+'</div></div></div>';
+    }
+
+    const EMPTY_D='<div class="empty-state" style="padding:16px 0">Sin diseños cargados.</div>';
+    const EMPTY_C='<div class="empty-state" style="padding:16px 0">Sin copies cargados.</div>';
+    const EMPTY_F='<div class="empty-state" style="padding:16px 0">Sin fotos/videos cargados.</div>';
+
     const dis=activos.filter(a=>a.subtipo==="diseno");
-    const dEl=document.getElementById("activos-diseno-list");
-    if(dEl)dEl.innerHTML=dis.length===0?`<div class="empty-state" style="padding:16px 0"><i data-lucide="image" size="24"></i>Sin diseños cargados.</div>`:dis.map(a=>`
-        <div class="activo-card">
-            <div class="activo-card-header">
-                <div>
-                    <div class="activo-card-title">${a.titulo}</div>
-                    <div class="activo-card-sub">${a.herramienta||""} ${a.formato?`· ${a.formato}`:""}</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    ${estadoBadge(a.estado)}
-                    ${a.url?`<a href="${a.url}" target="_blank" class="btn-secondary btn-sm">Abrir →</a>`:""}
-                    <button class="btn-icon" data-action="delete-activo" data-id="${a.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-        </div>`).join("");
-    // Copies
     const cop=activos.filter(a=>a.subtipo==="copy");
-    const cEl=document.getElementById("activos-copy-list");
-    if(cEl)cEl.innerHTML=cop.length===0?`<div class="empty-state" style="padding:16px 0"><i data-lucide="file-text" size="24"></i>Sin copies cargados.</div>`:cop.map(a=>`
-        <div class="activo-card">
-            <div class="activo-card-header">
-                <div>
-                    <div class="activo-card-title">${a.titulo}</div>
-                    <div class="activo-card-sub" style="display:flex;gap:6px;margin-top:4px">${redBadge(a.red)} ${estadoBadge(a.estado)}</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    ${a.url?`<a href="${a.url}" target="_blank" class="btn-secondary btn-sm">Diseño →</a>`:""}
-                    <button class="btn-icon" data-action="copy-text" data-copy="${encodeURIComponent(a.copy||"")}" title="Copiar texto"><i data-lucide="copy" size="14"></i></button>
-                    <button class="btn-icon" data-action="delete-activo" data-id="${a.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-            ${a.copy?`<div class="activo-copy">${a.copy}</div>`:""}`).join("");
-    // Fotos
     const fot=activos.filter(a=>a.subtipo==="foto");
+
+    const dEl=document.getElementById("activos-diseno-list");
+    const cEl=document.getElementById("activos-copy-list");
     const fEl=document.getElementById("activos-foto-list");
-    if(fEl)fEl.innerHTML=fot.length===0?`<div class="empty-state" style="padding:16px 0"><i data-lucide="camera" size="24"></i>Sin fotos/videos cargados.</div>`:fot.map(a=>`
-        <div class="activo-card">
-            <div class="activo-card-header">
-                <div>
-                    <div class="activo-card-title">${a.titulo}</div>
-                    <div class="activo-card-sub">${a.tipo||""} ${a.notas?`· ${a.notas}`:""}</div>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    ${estadoBadge(a.estado)}
-                    ${a.url?`<a href="${a.url}" target="_blank" class="btn-secondary btn-sm">Abrir →</a>`:""}
-                    <button class="btn-icon" data-action="delete-activo" data-id="${a.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-        </div>`).join("");
+
+    if(dEl)dEl.innerHTML=dis.length===0?EMPTY_D:dis.map(acCard).join("");
+    if(cEl)cEl.innerHTML=cop.length===0?EMPTY_C:cop.map(copyCard).join("");
+    if(fEl)fEl.innerHTML=fot.length===0?EMPTY_F:fot.map(fotoCard).join("");
+
     lucide.createIcons();
 }
 
@@ -1431,9 +1494,11 @@ function startRealtimeListeners(){
         if(pid&&document.getElementById("modal-summary").classList.contains("open"))renderActivosPanel(pid);
     }));
     unsubscribers.push(listen("potenciales",arr=>{allPotenciales=arr},renderPotenciales));
-    unsubscribers.push(listen("reuniones",arr=>{allReuniones=arr},renderReuniones));
+    unsubscribers.push(listen("eventos",arr=>{allReuniones=arr},renderReuniones));
     unsubscribers.push(listen("ideas",arr=>{allIdeas=arr},renderIdeas));
-    unsubscribers.push(listen("marketing_talento",arr=>{allMarketing=arr},renderMarketing));
+    unsubscribers.push(listen("notas_compartidas",arr=>{allNotas=arr},null));
+    unsubscribers.push(listen("gastos",arr=>{allGastos=arr},renderGastos));
+    unsubscribers.push(listen("marketing",arr=>{allMarketing=arr},renderMarketing));
     unsubscribers.push(listen("enlaces_internos",arr=>{allAccesos=arr},renderAccesos));
 }
 
@@ -1619,26 +1684,56 @@ function renderClientsList(){
 
 function renderResourcesList(){
     const el=document.getElementById("resources-list");if(!el)return;
-    if(allLinks.length===0){el.innerHTML=`<div class="empty-state"><i data-lucide="link" size="28"></i>Sin recursos aún.</div>`;lucide.createIcons();return}
-    const imap={web:"globe",repo:"github",social:"share-2",canva:"image",doc:"file-text",otro:"link"};
-    el.innerHTML=allLinks.map(l=>`<div class="data-item"><div style="display:flex;gap:var(--space-3);align-items:center"><i data-lucide="${imap[l.type]||"link"}" size="16" style="color:var(--text-dim);flex-shrink:0"></i><div><div class="data-item-name">${l.title}</div><div class="data-item-sub">${l.type||""} ${l.projectId?"· "+projName(l.projectId):""}</div></div></div><div style="display:flex;gap:var(--space-2)"><a href="${l.url}" target="_blank" class="btn-secondary btn-sm">Abrir</a><button class="btn-icon" data-action="delete-link" data-id="${l.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></div></div>`).join("");
-    lucide.createIcons()
+    if(allLinks.length===0){el.innerHTML='<div class="empty-state"><i data-lucide="link" size="28"></i>Sin recursos aún.</div>';lucide.createIcons();return}
+    const imap={web:"globe",repo:"github",social:"share-2",canva:"image",doc:"file-text",enlace:"link",otro:"link"};
+    el.innerHTML=allLinks.map(l=>{
+        const icon=imap[l.type]||"link";
+        const title=l.title||l.name||"Sin título";
+        // Determine owner label
+        let owner="";
+        if(l.relationName)owner="· "+l.relationName;
+        else if(l.projectId)owner="· "+projName(l.projectId);
+        else if(l.relationId){
+            if(l.relationId.startsWith("P_")){const p=allProjects.find(x=>x.id===l.relationId.slice(2));if(p)owner="· Proyecto: "+p.name;}
+            else if(l.relationId.startsWith("C_")){const c=allClients.find(x=>x.id===l.relationId.slice(2));if(c)owner="· Cliente: "+clientDisplayName(c);}
+        }
+        const delBtn='<button class="btn-icon" data-action="delete-link" data-id="'+l.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        const openBtn='<a href="'+l.url+'" target="_blank" class="btn-secondary btn-sm">Abrir</a>';
+        return '<div class="data-item"><div style="display:flex;gap:var(--space-3);align-items:center"><i data-lucide="'+icon+'" size="16" style="color:var(--text-dim);flex-shrink:0"></i><div><div class="data-item-name">'+title+'</div><div class="data-item-sub">'+(l.type||"")+" "+owner+'</div></div></div><div style="display:flex;gap:var(--space-2)">'+openBtn+delBtn+'</div></div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+function renderClientsList(){
+    const el=document.getElementById("clients-list");if(!el)return;
+    if(!allClients.length){el.innerHTML='<div class="empty-state"><i data-lucide="users" size="28"></i>Sin clientes aún.</div>';lucide.createIcons();return}
+    el.innerHTML=allClients.map(c=>{
+        const proyectosCount=allProjects.filter(p=>p.clientId===c.id||p.client===clientDisplayName(c)).length;
+        const ph=clientPhone(c),em=clientEmail(c),wb=clientWeb(c);
+        const contactParts=[];
+        if(ph)contactParts.push('<span class="cli-contact-item"><i data-lucide="message-circle" size="12"></i>'+ph+'</span>');
+        if(em)contactParts.push('<span class="cli-contact-item"><i data-lucide="mail" size="12"></i><a href="mailto:'+em+'">'+em+'</a></span>');
+        if(c.instagram)contactParts.push('<span class="cli-contact-item"><i data-lucide="instagram" size="12"></i>'+c.instagram+'</span>');
+        if(wb)contactParts.push('<span class="cli-contact-item"><i data-lucide="globe" size="12"></i><a href="'+(wb.startsWith("http")?wb:"https://"+wb)+'" target="_blank">'+wb+'</a></span>');
+        return '<div style="border-bottom:1px solid var(--border-light)"><div class="data-item" style="border-bottom:none"><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap"><div class="data-item-name">'+clientDisplayName(c)+'</div>'+(c.rubro?'<span style="font-size:var(--text-xs);color:var(--text-muted)">'+c.rubro+'</span>':"")+'<span class="badge '+(c.status||"active")+'">'+stLabel(c.status||"active")+'</span></div>'+(contactParts.length?'<div class="cli-contact-grid" style="margin-top:6px">'+contactParts.join("")+'</div>':"")+(proyectosCount?'<div style="font-size:var(--text-xs);color:var(--text-dim);margin-top:4px">'+proyectosCount+' proyecto'+(proyectosCount>1?"s":"")+(proyectosCount>1?" asociados":" asociado")+'</div>':"")+'</div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0"><button class="btn-secondary btn-sm" data-action="open-summary" data-type="client" data-id="'+c.id+'">Ver ficha</button><button class="btn-icon" data-action="edit-cliente" data-id="'+c.id+'"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-client" data-id="'+c.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></div></div></div>';
+    }).join("");
+    lucide.createIcons();
 }
 
 function updateDropdowns(){
     const ps=document.getElementById("proj-client"),ls=document.getElementById("lnk-project"),rs=document.getElementById("reu-proyecto");
-    if(ps){const c=ps.value;ps.innerHTML=`<option value="">— Talento (sin cliente) —</option>`;allClients.forEach(cl=>{const o=document.createElement("option");o.value=cl.id;o.textContent=cl.name;ps.appendChild(o)});if(c)ps.value=c}
-    if(ls){const c=ls.value;ls.innerHTML=`<option value="">— General (Talento) —</option>`;allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;ls.appendChild(o)});if(c)ls.value=c}
-    if(rs){const c=rs.value;rs.innerHTML=`<option value="">— Sin proyecto —</option>`;allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;rs.appendChild(o)});[...allPotenciales].forEach(p=>{const o=document.createElement("option");o.value="pot_"+p.id;o.textContent="Potencial: "+p.nombre;rs.appendChild(o)});if(c)rs.value=c}
+    if(ps){const c=ps.value;ps.innerHTML='<option value="">— Talento (sin cliente) —</option>';allClients.forEach(cl=>{const o=document.createElement("option");o.value=cl.id;o.textContent=clientDisplayName(cl);ps.appendChild(o)});if(c)ps.value=c}
+    if(ls){const c=ls.value;ls.innerHTML='<option value="">— General (Talento) —</option>';allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;ls.appendChild(o)});if(c)ls.value=c}
+    if(rs){const c=rs.value;rs.innerHTML='<option value="">— Sin proyecto —</option>';allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;rs.appendChild(o)});allPotenciales.forEach(p=>{const o=document.createElement("option");o.value="pot_"+p.id;const fn=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"Potencial";o.textContent="Potencial: "+fn;rs.appendChild(o)});if(c)rs.value=c}
 }
 
 function initGreeting(){
     const hr=new Date().getHours();
-    document.getElementById("greeting-text").textContent=`${hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches"}, ${localUser} 👋`;
+    document.getElementById("greeting-text").textContent=(hr<12?"Buenos días":hr<19?"Buenas tardes":"Buenas noches")+", "+localUser+" 👋";
     const d=new Date();const days=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];const months=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    document.getElementById("current-date").textContent=`${days[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
+    document.getElementById("current-date").textContent=days[d.getDay()]+" "+d.getDate()+" de "+months[d.getMonth()]+" de "+d.getFullYear();
     document.getElementById("nav-username").textContent=localUser;
-    document.getElementById("nav-avatar").textContent=localUser[0]
+    document.getElementById("nav-avatar").textContent=localUser[0];
 }
 
 // EVENT DELEGATION
@@ -1649,13 +1744,26 @@ document.addEventListener("click",async e=>{
     if(ac==="delete-project"&&confirm("¿Eliminar proyecto?")){await deleteItem("proyectos",id);showToast("Proyecto eliminado")}
     if(ac==="delete-client"&&confirm("¿Eliminar cliente?")){await deleteItem("clientes",id);showToast("Cliente eliminado")}
     if(ac==="delete-link"&&confirm("¿Eliminar recurso?")){await deleteItem("recursos_compartidos",id);showToast("Recurso eliminado")}
-    if(ac==="open-summary")openSummaryModal(btn.dataset.type==="project"?"project":"client",id)
+    if(ac==="open-summary")openSummaryModal(btn.dataset.type==="project"?"project":"client",id);
     if(ac==="delete-activo"&&confirm("¿Eliminar este activo?")){await deleteItem("activos_digitales",id);const pid=document.getElementById("summary-bit-detail").dataset.projectId;if(pid)renderActivosPanel(pid);showToast("Activo eliminado")}
-    if(ac==="copy-text"){try{await navigator.clipboard.writeText(decodeURIComponent(btn.dataset.copy||""));showToast("Copy copiado al portapapeles ✓")}catch{showToast("No se pudo copiar","err")}}
+    if(ac==="copy-text"){try{await navigator.clipboard.writeText(decodeURIComponent(btn.dataset.copy||""));showToast("Copiado al portapapeles ✓")}catch{showToast("No se pudo copiar","err")}}
     if(ac==="delete-potencial"&&confirm("¿Eliminar este potencial?")){await deleteItem("potenciales",id);showToast("Potencial eliminado")}
-    if(ac==="delete-reunion"&&confirm("¿Eliminar esta reunión?")){await deleteItem("reuniones",id);showToast("Reunión eliminada")}
+    if(ac==="edit-potencial"){
+        const p=allPotenciales.find(x=>x.id===id);if(!p)return;
+        const fullN=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"";
+        document.getElementById("pot-nombre").value=fullN;
+        document.getElementById("pot-contacto").value=p.phone||p.contacto||p.contact||"";
+        document.getElementById("pot-rubro").value=p.rubro||"";
+        document.getElementById("pot-etapa").value=p.etapa||"contacto";
+        document.getElementById("pot-servicio").value=p.servicio||"";
+        document.getElementById("pot-origen").value=p.canal||p.origen||"";
+        document.getElementById("pot-notas").value=p.notas||p.notes||"";
+        document.getElementById("form-add-potencial").dataset.editId=p.id;
+        document.getElementById("modal-potencial").classList.add("open");
+    }
+    if(ac==="delete-reunion"&&confirm("¿Eliminar esta reunión?")){await deleteItem("eventos",id);showToast("Reunión eliminada")}
     if(ac==="delete-idea"&&confirm("¿Eliminar esta idea?")){await deleteItem("ideas",id);showToast("Idea eliminada")}
-    if(ac==="edit-idea"){const i=allIdeas.find(x=>x.id===id);if(!i)return;document.getElementById("edit-idea-id").value=i.id;document.getElementById("edit-idea-titulo").value=i.titulo||"";document.getElementById("edit-idea-categoria").value=i.categoria||"producto";document.getElementById("edit-idea-cuerpo").value=i.cuerpo||"";document.getElementById("modal-edit-idea").classList.add("open");}
+    if(ac==="edit-idea"){const i=allIdeas.find(x=>x.id===id);if(!i)return;document.getElementById("edit-idea-id").value=i.id;document.getElementById("edit-idea-titulo").value=i.titulo||i.text||"";document.getElementById("edit-idea-categoria").value=i.categoria||"producto";document.getElementById("edit-idea-cuerpo").value=i.cuerpo||"";document.getElementById("modal-edit-idea").classList.add("open");}
     if(ac==="edit-bit"){const b=allBitacoras.find(x=>x.id===id);if(!b)return;document.getElementById("edit-bit-id").value=b.id;document.getElementById("edit-bit-detail").value=b.detail||"";document.getElementById("edit-bit-hours").value=b.hours||1;document.getElementById("edit-bit-status").value=b.status||"in-progress";document.getElementById("edit-bit-date").value=b.date||tsToDateStr(b.createdAt);document.getElementById("modal-edit-bit").classList.add("open");}
     if(ac==="edit-proyecto"){
         const p=allProjects.find(x=>x.id===id);if(!p)return;
@@ -1666,9 +1774,8 @@ document.addEventListener("click",async e=>{
         document.getElementById("edit-proj-kickoff").value=p.kickoffDate||p.dates?.kickoff||"";
         document.getElementById("edit-proj-delivery").value=p.deliveryDate||p.dates?.delivery||"";
         document.getElementById("edit-proj-desc").value=p.description||p.notes||"";
-        // poblar select cliente
         const csel=document.getElementById("edit-proj-client");
-        csel.innerHTML=`<option value="">— Sin cliente (Talento) —</option>`;
+        csel.innerHTML='<option value="">— Sin cliente (Talento) —</option>';
         allClients.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=clientDisplayName(c);csel.appendChild(o)});
         csel.value=p.clientId||"";
         document.getElementById("modal-edit-proyecto").classList.add("open");
@@ -1678,7 +1785,7 @@ document.addEventListener("click",async e=>{
         document.getElementById("edit-cli-id").value=c.id;
         document.getElementById("edit-cli-name").value=clientDisplayName(c);
         document.getElementById("edit-cli-status").value=c.status||"active";
-        document.getElementById("edit-cli-whatsapp").value=c.whatsapp||c.contact||"";
+        document.getElementById("edit-cli-whatsapp").value=c.whatsapp||c.phone||c.contact||"";
         document.getElementById("edit-cli-email").value=c.email||"";
         document.getElementById("edit-cli-instagram").value=c.instagram||"";
         document.getElementById("edit-cli-linkedin").value=c.linkedin||"";
@@ -1687,39 +1794,40 @@ document.addEventListener("click",async e=>{
         document.getElementById("edit-cli-notes").value=c.notes||"";
         document.getElementById("modal-edit-cliente").classList.add("open");
     }
-    if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||"";document.getElementById("mkt-tipo").value=m.tipo||"feed";document.getElementById("mkt-estado").value=m.estado||"pendiente";document.getElementById("mkt-fecha").value=m.fecha||"";document.getElementById("mkt-copy").value=m.copy||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("modal-mkt").classList.add("open");}
-    if(ac==="delete-mkt"&&confirm("¿Eliminar esta pieza?")){await deleteItem("marketing_talento",id);showToast("Pieza eliminada")}
-    if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.titulo||"";document.getElementById("acc-tipo").value=a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
+    if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||m.title||"";document.getElementById("mkt-tipo").value=m.tipo||m.type||"feed";let est=m.estado||"pendiente";if(!m.estado){if(m.published===true)est="publicada";else if(m.designed===true)est="disenada";}document.getElementById("mkt-estado").value=est;document.getElementById("mkt-fecha").value=m.fecha||m.date||"";document.getElementById("mkt-copy").value=m.copy||m.detail||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("modal-mkt").classList.add("open");}
+    if(ac==="delete-mkt"&&confirm("¿Eliminar esta pieza?")){await deleteItem("marketing",id);showToast("Pieza eliminada")}
+    if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.title||a.titulo||"";document.getElementById("acc-tipo").value=a.type||a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
     if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("enlaces_internos",id);showToast("Enlace eliminado")}
+    if(ac==="delete-gasto"&&confirm("¿Eliminar este gasto?")){await deleteItem("gastos",id);showToast("Gasto eliminado")}
     if(ac==="convertir-potencial"){
-        if(!confirm(`¿Convertir "${btn.dataset.nombre}" a cliente activo?`))return;
-        // Crear cliente
-        await col("clientes").add({name:btn.dataset.nombre,contact:btn.dataset.contacto||"",rubro:btn.dataset.rubro||"",status:"active",notes:"Convertido desde potenciales",addedBy:localUser,createdAt:Date.now()});
-        // Eliminar potencial
+        if(!confirm('¿Convertir "'+btn.dataset.nombre+'" a cliente activo?'))return;
+        await col("clientes").add({name:btn.dataset.nombre,contact:btn.dataset.contacto||"",phone:btn.dataset.contacto||"",rubro:btn.dataset.rubro||"",status:"active",notes:"Convertido desde potenciales",addedBy:localUser,createdAt:Date.now()});
         await deleteItem("potenciales",id);
-        showToast("✓ Convertido a cliente. Podés verlo en Clientes.");
+        showToast("✓ Convertido a cliente.");
         switchView("view-clientes");
     }
 });
 
+// Tabs modal nuevo
 document.getElementById("modal-nuevo-tabs").addEventListener("click",e=>{
     const t=e.target.closest(".modal-tab");if(!t)return;
     document.querySelectorAll("#modal-nuevo-tabs .modal-tab").forEach(x=>x.classList.remove("active"));
     document.querySelectorAll("#modal-nuevo .modal-section").forEach(x=>x.classList.remove("active"));
-    t.classList.add("active");document.getElementById(t.dataset.tab)?.classList.add("active")
+    t.classList.add("active");document.getElementById(t.dataset.tab)?.classList.add("active");
 });
 
+// Filtros bitácora
 ["flt-project","flt-status","flt-desde","flt-hasta"].forEach(id=>{document.getElementById(id)?.addEventListener("change",renderBitacoraFull)});
 document.getElementById("btn-clear-filters")?.addEventListener("click",()=>{["flt-project","flt-status","flt-desde","flt-hasta"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});renderBitacoraFull()});
 
+// FORMS
 document.getElementById("form-add-bitacora").addEventListener("submit",async e=>{
     e.preventDefault();
     const pid=document.getElementById("bit-project").value,detail=document.getElementById("bit-detail").value.trim();
     if(!pid||!detail)return;
     await saveBitacora(pid,detail,document.getElementById("bit-hours").value,document.getElementById("bit-status").value,document.getElementById("bit-date").value);
-    document.getElementById("form-add-bitacora").reset();document.getElementById("modal-bitacora").classList.remove("open");showToast("Registrado en bitácora ✓")
+    document.getElementById("form-add-bitacora").reset();document.getElementById("modal-bitacora").classList.remove("open");showToast("Registrado en bitácora ✓");
 });
-
 document.getElementById("btn-qa-save").addEventListener("click",submitQuickAdd);
 document.getElementById("qa-detail").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submitQuickAdd()}});
 async function submitQuickAdd(){
@@ -1727,361 +1835,98 @@ async function submitQuickAdd(){
     if(!detail){document.getElementById("qa-detail").focus();return}
     if(!pid){document.getElementById("qa-project").focus();return}
     await saveBitacora(pid,detail,document.getElementById("qa-hours").value,document.getElementById("qa-status").value);
-    document.getElementById("qa-detail").value="";showToast("Registrado ✓")
+    document.getElementById("qa-detail").value="";showToast("Registrado ✓");
 }
-
 document.getElementById("btn-save-summary-bit").addEventListener("click",async()=>{
     const detail=document.getElementById("summary-bit-detail").value.trim(),pid=document.getElementById("summary-bit-detail").dataset.projectId;
     if(!detail||!pid)return;
     await saveBitacora(pid,detail,document.getElementById("summary-bit-hours").value,document.getElementById("summary-bit-status").value);
-    document.getElementById("summary-bit-detail").value="";renderSummaryBitacora(pid);showToast("Registrado ✓")
+    document.getElementById("summary-bit-detail").value="";renderSummaryBitacora(pid);showToast("Registrado ✓");
 });
 document.getElementById("summary-bit-detail").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();document.getElementById("btn-save-summary-bit").click()}});
-
 document.getElementById("form-add-project").addEventListener("submit",async e=>{
     e.preventDefault();
     await col("proyectos").add({name:document.getElementById("proj-name").value.trim(),status:document.getElementById("proj-status").value,progress:parseInt(document.getElementById("proj-progress").value)||0,clientId:document.getElementById("proj-client").value||null,kickoffDate:document.getElementById("proj-kickoff").value||null,deliveryDate:document.getElementById("proj-delivery").value||null,description:document.getElementById("proj-desc").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-project").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Proyecto creado ✓")
+    document.getElementById("form-add-project").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Proyecto creado ✓");
 });
 document.getElementById("form-add-client").addEventListener("submit",async e=>{
     e.preventDefault();
-    await col("clientes").add({name:document.getElementById("cli-name").value.trim(),contact:document.getElementById("cli-contact").value.trim(),rubro:document.getElementById("cli-rubro").value.trim(),status:document.getElementById("cli-status").value,notes:document.getElementById("cli-notes").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-client").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Cliente guardado ✓")
+    await col("clientes").add({name:document.getElementById("cli-name").value.trim(),contact:document.getElementById("cli-contact").value.trim(),phone:document.getElementById("cli-contact").value.trim(),rubro:document.getElementById("cli-rubro").value.trim(),status:document.getElementById("cli-status").value,notes:document.getElementById("cli-notes").value.trim(),addedBy:localUser,createdAt:Date.now()});
+    document.getElementById("form-add-client").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Cliente guardado ✓");
 });
 document.getElementById("form-add-link").addEventListener("submit",async e=>{
     e.preventDefault();
     await col("recursos_compartidos").add({title:document.getElementById("lnk-title").value.trim(),url:document.getElementById("lnk-url").value.trim(),type:document.getElementById("lnk-type").value,projectId:document.getElementById("lnk-project").value||null,addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-link").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Recurso guardado ✓")
+    document.getElementById("form-add-link").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Recurso guardado ✓");
 });
 
+// EDIT FORMS
+document.getElementById("btn-close-edit-idea")?.addEventListener("click",()=>document.getElementById("modal-edit-idea").classList.remove("open"));
+document.getElementById("modal-edit-idea")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-idea"))document.getElementById("modal-edit-idea").classList.remove("open")});
+document.getElementById("form-edit-idea")?.addEventListener("submit",async e=>{
+    e.preventDefault();const id=document.getElementById("edit-idea-id").value;
+    await col("ideas").doc(id).update({titulo:document.getElementById("edit-idea-titulo").value.trim(),categoria:document.getElementById("edit-idea-categoria").value,cuerpo:document.getElementById("edit-idea-cuerpo").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-idea").classList.remove("open");showToast("Idea actualizada ✓");
+});
+document.getElementById("btn-close-edit-bit")?.addEventListener("click",()=>document.getElementById("modal-edit-bit").classList.remove("open"));
+document.getElementById("modal-edit-bit")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-bit"))document.getElementById("modal-edit-bit").classList.remove("open")});
+document.getElementById("form-edit-bit")?.addEventListener("submit",async e=>{
+    e.preventDefault();const id=document.getElementById("edit-bit-id").value;
+    await col("bitacoras").doc(id).update({detail:document.getElementById("edit-bit-detail").value.trim(),hours:parseFloat(document.getElementById("edit-bit-hours").value)||1,status:document.getElementById("edit-bit-status").value,date:document.getElementById("edit-bit-date").value,updatedAt:Date.now()});
+    document.getElementById("modal-edit-bit").classList.remove("open");showToast("Registro actualizado ✓");
+});
+document.getElementById("btn-close-edit-proyecto")?.addEventListener("click",()=>document.getElementById("modal-edit-proyecto").classList.remove("open"));
+document.getElementById("modal-edit-proyecto")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-proyecto"))document.getElementById("modal-edit-proyecto").classList.remove("open")});
+document.getElementById("form-edit-proyecto")?.addEventListener("submit",async e=>{
+    e.preventDefault();const id=document.getElementById("edit-proj-id").value;
+    await col("proyectos").doc(id).update({name:document.getElementById("edit-proj-name").value.trim(),status:document.getElementById("edit-proj-status").value,progress:parseInt(document.getElementById("edit-proj-progress").value)||0,clientId:document.getElementById("edit-proj-client").value||null,kickoffDate:document.getElementById("edit-proj-kickoff").value||null,deliveryDate:document.getElementById("edit-proj-delivery").value||null,description:document.getElementById("edit-proj-desc").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-proyecto").classList.remove("open");showToast("Proyecto actualizado ✓");
+});
+document.getElementById("btn-close-edit-cliente")?.addEventListener("click",()=>document.getElementById("modal-edit-cliente").classList.remove("open"));
+document.getElementById("modal-edit-cliente")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-cliente"))document.getElementById("modal-edit-cliente").classList.remove("open")});
+document.getElementById("form-edit-cliente")?.addEventListener("submit",async e=>{
+    e.preventDefault();const id=document.getElementById("edit-cli-id").value;
+    await col("clientes").doc(id).update({name:document.getElementById("edit-cli-name").value.trim(),status:document.getElementById("edit-cli-status").value,whatsapp:document.getElementById("edit-cli-whatsapp").value.trim(),phone:document.getElementById("edit-cli-whatsapp").value.trim(),email:document.getElementById("edit-cli-email").value.trim(),instagram:document.getElementById("edit-cli-instagram").value.trim(),linkedin:document.getElementById("edit-cli-linkedin").value.trim(),web:document.getElementById("edit-cli-web").value.trim(),rubro:document.getElementById("edit-cli-rubro").value.trim(),notes:document.getElementById("edit-cli-notes").value.trim(),updatedAt:Date.now()});
+    document.getElementById("modal-edit-cliente").classList.remove("open");showToast("Cliente actualizado ✓");
+});
+
+// BOTONES MODALES
 document.getElementById("btn-open-bit-modal").addEventListener("click",()=>openBitModal());
 document.getElementById("btn-open-bit-modal-2")?.addEventListener("click",()=>openBitModal());
 document.getElementById("btn-close-bit-modal").addEventListener("click",()=>document.getElementById("modal-bitacora").classList.remove("open"));
 document.getElementById("btn-open-nuevo-modal").addEventListener("click",()=>openNuevoModal("tab-proyecto"));
 document.getElementById("btn-close-nuevo-modal").addEventListener("click",()=>document.getElementById("modal-nuevo").classList.remove("open"));
 document.getElementById("btn-close-summary").addEventListener("click",()=>document.getElementById("modal-summary").classList.remove("open"));
-["modal-bitacora","modal-nuevo","modal-summary"].forEach(id=>{document.getElementById(id).addEventListener("click",e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove("open")})});
+["modal-bitacora","modal-nuevo","modal-summary"].forEach(id=>{document.getElementById(id)?.addEventListener("click",e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove("open")})});
+
+// NAVEGACIÓN SIDEBAR
 document.querySelectorAll(".nav-item").forEach(item=>{item.addEventListener("click",()=>{const v=item.dataset.view;if(v)switchView(v)})});
 document.getElementById("btn-open-sidebar").addEventListener("click",toggleSidebar);
 document.getElementById("btn-close-sidebar").addEventListener("click",closeSidebar);
 document.getElementById("sidebar-overlay").addEventListener("click",closeSidebar);
 document.getElementById("btn-logout").addEventListener("click",()=>{if(confirm("¿Cerrar sesión?"))location.reload()});
 
+// DROPDOWN ESTADO REUNIÓN
+document.addEventListener("change",async e=>{
+    const sel=e.target.closest("[data-action='change-reunion-estado']");
+    if(!sel)return;
+    const id=sel.dataset.id,estado=sel.value;
+    sel.className="reunion-estado-select "+estado;
+    await col("eventos").doc(id).update({estado,updatedAt:Date.now()});
+    showToast("Estado actualizado ✓");
+});
+
+// LOGIN
 const credentials={Soledad:"sole123",Gabriel:"gaby123"};
 document.getElementById("login-form").addEventListener("submit",async e=>{
     e.preventDefault();
     const user=document.getElementById("user-select").value,pass=document.getElementById("password-input").value,err=document.getElementById("login-error");
     if(credentials[user]!==pass){err.textContent="❌ Contraseña incorrecta.";err.style.display="block";return}
     err.style.display="none";
-    try{await auth.signInAnonymously()}catch(ex){err.textContent="⚠️ Error de conexión: "+ex.message;err.style.display="block";return}
+    try{await auth.signInAnonymously();}catch(ex){err.textContent="⚠️ Error de conexión: "+ex.message;err.style.display="block";return}
     localUser=user;
     const ov=document.getElementById("login-overlay");ov.style.opacity="0";
-    setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners()},300)
-});
-
-// ══════════════════════════════════════════════════════════════════
-// POTENCIALES
-// ══════════════════════════════════════════════════════════════════
-function renderPotenciales(){
-    const el=document.getElementById("potenciales-list");if(!el)return;
-    if(!allPotenciales.length){el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="users" size="32"></i>Sin potenciales cargados.</div>`;lucide.createIcons();return}
-    const etapaLabel={contacto:"Primer contacto",reunion:"Reunión agendada",propuesta:"Propuesta enviada",negociacion:"En negociación",perdido:"Perdido"};
-    el.innerHTML=allPotenciales.map(p=>`
-        <div class="pipeline-card">
-            <div class="pipeline-card-header">
-                <div>
-                    <div class="pipeline-card-name">${p.nombre}</div>
-                    <div class="pipeline-card-sub">${p.rubro||""} ${p.origen?"· vía "+p.origen:""}</div>
-                </div>
-                <span class="pipeline-etapa ${p.etapa||"contacto"}">${etapaLabel[p.etapa]||p.etapa||"Contacto"}</span>
-            </div>
-            ${p.notas?`<div class="pipeline-card-notas">${p.notas}</div>`:""}
-            <div class="pipeline-card-footer">
-                ${p.contacto?`<span style="font-size:var(--text-xs);color:var(--text-dim)">${p.contacto}</span>`:""}
-                ${p.servicio?`<span class="badge info">${p.servicio}</span>`:""}
-                <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
-                    <button class="btn-convertir" data-action="convertir-potencial" data-id="${p.id}" data-nombre="${p.nombre}" data-contacto="${p.contacto||""}" data-rubro="${p.rubro||""}">
-                        <i data-lucide="user-check" size="12"></i> Convertir a Cliente
-                    </button>
-                    <button class="btn-icon" data-action="delete-potencial" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-        </div>`).join("");
-    lucide.createIcons();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// REUNIONES
-// ══════════════════════════════════════════════════════════════════
-function renderReuniones(){
-    const el=document.getElementById("reuniones-list");if(!el)return;
-    if(!allReuniones.length){el.innerHTML=`<div class="empty-state"><i data-lucide="calendar" size="32"></i>Sin reuniones registradas.</div>`;lucide.createIcons();return}
-    const tipoMap={potencial:{cls:"potencial",lbl:"Potencial"},cliente:{cls:"cliente",lbl:"Cliente"},proyecto:{cls:"proyecto",lbl:"Proyecto"},interno:{cls:"interno",lbl:"Interno"}};
-    const today=getTodayStr();
-    const proximas=allReuniones.filter(r=>r.fecha>=today).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-    const pasadas=allReuniones.filter(r=>r.fecha<today).sort((a,b)=>b.fecha.localeCompare(a.fecha));
-    function card(r){
-        const[y,m,d]=r.fecha.split("-");
-        const mNames=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-        const t=tipoMap[r.tipo]||{cls:"interno",lbl:r.tipo};
-        return `<div class="meeting-card">
-            <div class="meeting-date-block">
-                <div class="meeting-date-day">${d}</div>
-                <div class="meeting-date-mon">${mNames[parseInt(m)-1]}</div>
-            </div>
-            <div class="meeting-body">
-                <div class="meeting-title">${r.titulo}</div>
-                <div class="meeting-meta">
-                    ${r.hora?`<span class="meeting-time"><i data-lucide="clock" size="11"></i>${r.hora}</span>`:""}
-                    <span class="meeting-tipo ${t.cls}">${t.lbl}</span>
-                    ${r.contraparte?`<span style="font-size:var(--text-xs);color:var(--text-dim)">${r.contraparte}</span>`:""}
-                    ${r.link?`<a href="${r.link}" target="_blank" class="btn-secondary btn-sm" style="font-size:0.65rem;padding:2px 10px"><i data-lucide="video" size="10"></i> Entrar</a>`:""}
-                </div>
-                ${r.notas?`<div class="meeting-notes">${r.notas}</div>`:""}
-            </div>
-            <div class="meeting-actions" style="opacity:1;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-                <select class="reunion-estado-select ${r.estado||'pendiente'}" data-action="change-reunion-estado" data-id="${r.id}">
-                    <option value="pendiente" ${(r.estado||'pendiente')==='pendiente'?'selected':''}>Pendiente</option>
-                    <option value="cumplimentada" ${r.estado==='cumplimentada'?'selected':''}>Cumplimentada</option>
-                    <option value="cancelada" ${r.estado==='cancelada'?'selected':''}>Cancelada</option>
-                </select>
-                <button class="btn-icon" data-action="delete-reunion" data-id="${r.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-            </div>
-        </div>`;
-    }
-    let html="";
-    if(proximas.length){html+=`<div class="meetings-section-label">Próximas (${proximas.length})</div>`;html+=`<div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-6)">${proximas.map(card).join("")}</div>`}
-    if(pasadas.length){html+=`<div class="meetings-section-label">Pasadas</div>`;html+=`<div style="display:flex;flex-direction:column;gap:var(--space-3);opacity:.75">${pasadas.slice(0,10).map(card).join("")}</div>`}
-    el.innerHTML=html;lucide.createIcons();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// IDEAS
-// ══════════════════════════════════════════════════════════════════
-function renderIdeas(){
-    const el=document.getElementById("ideas-list");if(!el)return;
-    if(!allIdeas.length){el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="lightbulb" size="32"></i>Sin ideas registradas.</div>`;lucide.createIcons();return}
-    const catMap={producto:"Producto",marketing:"Marketing",proceso:"Proceso",tecnologia:"Tecnología",otro:"Otra"};
-    el.innerHTML=allIdeas.map(i=>`
-        <div class="idea-card">
-            <div class="idea-card-title">${i.titulo}</div>
-            ${i.cuerpo?`<div class="idea-card-body">${i.cuerpo}</div>`:""}
-            <div class="idea-card-meta">
-                ${i.categoria?`<span class="idea-tag">${catMap[i.categoria]||i.categoria}</span>`:""}
-                <span class="idea-card-date">${formatDateLabel(tsToDateStr(i.createdAt))}</span>
-                <div class="idea-card-actions">
-                    <button class="btn-icon" data-action="edit-idea" data-id="${i.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>
-                    <button class="btn-icon" data-action="delete-idea" data-id="${i.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-        </div>`).join("");
-    lucide.createIcons();
-}
-
-// ══════════════════════════════════════════════════════════════════
-// FORMS SUBMIT — POTENCIAL
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("form-add-potencial")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    await col("potenciales").add({nombre:document.getElementById("pot-nombre").value.trim(),contacto:document.getElementById("pot-contacto").value.trim(),rubro:document.getElementById("pot-rubro").value.trim(),etapa:document.getElementById("pot-etapa").value,servicio:document.getElementById("pot-servicio").value.trim(),origen:document.getElementById("pot-origen").value,notas:document.getElementById("pot-notas").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-potencial").reset();document.getElementById("modal-potencial").classList.remove("open");showToast("Potencial guardado ✓");
-});
-
-// FORM REUNIÓN
-document.getElementById("form-add-reunion")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    await col("reuniones").add({titulo:document.getElementById("reu-titulo").value.trim(),tipo:document.getElementById("reu-tipo").value,fecha:document.getElementById("reu-fecha").value,hora:document.getElementById("reu-hora").value,contraparte:document.getElementById("reu-contraparte").value.trim(),proyectoId:document.getElementById("reu-proyecto").value||null,link:document.getElementById("reu-link").value.trim(),notas:document.getElementById("reu-notas").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-reunion").reset();document.getElementById("modal-reunion").classList.remove("open");showToast("Reunión guardada ✓");
-});
-
-// FORM IDEA
-document.getElementById("form-add-idea")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    await col("ideas").add({titulo:document.getElementById("idea-titulo").value.trim(),categoria:document.getElementById("idea-categoria").value,cuerpo:document.getElementById("idea-cuerpo").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-idea").reset();document.getElementById("modal-idea").classList.remove("open");showToast("Idea guardada ✓");
-});
-
-// BOTONES OPEN/CLOSE MODALES NUEVOS
-document.getElementById("btn-open-potencial-modal")?.addEventListener("click",()=>{document.getElementById("reu-fecha")?.valueOf;document.getElementById("modal-potencial").classList.add("open")});
-document.getElementById("btn-close-potencial-modal")?.addEventListener("click",()=>document.getElementById("modal-potencial").classList.remove("open"));
-document.getElementById("btn-open-reunion-modal")?.addEventListener("click",()=>{document.getElementById("reu-fecha").value=getTodayStr();document.getElementById("modal-reunion").classList.add("open")});
-document.getElementById("btn-close-reunion-modal")?.addEventListener("click",()=>document.getElementById("modal-reunion").classList.remove("open"));
-document.getElementById("btn-open-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.add("open"));
-document.getElementById("btn-close-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.remove("open"));
-["modal-potencial","modal-reunion","modal-idea"].forEach(id=>{document.getElementById(id)?.addEventListener("click",e=>{if(e.target===document.getElementById(id))document.getElementById(id).classList.remove("open")})});
-
-// ══════════════════════════════════════════════════════════════════
-// MARKETING TALENTO
-// ══════════════════════════════════════════════════════════════════
-function renderMarketing(){
-    const el=document.getElementById("marketing-list");if(!el)return;
-    const fltEstado=document.getElementById("flt-mkt-estado")?.value||"";
-    const fltTipo=document.getElementById("flt-mkt-tipo")?.value||"";
-    let items=[...allMarketing];
-    if(fltEstado)items=items.filter(m=>m.estado===fltEstado);
-    if(fltTipo)items=items.filter(m=>m.tipo===fltTipo);
-    items.sort((a,b)=>{const da=a.fecha||"",db2=b.fecha||"";return db2.localeCompare(da)});
-    if(!items.length){el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas${fltEstado||fltTipo?" con esos filtros":""} aún.</div>`;lucide.createIcons();return}
-    const tipoLabel={feed:"Feed IG",story:"Story",reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
-    const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",publicada:"Publicada"};
-    el.innerHTML=items.map(m=>`
-        <div class="mkt-card">
-            <div class="mkt-card-header">
-                <div>
-                    <div class="mkt-card-title">${m.nombre}</div>
-                    <div class="mkt-card-sub">
-                        <span class="mkt-tipo-badge">${tipoLabel[m.tipo]||m.tipo}</span>
-                        <span class="mkt-estado ${m.estado||"pendiente"}">${estadoLabel[m.estado]||m.estado}</span>
-                        ${m.fecha?`<span style="font-size:var(--text-xs);color:var(--text-muted)">${m.fecha}</span>`:""}
-                    </div>
-                </div>
-                <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
-                    ${m.url?`<a href="${m.url}" target="_blank" class="btn-secondary btn-sm">Diseño →</a>`:""}
-                    <button class="btn-icon" data-action="copy-text" data-copy="${encodeURIComponent(m.copy||"")}"><i data-lucide="copy" size="14"></i></button>
-                    <button class="btn-icon" data-action="edit-mkt" data-id="${m.id}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>
-                    <button class="btn-icon" data-action="delete-mkt" data-id="${m.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>
-                </div>
-            </div>
-            ${m.copy?`<div class="mkt-copy">${m.copy}</div>`:""}
-        </div>`).join("");
-    lucide.createIcons();
-}
-document.getElementById("flt-mkt-estado")?.addEventListener("change",renderMarketing);
-document.getElementById("flt-mkt-tipo")?.addEventListener("change",renderMarketing);
-document.getElementById("btn-clear-mkt-filters")?.addEventListener("click",()=>{
-    const fe=document.getElementById("flt-mkt-estado"),ft=document.getElementById("flt-mkt-tipo");
-    if(fe)fe.value="";if(ft)ft.value="";renderMarketing();
-});
-
-// ══════════════════════════════════════════════════════════════════
-// FORMS MARKETING
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("btn-open-mkt-modal")?.addEventListener("click",()=>{
-    document.getElementById("mkt-edit-id").value="";
-    document.getElementById("mkt-modal-title").textContent="Nueva Pieza";
-    document.getElementById("form-add-mkt").reset();
-    document.getElementById("modal-mkt").classList.add("open");
-});
-document.getElementById("btn-close-mkt-modal")?.addEventListener("click",()=>document.getElementById("modal-mkt").classList.remove("open"));
-document.getElementById("modal-mkt")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-mkt"))document.getElementById("modal-mkt").classList.remove("open")});
-
-document.getElementById("form-add-mkt")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const editId=document.getElementById("mkt-edit-id").value;
-    const data={nombre:document.getElementById("mkt-nombre").value.trim(),tipo:document.getElementById("mkt-tipo").value,estado:document.getElementById("mkt-estado").value,fecha:document.getElementById("mkt-fecha").value,copy:document.getElementById("mkt-copy").value.trim(),url:document.getElementById("mkt-url").value.trim(),addedBy:localUser,updatedAt:Date.now()};
-    if(editId){await col("marketing_talento").doc(editId).update(data);}
-    else{data.createdAt=Date.now();await col("marketing_talento").add(data);}
-    document.getElementById("form-add-mkt").reset();document.getElementById("modal-mkt").classList.remove("open");
-    showToast(editId?"Pieza actualizada ✓":"Pieza guardada ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// EDITAR IDEA
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("btn-close-edit-idea")?.addEventListener("click",()=>document.getElementById("modal-edit-idea").classList.remove("open"));
-document.getElementById("modal-edit-idea")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-idea"))document.getElementById("modal-edit-idea").classList.remove("open")});
-document.getElementById("form-edit-idea")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const id=document.getElementById("edit-idea-id").value;
-    await col("ideas").doc(id).update({titulo:document.getElementById("edit-idea-titulo").value.trim(),categoria:document.getElementById("edit-idea-categoria").value,cuerpo:document.getElementById("edit-idea-cuerpo").value.trim(),updatedAt:Date.now()});
-    document.getElementById("modal-edit-idea").classList.remove("open");showToast("Idea actualizada ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// EDITAR BITÁCORA
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("btn-close-edit-bit")?.addEventListener("click",()=>document.getElementById("modal-edit-bit").classList.remove("open"));
-document.getElementById("modal-edit-bit")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-bit"))document.getElementById("modal-edit-bit").classList.remove("open")});
-document.getElementById("form-edit-bit")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const id=document.getElementById("edit-bit-id").value;
-    await col("bitacoras").doc(id).update({detail:document.getElementById("edit-bit-detail").value.trim(),hours:parseFloat(document.getElementById("edit-bit-hours").value)||1,status:document.getElementById("edit-bit-status").value,date:document.getElementById("edit-bit-date").value,updatedAt:Date.now()});
-    document.getElementById("modal-edit-bit").classList.remove("open");showToast("Registro actualizado ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// EDITAR PROYECTO
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("btn-close-edit-proyecto")?.addEventListener("click",()=>document.getElementById("modal-edit-proyecto").classList.remove("open"));
-document.getElementById("modal-edit-proyecto")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-proyecto"))document.getElementById("modal-edit-proyecto").classList.remove("open")});
-document.getElementById("form-edit-proyecto")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const id=document.getElementById("edit-proj-id").value;
-    await col("proyectos").doc(id).update({name:document.getElementById("edit-proj-name").value.trim(),status:document.getElementById("edit-proj-status").value,progress:parseInt(document.getElementById("edit-proj-progress").value)||0,clientId:document.getElementById("edit-proj-client").value||null,kickoffDate:document.getElementById("edit-proj-kickoff").value||null,deliveryDate:document.getElementById("edit-proj-delivery").value||null,description:document.getElementById("edit-proj-desc").value.trim(),updatedAt:Date.now()});
-    document.getElementById("modal-edit-proyecto").classList.remove("open");showToast("Proyecto actualizado ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// EDITAR CLIENTE
-// ══════════════════════════════════════════════════════════════════
-document.getElementById("btn-close-edit-cliente")?.addEventListener("click",()=>document.getElementById("modal-edit-cliente").classList.remove("open"));
-document.getElementById("modal-edit-cliente")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-cliente"))document.getElementById("modal-edit-cliente").classList.remove("open")});
-document.getElementById("form-edit-cliente")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const id=document.getElementById("edit-cli-id").value;
-    await col("clientes").doc(id).update({name:document.getElementById("edit-cli-name").value.trim(),status:document.getElementById("edit-cli-status").value,whatsapp:document.getElementById("edit-cli-whatsapp").value.trim(),email:document.getElementById("edit-cli-email").value.trim(),instagram:document.getElementById("edit-cli-instagram").value.trim(),linkedin:document.getElementById("edit-cli-linkedin").value.trim(),web:document.getElementById("edit-cli-web").value.trim(),rubro:document.getElementById("edit-cli-rubro").value.trim(),notes:document.getElementById("edit-cli-notes").value.trim(),updatedAt:Date.now()});
-    document.getElementById("modal-edit-cliente").classList.remove("open");showToast("Cliente actualizado ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// DROPDOWN ESTADO REUNIÓN (change event delegation)
-// ══════════════════════════════════════════════════════════════════
-document.addEventListener("change",async e=>{
-    const sel=e.target.closest("[data-action='change-reunion-estado']");
-    if(!sel)return;
-    const id=sel.dataset.id,estado=sel.value;
-    sel.className=`reunion-estado-select ${estado}`;
-    await col("reuniones").doc(id).update({estado,updatedAt:Date.now()});
-    showToast("Estado actualizado ✓");
-});
-
-// ══════════════════════════════════════════════════════════════════
-// ACCESOS RÁPIDOS
-// ══════════════════════════════════════════════════════════════════
-function renderAccesos(){
-    const el=document.getElementById("accesos-list");if(!el)return;
-    if(!allAccesos.length){
-        el.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><i data-lucide="link-2" size="32"></i>Sin enlaces cargados aún.</div>`;
-        lucide.createIcons();return;
-    }
-    const iconMap={web:"globe",instagram:"instagram",linkedin:"linkedin",whatsapp:"message-circle",canva:"image",github:"github",drive:"hard-drive",calendly:"calendar",notion:"file-text",repo:"git-branch",otro:"link"};
-    const colorMap={web:"#1A1814",instagram:"#E1306C",linkedin:"#0A66C2",whatsapp:"#25D366",canva:"#7C3AED",github:"#1A1814",drive:"#4285F4",calendly:"#006BFF",notion:"#1A1814",repo:"#475569",otro:"var(--brand-primary)"};
-    el.innerHTML=allAccesos.map(a=>`
-        <div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3);transition:box-shadow .15s;cursor:pointer;" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow='none'">
-            <div style="width:42px;height:42px;border-radius:var(--radius-md);background:${colorMap[a.tipo]||"var(--brand-primary)"}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${colorMap[a.tipo]||"var(--brand-primary)"}">
-                <i data-lucide="${iconMap[a.tipo]||"link"}" size="20"></i>
-            </div>
-            <div style="flex:1;min-width:0">
-                <div style="font-weight:700;font-size:var(--text-sm);color:var(--text)">${a.titulo}</div>
-                ${a.desc?`<div style="font-size:var(--text-xs);color:var(--text-dim);margin-top:2px">${a.desc}</div>`:""}
-            </div>
-            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
-                <a href="${a.url}" target="_blank" class="btn-primary btn-sm" style="text-decoration:none">Abrir →</a>
-                <button class="btn-icon" data-action="edit-acceso" data-id="${a.id}"><i data-lucide="pencil" size="13"></i></button>
-                <button class="btn-icon" data-action="delete-acceso" data-id="${a.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>
-            </div>
-        </div>`).join("");
-    lucide.createIcons();
-}
-
-document.getElementById("btn-open-acceso-modal")?.addEventListener("click",()=>{
-    document.getElementById("acceso-edit-id").value="";
-    document.getElementById("acceso-modal-title").textContent="Nuevo Enlace";
-    document.getElementById("form-add-acceso").reset();
-    document.getElementById("modal-acceso").classList.add("open");
-});
-document.getElementById("btn-close-acceso-modal")?.addEventListener("click",()=>document.getElementById("modal-acceso").classList.remove("open"));
-document.getElementById("modal-acceso")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-acceso"))document.getElementById("modal-acceso").classList.remove("open")});
-
-document.getElementById("form-add-acceso")?.addEventListener("submit",async e=>{
-    e.preventDefault();
-    const editId=document.getElementById("acceso-edit-id").value;
-    const data={titulo:document.getElementById("acc-titulo").value.trim(),tipo:document.getElementById("acc-tipo").value,url:document.getElementById("acc-url").value.trim(),desc:document.getElementById("acc-desc").value.trim(),addedBy:localUser,updatedAt:Date.now()};
-    if(editId){await col("enlaces_internos").doc(editId).update(data);}
-    else{data.createdAt=Date.now();await col("enlaces_internos").add(data);}
-    document.getElementById("form-add-acceso").reset();
-    document.getElementById("modal-acceso").classList.remove("open");
-    showToast(editId?"Enlace actualizado ✓":"Enlace guardado ✓");
+    setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners();},300);
 });
 auth.onAuthStateChanged(user=>{firebaseUser=user;if(user&&localUser)startRealtimeListeners()});
 lucide.createIcons();
