@@ -1434,7 +1434,7 @@ function startRealtimeListeners(){
     unsubscribers.push(listen("reuniones",arr=>{allReuniones=arr},renderReuniones));
     unsubscribers.push(listen("ideas",arr=>{allIdeas=arr},renderIdeas));
     unsubscribers.push(listen("marketing_talento",arr=>{allMarketing=arr},renderMarketing));
-    unsubscribers.push(listen("accesos_rapidos",arr=>{allAccesos=arr},renderAccesos));
+    unsubscribers.push(listen("enlaces_internos",arr=>{allAccesos=arr},renderAccesos));
 }
 
 function updateHoyStats(){
@@ -1690,7 +1690,7 @@ document.addEventListener("click",async e=>{
     if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||"";document.getElementById("mkt-tipo").value=m.tipo||"feed";document.getElementById("mkt-estado").value=m.estado||"pendiente";document.getElementById("mkt-fecha").value=m.fecha||"";document.getElementById("mkt-copy").value=m.copy||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("modal-mkt").classList.add("open");}
     if(ac==="delete-mkt"&&confirm("¿Eliminar esta pieza?")){await deleteItem("marketing_talento",id);showToast("Pieza eliminada")}
     if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.titulo||"";document.getElementById("acc-tipo").value=a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
-    if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("accesos_rapidos",id);showToast("Enlace eliminado")}
+    if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("enlaces_internos",id);showToast("Enlace eliminado")}
     if(ac==="convertir-potencial"){
         if(!confirm(`¿Convertir "${btn.dataset.nombre}" a cliente activo?`))return;
         // Crear cliente
@@ -2077,8 +2077,8 @@ document.getElementById("form-add-acceso")?.addEventListener("submit",async e=>{
     e.preventDefault();
     const editId=document.getElementById("acceso-edit-id").value;
     const data={titulo:document.getElementById("acc-titulo").value.trim(),tipo:document.getElementById("acc-tipo").value,url:document.getElementById("acc-url").value.trim(),desc:document.getElementById("acc-desc").value.trim(),addedBy:localUser,updatedAt:Date.now()};
-    if(editId){await col("accesos_rapidos").doc(editId).update(data);}
-    else{data.createdAt=Date.now();await col("accesos_rapidos").add(data);}
+    if(editId){await col("enlaces_internos").doc(editId).update(data);}
+    else{data.createdAt=Date.now();await col("enlaces_internos").add(data);}
     document.getElementById("form-add-acceso").reset();
     document.getElementById("modal-acceso").classList.remove("open");
     showToast(editId?"Enlace actualizado ✓":"Enlace guardado ✓");
