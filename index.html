@@ -1032,6 +1032,40 @@
     </div>
 </div>
 
+<!-- MODAL EDITAR RECURSO -->
+<div id="modal-edit-recurso" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+            <span class="modal-title">Editar Recurso</span>
+            <button class="btn-icon" id="btn-close-edit-recurso"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-recurso" class="form-grid form-grid-2">
+                <input type="hidden" id="edit-recurso-id">
+                <div class="form-group"><label>Título</label><input type="text" id="edit-rec-title" class="form-control" required></div>
+                <div class="form-group"><label>Tipo</label>
+                    <select id="edit-rec-type" class="form-control">
+                        <option value="enlace">Enlace</option>
+                        <option value="web">Web</option>
+                        <option value="repo">Repositorio</option>
+                        <option value="social">Social</option>
+                        <option value="canva">Canva / Diseño</option>
+                        <option value="doc">Documento</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>URL</label><input type="url" id="edit-rec-url" class="form-control" required></div>
+                <div class="form-group" style="grid-column:1/-1"><label>Proyecto asociado</label>
+                    <select id="edit-rec-project" class="form-control"><option value="">— General (Talento) —</option></select>
+                </div>
+                <div class="form-footer" style="grid-column:1/-1">
+                    <button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- APP LAYOUT -->
 <div id="app-layout">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -1848,8 +1882,9 @@ function renderResourcesList(){
             else if(l.relationId.startsWith("C_")){const c=allClients.find(x=>x.id===l.relationId.slice(2));if(c)owner="· Cliente: "+clientDisplayName(c);}
         }
         const delBtn='<button class="btn-icon" data-action="delete-link" data-id="'+l.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        const editBtnF='<button class="btn-icon" data-action="edit-recurso" data-id="'+l.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>';
         const openBtn='<a href="'+l.url+'" target="_blank" class="btn-secondary btn-sm">Abrir</a>';
-        return '<div class="data-item"><div style="display:flex;gap:var(--space-3);align-items:center"><i data-lucide="'+icon+'" size="16" style="color:var(--text-dim);flex-shrink:0"></i><div><div class="data-item-name">'+title+'</div><div class="data-item-sub">'+(l.type||"")+" "+owner+'</div></div></div><div style="display:flex;gap:var(--space-2)">'+openBtn+delBtn+'</div></div>';
+        return '<div class="data-item"><div style="display:flex;gap:var(--space-3);align-items:center"><i data-lucide="'+icon+'" size="16" style="color:var(--text-dim);flex-shrink:0"></i><div><div class="data-item-name">'+title+'</div><div class="data-item-sub">'+(l.type||"")+" "+owner+'</div></div></div><div style="display:flex;gap:var(--space-2)">'+openBtn+editBtnF+delBtn+'</div></div>';
     }).join("");
     lucide.createIcons();
 }
@@ -1895,6 +1930,19 @@ document.addEventListener("click",async e=>{
     if(ac==="delete-project"&&confirm("¿Eliminar proyecto?")){await deleteItem("proyectos",id);showToast("Proyecto eliminado")}
     if(ac==="delete-client"&&confirm("¿Eliminar cliente?")){await deleteItem("clientes",id);showToast("Cliente eliminado")}
     if(ac==="delete-link"&&confirm("¿Eliminar recurso?")){await deleteItem("recursos_compartidos",id);showToast("Recurso eliminado")}
+    if(ac==="edit-recurso"){
+        const l=allLinks.find(x=>x.id===id);if(!l)return;
+        document.getElementById("edit-recurso-id").value=l.id;
+        document.getElementById("edit-rec-title").value=l.title||l.name||"";
+        document.getElementById("edit-rec-type").value=l.type||"enlace";
+        document.getElementById("edit-rec-url").value=l.url||"";
+        // poblar proyectos
+        const rsel=document.getElementById("edit-rec-project");
+        rsel.innerHTML='<option value="">— General (Talento) —</option>';
+        allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;rsel.appendChild(o)});
+        rsel.value=l.projectId||"";
+        document.getElementById("modal-edit-recurso").classList.add("open");
+    }
     if(ac==="open-summary")openSummaryModal(btn.dataset.type==="project"?"project":"client",id);
     if(ac==="delete-activo"&&confirm("¿Eliminar este activo?")){await deleteItem("activos_digitales",id);const pid=document.getElementById("summary-bit-detail").dataset.projectId;if(pid)renderActivosPanel(pid);showToast("Activo eliminado")}
     if(ac==="copy-text"){try{await navigator.clipboard.writeText(decodeURIComponent(btn.dataset.copy||""));showToast("Copiado al portapapeles ✓")}catch{showToast("No se pudo copiar","err")}}
@@ -2065,6 +2113,80 @@ document.addEventListener("change",async e=>{
     sel.className="reunion-estado-select "+estado;
     await col("eventos").doc(id).update({estado,updatedAt:Date.now()});
     showToast("Estado actualizado ✓");
+});
+
+
+// ══════════════════════════════════════════════════════════════
+// BOTONES ABRIR MODAL (todos los que faltaban)
+// ══════════════════════════════════════════════════════════════
+document.getElementById("btn-open-acceso-modal")?.addEventListener("click",()=>{
+    document.getElementById("acceso-edit-id").value="";
+    document.getElementById("acceso-modal-title").textContent="Nuevo Enlace";
+    document.getElementById("form-add-acceso").reset();
+    document.getElementById("modal-acceso").classList.add("open");
+});
+document.getElementById("btn-close-acceso-modal")?.addEventListener("click",()=>document.getElementById("modal-acceso").classList.remove("open"));
+document.getElementById("modal-acceso")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-acceso"))document.getElementById("modal-acceso").classList.remove("open")});
+
+document.getElementById("btn-open-idea-modal")?.addEventListener("click",()=>{
+    document.getElementById("form-add-idea").reset();
+    document.getElementById("modal-idea").classList.add("open");
+});
+document.getElementById("btn-close-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.remove("open"));
+document.getElementById("modal-idea")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-idea"))document.getElementById("modal-idea").classList.remove("open")});
+
+document.getElementById("btn-open-gasto-modal")?.addEventListener("click",()=>{
+    document.getElementById("gasto-date").value=getTodayStr();
+    document.getElementById("gasto-edit-id").value="";
+    document.getElementById("gasto-modal-title").textContent="Registrar Gasto";
+    document.getElementById("form-add-gasto").reset();
+    document.getElementById("gasto-date").value=getTodayStr();
+    document.getElementById("modal-gasto").classList.add("open");
+});
+document.getElementById("btn-close-gasto-modal")?.addEventListener("click",()=>document.getElementById("modal-gasto").classList.remove("open"));
+document.getElementById("modal-gasto")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-gasto"))document.getElementById("modal-gasto").classList.remove("open")});
+
+document.getElementById("btn-open-reunion-modal")?.addEventListener("click",()=>{
+    document.getElementById("reu-fecha").value=getTodayStr();
+    document.getElementById("form-add-reunion").reset();
+    document.getElementById("reu-fecha").value=getTodayStr();
+    document.getElementById("modal-reunion").classList.add("open");
+});
+document.getElementById("btn-close-reunion-modal")?.addEventListener("click",()=>document.getElementById("modal-reunion").classList.remove("open"));
+document.getElementById("modal-reunion")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-reunion"))document.getElementById("modal-reunion").classList.remove("open")});
+
+document.getElementById("btn-open-mkt-modal")?.addEventListener("click",()=>{
+    document.getElementById("mkt-edit-id").value="";
+    document.getElementById("mkt-modal-title").textContent="Nueva Pieza";
+    document.getElementById("form-add-mkt").reset();
+    document.getElementById("modal-mkt").classList.add("open");
+});
+document.getElementById("btn-close-mkt-modal")?.addEventListener("click",()=>document.getElementById("modal-mkt").classList.remove("open"));
+document.getElementById("modal-mkt")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-mkt"))document.getElementById("modal-mkt").classList.remove("open")});
+
+document.getElementById("btn-open-potencial-modal")?.addEventListener("click",()=>{
+    document.getElementById("form-add-potencial").reset();
+    document.getElementById("form-add-potencial").dataset.editId="";
+    document.getElementById("modal-potencial").classList.add("open");
+});
+document.getElementById("btn-close-potencial-modal")?.addEventListener("click",()=>document.getElementById("modal-potencial").classList.remove("open"));
+document.getElementById("modal-potencial")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-potencial"))document.getElementById("modal-potencial").classList.remove("open")});
+// EDIT RECURSO FORM
+document.getElementById("btn-close-edit-recurso")?.addEventListener("click",()=>document.getElementById("modal-edit-recurso").classList.remove("open"));
+document.getElementById("modal-edit-recurso")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-recurso"))document.getElementById("modal-edit-recurso").classList.remove("open")});
+document.getElementById("form-edit-recurso")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-recurso-id").value;
+    const projectId=document.getElementById("edit-rec-project").value||null;
+    await col("recursos_compartidos").doc(id).update({
+        title:document.getElementById("edit-rec-title").value.trim(),
+        type:document.getElementById("edit-rec-type").value,
+        url:document.getElementById("edit-rec-url").value.trim(),
+        projectId,
+        updatedAt:Date.now()
+    });
+    document.getElementById("modal-edit-recurso").classList.remove("open");
+    showToast("Recurso actualizado ✓");
 });
 
 // LOGIN
@@ -2241,7 +2363,8 @@ function renderPdRecursos(pid){
     el.innerHTML=links.map(l=>{
         const icon=imap[l.type]||"link";
         const delBtn='<button class="btn-icon" data-action="delete-link" data-id="'+l.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
-        return '<div class="recurso-card"><div class="recurso-card-icon"><i data-lucide="'+icon+'" size="18"></i></div><div class="recurso-card-body"><div class="recurso-card-title">'+(l.title||l.name||"Sin título")+'</div><div class="recurso-card-meta">'+(l.type||"")+(l.url?" · "+l.url.slice(0,50)+"...":"")+'</div></div><a href="'+l.url+'" target="_blank" class="btn-primary btn-sm">Abrir →</a>'+delBtn+'</div>';
+        const editBtnR='<button class="btn-icon" data-action="edit-recurso" data-id="'+l.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>';
+        return '<div class="recurso-card"><div class="recurso-card-icon"><i data-lucide="'+icon+'" size="18"></i></div><div class="recurso-card-body"><div class="recurso-card-title">'+(l.title||l.name||"Sin título")+'</div><div class="recurso-card-meta">'+(l.type||"")+(l.url?" · "+l.url.slice(0,50)+"...":"")+'</div></div><a href="'+l.url+'" target="_blank" class="btn-primary btn-sm">Abrir →</a>'+editBtnR+delBtn+'</div>';
     }).join("");
     lucide.createIcons();
 }
