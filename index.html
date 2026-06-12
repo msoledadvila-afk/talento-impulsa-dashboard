@@ -427,7 +427,9 @@
         .recurso-card-body{flex:1;min-width:0}
         .recurso-card-title{font-weight:600;font-size:var(--text-sm);color:var(--text)}
         .recurso-card-meta{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px}
-    </style>
+.acceso-card-item{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3);transition:box-shadow .15s}
+        .acceso-card-item:hover{box-shadow:var(--shadow-md)}
+            </style>
 </head>
 <body>
 <div id="toast-notification"></div>
@@ -2461,6 +2463,188 @@ function renderInicioProyectosActivos(){
         const delivery=p.deliveryDate||p.dates?.delivery||"";
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-weight:600;font-size:var(--text-sm);cursor:pointer;color:var(--brand-primary)" data-action="abrir-proyecto" data-id="'+p.id+'">'+p.name+'</div>'+(delivery?'<div style="font-size:var(--text-xs);color:var(--text-muted)">Entrega: '+delivery+'</div>':'')+'</div><div style="display:flex;gap:var(--space-3);align-items:center"><span style="font-size:var(--text-xs);font-weight:700;color:var(--brand-gold)">'+(hs>0?hsLabel(hs):"—")+'</span><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="'+p.id+'">Abrir</button></div></div>';
     }).join("");
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER FUNCTIONS (restauradas con campos legacy reales)
+// ══════════════════════════════════════════════════════════════
+
+// ── ACCESOS RÁPIDOS (colección: enlaces_internos) ─────────────
+// Campos: title, type, url
+function renderAccesos(){
+    const el=document.getElementById("accesos-list");if(!el)return;
+    if(!allAccesos.length){
+        el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="link-2" size="32"></i>Sin accesos cargados.</div>';
+        lucide.createIcons();return;
+    }
+    const iconMap={web:"globe",instagram:"instagram",linkedin:"linkedin",whatsapp:"message-circle",canva:"image",github:"github",drive:"hard-drive",calendly:"calendar",notion:"file-text",repo:"git-branch",social:"share-2",otro:"link"};
+    const colorMap={web:"#1A1814",instagram:"#E1306C",linkedin:"#0A66C2",whatsapp:"#25D366",canva:"#7C3AED",github:"#1A1814",drive:"#4285F4",calendly:"#006BFF",notion:"#1A1814",repo:"#475569",social:"#E1306C",otro:"var(--brand-primary)"};
+    el.innerHTML=allAccesos.map(a=>{
+        const titulo=a.title||a.titulo||"Sin título";
+        const tipo=a.type||a.tipo||"otro";
+        const url=a.url||"";
+        const icon=iconMap[tipo]||"link";
+        const color=colorMap[tipo]||"var(--brand-primary)";
+        const editBtn='<button class="btn-icon" data-action="edit-acceso" data-id="'+a.id+'" style="color:var(--text-muted)"><i data-lucide="pencil" size="13"></i></button>';
+        const delBtn='<button class="btn-icon" data-action="delete-acceso" data-id="'+a.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>';
+        return '<div style="background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3);transition:box-shadow .15s" class="acceso-card-item"><div style="width:42px;height:42px;border-radius:var(--radius-md);background:'+color+'18;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:'+color+'"><i data-lucide="'+icon+'" size="20"></i></div><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:var(--text-sm);color:var(--text)">'+titulo+'</div><div style="font-size:var(--text-xs);color:var(--text-muted);margin-top:2px">'+tipo+'</div></div>'+(url?'<a href="'+url+'" target="_blank" class="btn-primary btn-sm" style="text-decoration:none">Abrir →</a>':"")+editBtn+delBtn+'</div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+// ── MARKETING (colección: marketing) ─────────────────────────
+// Campos: title, type, designed(bool), published(bool), detail, date
+function renderMarketing(){
+    const el=document.getElementById("marketing-list");if(!el)return;
+    const fltEstado=document.getElementById("flt-mkt-estado")?.value||"";
+    const fltTipo=document.getElementById("flt-mkt-tipo")?.value||"";
+    let items=[...allMarketing];
+    items.sort((a,b)=>(b.date||b.createdAt||0)-(a.date?new Date(a.date).getTime():a.createdAt||0));
+
+    if(fltEstado){items=items.filter(m=>{
+        let est=m.estado||"pendiente";
+        if(!m.estado){if(m.published===true)est="publicada";else if(m.designed===true)est="disenada";}
+        return est===fltEstado;
+    });}
+    if(fltTipo)items=items.filter(m=>(m.tipo||m.type||"")===fltTipo);
+
+    if(!items.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas'+((fltEstado||fltTipo)?" con esos filtros":"")+'.</div>';lucide.createIcons();return;}
+
+    const tipoLabel={feed:"Feed IG",story:"Story",reel:"Reel",Reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
+    const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",publicada:"Publicada"};
+
+    el.innerHTML=items.map(m=>{
+        const mtitulo=m.nombre||m.title||"Sin título";
+        const mcopy=m.copy||m.detail||"";
+        const mtipo=m.tipo||m.type||"otro";
+        let mestado=m.estado||"pendiente";
+        if(!m.estado){if(m.published===true)mestado="publicada";else if(m.designed===true)mestado="disenada";}
+        const mfecha=m.fecha||m.date||"";
+        const editBtn='<button class="btn-icon" data-action="edit-mkt" data-id="'+m.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>';
+        const delBtn='<button class="btn-icon" data-action="delete-mkt" data-id="'+m.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        const copyBtn=mcopy?'<button class="btn-icon" data-action="copy-text" data-copy="'+encodeURIComponent(mcopy)+'" title="Copiar"><i data-lucide="copy" size="14"></i></button>':"";
+        const openBtn=m.url?'<a href="'+m.url+'" target="_blank" class="btn-secondary btn-sm">Diseño →</a>':"";
+        const copyBlock=mcopy?'<div class="mkt-copy">'+mcopy+'</div>':"";
+        return '<div class="mkt-card"><div class="mkt-card-header"><div><div class="mkt-card-title">'+mtitulo+'</div><div class="mkt-card-sub"><span class="mkt-tipo-badge">'+(tipoLabel[mtipo]||mtipo)+'</span><span class="mkt-estado '+mestado+'">'+(estadoLabel[mestado]||mestado)+'</span>'+(mfecha?'<span style="font-size:var(--text-xs);color:var(--text-muted)">'+mfecha+'</span>':"")+'</div></div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0">'+openBtn+copyBtn+editBtn+delBtn+'</div></div>'+copyBlock+'</div>';
+    }).join("");
+    lucide.createIcons();
+}
+document.getElementById("flt-mkt-estado")?.addEventListener("change",renderMarketing);
+document.getElementById("flt-mkt-tipo")?.addEventListener("change",renderMarketing);
+document.getElementById("btn-clear-mkt-filters")?.addEventListener("click",()=>{
+    ["flt-mkt-estado","flt-mkt-tipo"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+    renderMarketing();
+});
+
+// ── GASTOS (colección: gastos) ────────────────────────────────
+// Campos: concept, amount, currency, category, date
+function renderGastos(){
+    const el=document.getElementById("gastos-list");if(!el)return;
+    const fltCat=document.getElementById("flt-gasto-cat")?.value||"";
+    const fltMes=document.getElementById("flt-gasto-mes")?.value||"";
+    let items=[...allGastos];
+    if(fltCat)items=items.filter(g=>g.category===fltCat);
+    if(fltMes)items=items.filter(g=>(g.date||"").startsWith(fltMes));
+    items.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+
+    // Resumen totales
+    const resEl=document.getElementById("gastos-resumen");
+    if(resEl){
+        const filtered=fltCat||fltMes?items:allGastos;
+        const totARS=filtered.filter(g=>!g.currency||g.currency==="ARS").reduce((s,g)=>s+(parseFloat(g.amount)||0),0);
+        const totUSD=filtered.filter(g=>g.currency==="USD").reduce((s,g)=>s+(parseFloat(g.amount)||0),0);
+        resEl.innerHTML='<div class="col-stat"><div class="col-stat-label">Total ARS</div><div class="col-stat-value" style="font-size:var(--text-lg)">$ '+totARS.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>'+(totUSD>0?'<div class="col-stat"><div class="col-stat-label">Total USD</div><div class="col-stat-value gold" style="font-size:var(--text-lg)">u$s '+totUSD.toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})+'</div></div>':"")+'<div class="col-stat"><div class="col-stat-label">Registros</div><div class="col-stat-value" style="font-size:var(--text-lg)">'+items.length+'</div></div>';
+    }
+    // Categorías para filtro
+    const cats=[...new Set(allGastos.map(g=>g.category).filter(Boolean))];
+    const catSel=document.getElementById("flt-gasto-cat");
+    if(catSel&&catSel.options.length<=1){cats.forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;catSel.appendChild(o)});}
+
+    if(!items.length){el.innerHTML='<div class="empty-state"><i data-lucide="wallet" size="32"></i>Sin gastos registrados'+(fltCat||fltMes?" con esos filtros":"")+'.</div>';lucide.createIcons();return;}
+    el.innerHTML='<table class="data-table"><thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>'+items.map(g=>'<tr><td style="font-size:var(--text-xs);color:var(--text-dim)">'+(g.date||"")+'</td><td style="font-weight:600">'+(g.concept||g.description||"—")+'</td><td><span class="badge info">'+(g.category||"—")+'</span></td><td style="text-align:right;font-weight:700;color:var(--brand-primary)">'+(g.currency==="USD"?"u$s":"$")+" "+parseFloat(g.amount||0).toLocaleString("es-AR",{minimumFractionDigits:2})+'</td><td><button class="btn-icon" data-action="delete-gasto" data-id="'+g.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>').join("")+'</tbody></table>';
+    lucide.createIcons();
+}
+document.getElementById("flt-gasto-cat")?.addEventListener("change",renderGastos);
+document.getElementById("flt-gasto-mes")?.addEventListener("change",renderGastos);
+document.getElementById("btn-clear-gastos-filter")?.addEventListener("click",()=>{
+    ["flt-gasto-cat","flt-gasto-mes"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+    renderGastos();
+});
+
+// ── IDEAS (colección: ideas) ──────────────────────────────────
+// Campos: text (legacy), titulo/cuerpo (nuevo)
+function renderIdeas(){
+    const el=document.getElementById("ideas-list");if(!el)return;
+    if(!allIdeas.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="lightbulb" size="32"></i>Sin ideas registradas.</div>';lucide.createIcons();return}
+    const catMap={producto:"Producto",marketing:"Marketing",proceso:"Proceso",tecnologia:"Tecnología",otro:"Otra"};
+    el.innerHTML=allIdeas.map(i=>{
+        const itxt=i.titulo||i.text||"Sin título";
+        const icuerpo=i.cuerpo||(i.titulo?"":i.text?i.text:"");
+        const tag=i.categoria?'<span class="idea-tag">'+catMap[i.categoria]+'</span>':"";
+        const date='<span class="idea-card-date">'+formatDateLabel(tsToDateStr(i.createdAt))+'</span>';
+        const editBtn='<button class="btn-icon" data-action="edit-idea" data-id="'+i.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>';
+        const delBtn='<button class="btn-icon" data-action="delete-idea" data-id="'+i.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
+        const body=icuerpo&&icuerpo!==itxt?'<div class="idea-card-body">'+icuerpo+'</div>':"";
+        return '<div class="idea-card"><div class="idea-card-title">'+itxt+'</div>'+body+'<div class="idea-card-meta">'+tag+date+'<div class="idea-card-actions">'+editBtn+delBtn+'</div></div></div>';
+    }).join("");
+    const ic=document.getElementById("ideas-count-label");if(ic)ic.textContent=allIdeas.length+" idea"+(allIdeas.length!==1?"s":"")+" guardada"+(allIdeas.length!==1?"s":"");
+    lucide.createIcons();
+}
+
+// ── POTENCIALES (colección: potenciales) ──────────────────────
+// Campos legacy: nombre, apellido, canal, email, phone
+function renderPotenciales(){
+    const el=document.getElementById("potenciales-list");if(!el)return;
+    if(!allPotenciales.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="users" size="32"></i>Sin potenciales cargados.</div>';lucide.createIcons();return}
+    const etapaLabel={contacto:"Primer contacto",reunion:"Reunión agendada",propuesta:"Propuesta enviada",negociacion:"En negociación",perdido:"Perdido"};
+    el.innerHTML=allPotenciales.map(p=>{
+        const fullName=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||p.company||"Sin nombre";
+        const phone=p.phone||p.contacto||p.contact||"";
+        const email=p.email||"";
+        const canal=p.canal||p.origen||"";
+        const notas=p.notas||p.notes||"";
+        const contactParts=[];
+        if(phone)contactParts.push('<span class="cli-contact-item"><i data-lucide="message-circle" size="12"></i>'+phone+'</span>');
+        if(email)contactParts.push('<span class="cli-contact-item"><i data-lucide="mail" size="12"></i>'+email+'</span>');
+        if(canal)contactParts.push('<span class="cli-contact-item"><i data-lucide="share-2" size="12"></i>'+canal+'</span>');
+        const etapa=p.etapa||"contacto";
+        return '<div class="pipeline-card"><div class="pipeline-card-header"><div><div class="pipeline-card-name">'+fullName+'</div><div class="pipeline-card-sub">'+(p.rubro||"")+'</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><span class="pipeline-etapa '+etapa+'">'+(etapaLabel[etapa]||"Contacto")+'</span><div style="display:flex;gap:4px"><button class="btn-icon" data-action="edit-potencial" data-id="'+p.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button><button class="btn-icon" data-action="delete-potencial" data-id="'+p.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button></div></div></div>'+(contactParts.length?'<div class="cli-contact-grid" style="margin-bottom:8px">'+contactParts.join("")+'</div>':"")+(notas?'<div class="pipeline-card-notas">'+notas+'</div>':"")+'<div class="pipeline-card-footer">'+(p.servicio?'<span class="badge info">'+p.servicio+'</span>':"")+'<button class="btn-convertir" data-action="convertir-potencial" data-id="'+p.id+'" data-nombre="'+fullName+'" data-contacto="'+phone+'" data-rubro="'+(p.rubro||"")+'"><i data-lucide="user-check" size="12"></i> Convertir a Cliente</button></div></div>';
+    }).join("");
+    const pc=document.getElementById("pot-count-label");if(pc)pc.textContent=allPotenciales.length+" potencial"+(allPotenciales.length!==1?"es":"")+" en pipeline";
+    lucide.createIcons();
+}
+
+// ── REUNIONES (colección: eventos) ────────────────────────────
+// Campos legacy: title, date, time, meetLink, status
+function renderReuniones(){
+    const el=document.getElementById("reuniones-list");if(!el)return;
+    if(!allReuniones.length){el.innerHTML='<div class="empty-state"><i data-lucide="calendar" size="32"></i>Sin reuniones registradas.</div>';lucide.createIcons();return}
+    const tipoMap={potencial:{cls:"potencial",lbl:"Potencial"},cliente:{cls:"cliente",lbl:"Cliente"},proyecto:{cls:"proyecto",lbl:"Proyecto"},interno:{cls:"interno",lbl:"Interno"}};
+    const today=getTodayStr();
+    const proximas=allReuniones.filter(r=>(r.fecha||r.date||"")>=today).sort((a,b)=>(a.fecha||a.date||"").localeCompare(b.fecha||b.date||""));
+    const pasadas=allReuniones.filter(r=>(r.fecha||r.date||"")<today).sort((a,b)=>(b.fecha||b.date||"").localeCompare(a.fecha||a.date||""));
+    const rc=document.getElementById("reu-count-label");
+    if(rc)rc.textContent=proximas.length+" próxima"+(proximas.length!==1?"s":"")+" · "+allReuniones.length+" en total";
+
+    function card(r){
+        const rfecha=r.fecha||r.date||"";
+        const rtitulo=r.titulo||r.title||"Sin título";
+        const rlink=r.link||r.meetLink||"";
+        const restado=r.estado||r.status||"pendiente";
+        const rtipo=r.tipo||"interno";
+        const rcontraparte=r.contraparte||"";
+        const rnotas=r.notas||"";
+        const[y,m,d]=(rfecha||"0000-00-00").split("-");
+        const mN=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+        const t2=tipoMap[rtipo]||{cls:"interno",lbl:"Reunión"};
+        const estadoLabel={pendiente:"Pendiente",cumplimentada:"Cumplimentada",cancelada:"Cancelada",Realizada:"Realizada"};
+        return '<div class="meeting-card"><div class="meeting-date-block"><div class="meeting-date-day">'+(d||"?")+'</div><div class="meeting-date-mon">'+(mN[parseInt(m||1)-1]||"—")+'</div></div><div class="meeting-body"><div class="meeting-title">'+rtitulo+'</div><div class="meeting-meta">'+(r.hora||r.time?'<span class="meeting-time"><i data-lucide="clock" size="11"></i>'+(r.hora||r.time)+'</span>':"")+'<span class="meeting-tipo '+t2.cls+'">'+t2.lbl+'</span>'+(rcontraparte?'<span style="font-size:var(--text-xs);color:var(--text-dim)">'+rcontraparte+'</span>':"")+(rlink?'<a href="'+rlink+'" target="_blank" class="btn-secondary btn-sm" style="font-size:0.65rem;padding:2px 10px"><i data-lucide="video" size="10"></i> Entrar</a>':"")+'</div>'+(rnotas?'<div class="meeting-notes">'+rnotas+'</div>':"")+'</div><div class="meeting-actions" style="opacity:1;display:flex;flex-direction:column;gap:4px;align-items:flex-end"><select class="reunion-estado-select '+restado+'" data-action="change-reunion-estado" data-id="'+r.id+'"><option value="pendiente" '+(restado==="pendiente"?"selected":"")+'>Pendiente</option><option value="cumplimentada" '+(restado==="cumplimentada"||restado==="Realizada"?"selected":"")+'>Cumplimentada</option><option value="cancelada" '+(restado==="cancelada"?"selected":"")+'>Cancelada</option></select><button class="btn-icon" data-action="delete-reunion" data-id="'+r.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></div></div>';
+    }
+    let html="";
+    if(proximas.length){html+='<div class="meetings-section-label">Próximas ('+proximas.length+')</div><div style="display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-6)">'+proximas.map(card).join("")+'</div>';}
+    if(pasadas.length){html+='<div class="meetings-section-label">Pasadas</div><div style="display:flex;flex-direction:column;gap:var(--space-3);opacity:.8">'+pasadas.slice(0,10).map(card).join("")+'</div>';}
+    el.innerHTML=html;
+    lucide.createIcons();
 }
 auth.onAuthStateChanged(user=>{firebaseUser=user;if(user&&localUser)startRealtimeListeners()});
 lucide.createIcons();
