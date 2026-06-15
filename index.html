@@ -2331,6 +2331,7 @@ document.getElementById("login-form").addEventListener("submit",async e=>{
     err.style.display="none";
     try{await auth.signInAnonymously();}catch(ex){err.textContent="⚠️ Error de conexión: "+ex.message;err.style.display="block";return}
     localUser=user;
+    sessionStorage.setItem("ti_user",user);
     const ov=document.getElementById("login-overlay");ov.style.opacity="0";
     setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners();},300);
 });
@@ -2417,6 +2418,20 @@ function openProyectoDetalle(pid){
 
     switchView("view-proyecto-detalle");
     lucide.createIcons();
+    // Auto-login si hay sesión guardada
+(function(){
+    const saved=sessionStorage.getItem("ti_user");
+    if(saved&&credentials[saved]!==undefined){
+        localUser=saved;
+        auth.signInAnonymously().then(()=>{
+            const ov=document.getElementById("login-overlay");
+            ov.style.display="none";
+            document.getElementById("app-layout").style.display="block";
+            initGreeting();
+            if(firebaseUser)startRealtimeListeners();
+        }).catch(()=>{});
+    }
+})();
 }
 window.openProyectoDetalle=openProyectoDetalle;
 
