@@ -438,7 +438,155 @@
         .recurso-card-meta{font-size:var(--text-xs);color:var(--text-muted);margin-top:2px}
 .acceso-card-item{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;align-items:center;gap:var(--space-3);transition:box-shadow .15s}
         .acceso-card-item:hover{box-shadow:var(--shadow-md)}
-            </style>
+        
+        /* ══════════════════════════════════════════════
+           MOBILE RESPONSIVE — COMPLETO
+           ══════════════════════════════════════════════ */
+
+        /* Touch targets */
+        .btn-icon { min-width:36px; min-height:36px; }
+
+        /* Topbar mobile */
+        @media(max-width:768px){
+            .topbar { padding: var(--space-3) var(--space-3); gap: var(--space-2); }
+            .topbar-greeting h1 { font-size: var(--text-sm); }
+            .topbar-greeting p { display: none; }
+            .topbar-actions .btn-secondary { display: none; }
+            .topbar-actions .btn-primary { padding: 7px 12px; font-size: var(--text-xs); }
+        }
+
+        /* Sidebar mobile */
+        @media(max-width:1024px){
+            .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+            .sidebar.open { transform: translateX(0); }
+            .btn-close-sidebar { display: flex; }
+            .main-content { margin-left: 0; }
+            .mobile-menu-btn { display: flex; }
+        }
+
+        /* Views */
+        @media(max-width:768px){
+            .view { padding: var(--space-3); gap: var(--space-3); }
+            .view-header { flex-direction: column; align-items: flex-start; }
+            .view-title { font-size: var(--text-lg); }
+        }
+
+        /* Panel inicio — columnas */
+        @media(max-width:900px){ .panel-hoy-cols { grid-template-columns: 1fr 1fr; } }
+        @media(max-width:600px){ .panel-hoy-cols { grid-template-columns: 1fr; } }
+
+        /* Quick add bar */
+        @media(max-width:600px){
+            .quick-add-bar { flex-wrap: wrap; gap: var(--space-2); }
+            .quick-add-bar input[type="text"] { width: 100%; order: -1; min-width: 0; }
+            .quick-add-bar select { flex: 1; min-width: 80px; font-size: var(--text-xs); }
+            .quick-add-bar .btn-primary { width: 100%; justify-content: center; }
+        }
+
+        /* Horas widget */
+        @media(max-width:600px){
+            .horas-widget { flex-direction: column; gap: var(--space-1); }
+            .horas-widget-value { font-size: 2rem; }
+        }
+
+        /* Col stats grid */
+        @media(max-width:480px){
+            .panel-col > div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Tablero proyectos inicio */
+        @media(max-width:768px){
+            .data-table { font-size: var(--text-xs); }
+            .data-table th, .data-table td { padding: 8px var(--space-2); }
+            /* Hide less important columns on mobile */
+            .data-table th:nth-child(4),
+            .data-table td:nth-child(4) { display: none; }
+        }
+        @media(max-width:480px){
+            .data-table th:nth-child(3),
+            .data-table td:nth-child(3) { display: none; }
+        }
+
+        /* Modales */
+        @media(max-width:600px){
+            .modal-box { width: 100%; max-height: 95vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; position: fixed; bottom: 0; left: 0; right: 0; animation: slideUp .25s var(--ease-std); }
+            .modal-overlay.open { align-items: flex-end; }
+            .modal-header { padding: var(--space-4); }
+            .modal-body { padding: var(--space-4); }
+            .form-grid-2 { grid-template-columns: 1fr; }
+            .summary-modal-box { max-width: 100%; }
+            .edit-modal-box { max-width: 100%; }
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        /* Filtros bar */
+        @media(max-width:600px){
+            .filtros-bar { flex-wrap: wrap; gap: var(--space-2); }
+            .filtros-bar select,
+            .filtros-bar input { flex: 1; min-width: 120px; font-size: var(--text-xs); }
+        }
+
+        /* Pipeline cards */
+        @media(max-width:600px){
+            .pipeline-grid { grid-template-columns: 1fr; }
+            .mkt-grid { grid-template-columns: 1fr; }
+            .ideas-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Meeting cards */
+        @media(max-width:480px){
+            .meeting-card { flex-wrap: wrap; }
+            .meeting-date-block { width: 44px; }
+            .meeting-actions { opacity: 1; }
+        }
+
+        /* Recurso cards */
+        @media(max-width:480px){
+            .recurso-card { flex-wrap: wrap; }
+            .recurso-card-body { min-width: 0; }
+        }
+
+        /* Proj detalle */
+        @media(max-width:600px){
+            .proj-detalle-header { flex-direction: column; }
+            .proj-detalle-tabs { gap: 0; }
+            .proj-detalle-tab { padding: 10px var(--space-3); font-size: var(--text-xs); }
+            .summary-bit-input-area { flex-wrap: wrap; }
+            .summary-bit-input-area input { width: 100%; }
+            .summary-bit-input-area select { flex: 1; }
+        }
+
+        /* Accesos rápidos grid */
+        @media(max-width:480px){
+            #accesos-list { grid-template-columns: 1fr !important; }
+        }
+
+        /* Bit entry actions siempre visibles en mobile */
+        @media(max-width:768px){
+            .bit-delete { opacity: 1 !important; }
+            .meeting-actions { opacity: 1 !important; }
+            .idea-card-actions { opacity: 1 !important; }
+            .bit-entry-actions { opacity: 1 !important; }
+        }
+
+        /* Clients list */
+        @media(max-width:480px){
+            .cli-contact-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Gastos resumen */
+        @media(max-width:480px){
+            #gastos-resumen { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* Strip semana */
+        @media(max-width:480px){
+            .strip-semana { gap: var(--space-3); padding: var(--space-3) var(--space-4); }
+            .strip-sep { display: none; }
+            .strip-semana .sv { font-size: var(--text-lg); }
+        }
+
+    </style>
 </head>
 <body>
 <div id="toast-notification"></div>
@@ -1077,6 +1225,27 @@
     </div>
 </div>
 
+<!-- MODAL EDITAR NOTA -->
+<div id="modal-edit-nota" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+            <span class="modal-title">Editar Nota</span>
+            <button class="btn-icon" id="btn-close-edit-nota"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit-nota" class="form-grid">
+                <input type="hidden" id="edit-nota-id">
+                <div class="form-group"><label>Nota</label>
+                    <textarea id="edit-nota-text" class="form-control" rows="4" required></textarea>
+                </div>
+                <div class="form-footer">
+                    <button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- APP LAYOUT -->
 <div id="app-layout">
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -1103,11 +1272,6 @@
             <div class="nav-item" data-view="view-brainstorming"><i data-lucide="lightbulb" size="16"></i> Ideas</div>
             <div class="nav-item" data-view="view-accesos"><i data-lucide="link-2" size="16"></i> Accesos Rápidos</div>
             <div class="nav-item" data-view="view-gastos"><i data-lucide="wallet" size="16"></i> Gastos</div>
-            <div class="nav-section-label">Herramientas PCA™</div>
-            <a class="nav-item" href="https://msoledadvila-afk.github.io/hub-pca/" target="_blank" style="text-decoration:none">
-                <i data-lucide="brain-circuit" size="16"></i> Hub PCA™
-                <span style="margin-left:auto;font-size:0.6rem;color:var(--text-muted);font-weight:500">↗</span>
-            </a>
         </nav>
         <div class="user-profile-nav">
             <div class="avatar" id="nav-avatar">S</div>
@@ -1696,7 +1860,9 @@ function startRealtimeListeners(){
     unsubscribers.push(listen("potenciales",arr=>{allPotenciales=arr},renderPotenciales));
     unsubscribers.push(listen("eventos",arr=>{allReuniones=arr},renderReuniones));
     unsubscribers.push(listen("ideas",arr=>{allIdeas=arr},renderIdeas));
-    unsubscribers.push(listen("notas_compartidas",arr=>{allNotas=arr},null));
+    unsubscribers.push(listen("notas_compartidas",arr=>{allNotas=arr},()=>{
+        if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdNotas(currentProyectoId);
+    }));
     unsubscribers.push(listen("gastos",arr=>{allGastos=arr},renderGastos));
     unsubscribers.push(listen("marketing",arr=>{allMarketing=arr},renderMarketing));
     unsubscribers.push(listen("enlaces_internos",arr=>{allAccesos=arr},renderAccesos));
@@ -2010,6 +2176,16 @@ document.addEventListener("click",async e=>{
     if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.title||a.titulo||"";document.getElementById("acc-tipo").value=a.type||a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
     if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("enlaces_internos",id);showToast("Enlace eliminado")}
     if(ac==="delete-gasto"&&confirm("¿Eliminar este gasto?")){await deleteItem("gastos",id);showToast("Gasto eliminado")}
+    if(ac==="edit-nota"){
+        document.getElementById("edit-nota-id").value=id;
+        document.getElementById("edit-nota-text").value=decodeURIComponent(btn.dataset.text||"");
+        document.getElementById("modal-edit-nota").classList.add("open");
+    }
+    if(ac==="delete-nota"&&confirm("¿Eliminar esta nota?")){
+        await deleteItem("notas_compartidas",id);
+        if(currentProyectoId)renderPdNotas(currentProyectoId);
+        showToast("Nota eliminada");
+    }
     if(ac==="convertir-potencial"){
         if(!confirm('¿Convertir "'+btn.dataset.nombre+'" a cliente activo?'))return;
         await col("clientes").add({name:btn.dataset.nombre,contact:btn.dataset.contacto||"",phone:btn.dataset.contacto||"",rubro:btn.dataset.rubro||"",status:"active",notes:"Convertido desde potenciales",addedBy:localUser,createdAt:Date.now()});
@@ -2322,6 +2498,22 @@ document.getElementById("form-edit-recurso")?.addEventListener("submit",async e=
     showToast("Recurso actualizado ✓");
 });
 
+// EDITAR NOTA
+document.getElementById("btn-close-edit-nota")?.addEventListener("click",()=>document.getElementById("modal-edit-nota").classList.remove("open"));
+document.getElementById("modal-edit-nota")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-nota"))document.getElementById("modal-edit-nota").classList.remove("open")});
+document.getElementById("form-edit-nota")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    const id=document.getElementById("edit-nota-id").value;
+    const text=document.getElementById("edit-nota-text").value.trim();
+    if(!id||!text)return;
+    try{
+        await col("notas_compartidas").doc(id).update({text,updatedAt:Date.now()});
+        document.getElementById("modal-edit-nota").classList.remove("open");
+        if(currentProyectoId)renderPdNotas(currentProyectoId);
+        showToast("Nota actualizada ✓");
+    }catch(err){showToast("Error: "+err.message,"err");}
+});
+
 // LOGIN
 const credentials={Soledad:"sole123",Gabriel:"gaby123"};
 document.getElementById("login-form").addEventListener("submit",async e=>{
@@ -2331,7 +2523,6 @@ document.getElementById("login-form").addEventListener("submit",async e=>{
     err.style.display="none";
     try{await auth.signInAnonymously();}catch(ex){err.textContent="⚠️ Error de conexión: "+ex.message;err.style.display="block";return}
     localUser=user;
-    sessionStorage.setItem("ti_user",user);
     const ov=document.getElementById("login-overlay");ov.style.opacity="0";
     setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners();},300);
 });
@@ -2418,20 +2609,6 @@ function openProyectoDetalle(pid){
 
     switchView("view-proyecto-detalle");
     lucide.createIcons();
-    // Auto-login si hay sesión guardada
-(function(){
-    const saved=sessionStorage.getItem("ti_user");
-    if(saved&&credentials[saved]!==undefined){
-        localUser=saved;
-        auth.signInAnonymously().then(()=>{
-            const ov=document.getElementById("login-overlay");
-            ov.style.display="none";
-            document.getElementById("app-layout").style.display="block";
-            initGreeting();
-            if(firebaseUser)startRealtimeListeners();
-        }).catch(()=>{});
-    }
-})();
 }
 window.openProyectoDetalle=openProyectoDetalle;
 
@@ -2548,7 +2725,18 @@ function renderPdNotas(pid){
         el.innerHTML='<div class="empty-state"><i data-lucide="sticky-note" size="28"></i>Sin notas en este proyecto.</div>';
         lucide.createIcons();return;
     }
-    el.innerHTML=notas.map(n=>'<div class="note-item" style="margin-bottom:8px"><strong>'+n.addedBy+':</strong> '+n.text+'</div>').join("");
+    el.innerHTML=notas.map(n=>`
+        <div class="note-item" style="margin-bottom:8px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:var(--space-3);background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-md);">
+            <div style="flex:1;min-width:0">
+                <div style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:4px;font-weight:600">${n.addedBy||""}</div>
+                <div style="font-size:var(--text-sm);color:var(--text);white-space:pre-wrap;word-break:break-word">${n.text||""}</div>
+            </div>
+            <div style="display:flex;gap:2px;flex-shrink:0">
+                <button class="btn-icon" data-action="edit-nota" data-id="${n.id}" data-text="${encodeURIComponent(n.text||"")}" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button>
+                <button class="btn-icon" data-action="delete-nota" data-id="${n.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>
+            </div>
+        </div>`).join("");
+    lucide.createIcons();
 }
 
 document.getElementById("form-pd-nota")?.addEventListener("submit",async e=>{
