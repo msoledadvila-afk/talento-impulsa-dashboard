@@ -1373,6 +1373,10 @@
                 <i data-lucide="brain-circuit" size="16"></i> Hub PCA™
                 <span style="margin-left:auto;font-size:0.6rem;color:var(--text-muted);font-weight:500">↗</span>
             </a>
+            <a class="nav-item" href="https://msoledadvila-afk.github.io/presupuestos-pca/" target="_blank" style="text-decoration:none">
+                <i data-lucide="calculator" size="16"></i> Presupuestos PCA™
+                <span style="margin-left:auto;font-size:0.6rem;color:var(--text-muted);font-weight:500">↗</span>
+            </a>
         </nav>
         <div class="user-profile-nav">
             <div class="avatar" id="nav-avatar">S</div>
@@ -2568,6 +2572,22 @@ document.getElementById("modal-acceso")?.addEventListener("click",e=>{if(e.targe
 document.getElementById("btn-open-idea-modal")?.addEventListener("click",()=>{
     document.getElementById("form-add-idea").reset();
     document.getElementById("modal-idea").classList.add("open");
+});
+document.getElementById("form-add-idea")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
+    const data={
+        titulo:document.getElementById("idea-titulo").value.trim(),
+        categoria:document.getElementById("idea-categoria").value,
+        cuerpo:document.getElementById("idea-cuerpo").value.trim(),
+        addedBy:localUser,createdAt:Date.now(),updatedAt:Date.now()
+    };
+    try{
+        await col("ideas").add(data);
+        document.getElementById("form-add-idea").reset();
+        document.getElementById("modal-idea").classList.remove("open");
+        showToast("Idea guardada ✓");
+    }catch(err){console.error(err);showToast("Error al guardar: "+err.message,"err");}
 });
 document.getElementById("btn-close-idea-modal")?.addEventListener("click",()=>document.getElementById("modal-idea").classList.remove("open"));
 document.getElementById("modal-idea")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-idea"))document.getElementById("modal-idea").classList.remove("open")});
