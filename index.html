@@ -1655,11 +1655,17 @@
         <section id="view-proyectos" class="view">
             <div class="view-header">
                 <div class="view-title">Proyectos</div>
-                <button class="btn-primary" onclick="openNuevoModal('tab-proyecto')"><i data-lucide="folder-plus" size="16"></i> Nuevo proyecto</button>
+                <div style="display:flex;align-items:center;gap:var(--space-3);">
+                    <div style="display:flex;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">
+                        <button id="toggle-semana" onclick="setPeriodo('semana')" style="padding:6px 14px;font-size:var(--text-xs);font-weight:600;background:var(--brand-primary);color:white;border:none;cursor:pointer;transition:all .2s;">Semana</button>
+                        <button id="toggle-mes" onclick="setPeriodo('mes')" style="padding:6px 14px;font-size:var(--text-xs);font-weight:600;background:transparent;color:var(--text-muted);border:none;cursor:pointer;transition:all .2s;">Mes</button>
+                    </div>
+                    <button class="btn-primary" onclick="openNuevoModal('tab-proyecto')"><i data-lucide="folder-plus" size="16"></i> Nuevo proyecto</button>
+                </div>
             </div>
             <div class="card" style="overflow-x:auto">
                 <table class="data-table">
-                    <thead><tr><th>Proyecto</th><th>Estado</th><th>Progreso</th><th>Hs semana</th><th>Entrega</th><th></th></tr></thead>
+                    <thead><tr><th>Proyecto</th><th>Estado</th><th>Progreso</th><th id="th-hs-periodo">Hs semana</th><th>Entrega</th><th></th></tr></thead>
                     <tbody id="projects-table-full"></tbody>
                 </table>
             </div>
@@ -1810,6 +1816,7 @@ const col=n=>db.collection(["artifacts",APP_ID,"public","data",n].join("/"));
 
 function getTodayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function getWeekStart(){const d=new Date(),day=d.getDay(),diff=d.getDate()-(day===0?6:day-1),m=new Date(new Date(d).setDate(diff));return `${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,"0")}-${String(m.getDate()).padStart(2,"0")}`}
+function getMonthStart(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-01`}
 function tsToDateStr(ts){if(!ts)return getTodayStr();const d=new Date(typeof ts==="object"?ts.seconds*1000:ts);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
 function formatDateLabel(ds){const t=getTodayStr(),yd=(()=>{const d=new Date();d.setDate(d.getDate()-1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`})();if(ds===t)return "Hoy";if(ds===yd)return "Ayer";const[y,m,d]=ds.split("-");return `${d}/${m}/${y}`}
 function hsLabel(v){const n=parseFloat(v)||0;return n===1?"1 hs":`${n} hs`}
@@ -2138,9 +2145,19 @@ function renderBitacoraFull(){
     lucide.createIcons()
 }
 
+var _proyPeriodo="semana";
+function setPeriodo(p){
+    _proyPeriodo=p;
+    const btnS=document.getElementById("toggle-semana"),btnM=document.getElementById("toggle-mes");
+    const th=document.getElementById("th-hs-periodo");
+    if(btnS){btnS.style.background=p==="semana"?"var(--brand-primary)":"transparent";btnS.style.color=p==="semana"?"white":"var(--text-muted)";}
+    if(btnM){btnM.style.background=p==="mes"?"var(--brand-primary)":"transparent";btnM.style.color=p==="mes"?"white":"var(--text-muted)";}
+    if(th) th.textContent=p==="semana"?"Hs semana":"Hs mes";
+    renderProjectsTable();
+}
 function renderProjectsTable(){
-    const ws=getWeekStart();
-    const wb=allBitacoras.filter(b=>(b.date||tsToDateStr(b.createdAt))>=ws);
+    const cutoff=_proyPeriodo==="mes"?getMonthStart():getWeekStart();
+    const wb=allBitacoras.filter(b=>(b.date||tsToDateStr(b.createdAt))>=cutoff);
     const hsP=pid=>wb.filter(b=>b.projectId===pid).reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
     const da=ds=>{if(!ds)return{cls:"",txt:"—"};const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds+"T00:00:00");const diff=Math.ceil((d-t)/86400000);if(diff<0)return{cls:"badge warn",txt:"Vencida"};if(diff<=7)return{cls:"badge warn",txt:`${diff}d`};const[y,m,dy]=ds.split("-");return{cls:"",txt:`${dy}/${m}`}};
     const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
