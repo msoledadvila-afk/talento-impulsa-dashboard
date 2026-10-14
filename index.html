@@ -51,6 +51,23 @@
         .badge.paused{background:var(--status-paused-bg);color:var(--status-paused)}
         .badge.info{background:#DBEAFE;color:#1E40AF}
         .badge.warn{background:#FEF9C3;color:#92400E}
+        .badge.archived{background:#ECEBE6;color:#6B6A65}
+        .lab-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.65rem;font-weight:700;padding:1px 7px;border-radius:var(--radius-pill);background:#E1F5EE;color:#0F6E56;margin-left:6px;vertical-align:middle}
+        .proj-meta{font-size:var(--text-xs);color:var(--text-dim);margin-bottom:2px;letter-spacing:0.01em}
+        .proj-meta .area-chip{font-weight:700;color:var(--brand-primary)}
+        .prio{display:inline-flex;padding:2px 8px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700}
+        .prio.alta{background:#FEE2E2;color:#B91C1C}.prio.media{background:#FEF9C3;color:#92400E}.prio.baja{background:#DBEAFE;color:#1E40AF}
+        .pend-status-select{border:1px solid var(--border);border-radius:var(--radius-md);padding:4px 8px;font-size:var(--text-xs);background:var(--bg);color:var(--text);font-family:var(--font-body)}
+        .filtros-bar input[type="text"]{border:1px solid var(--border);border-radius:var(--radius-md);padding:7px 10px;background:var(--bg);color:var(--text);font-size:var(--text-sm);font-family:var(--font-body);min-width:160px}
+        .clasif-row-warn td{background:#FFFBEB}
+        .clasif-ok{color:var(--brand-green);font-weight:700;font-size:var(--text-xs)}
+        .clasif-warn{color:#B45309;font-weight:700;font-size:var(--text-xs)}
+        .clasif-pend{color:var(--brand-primary);font-weight:700;font-size:var(--text-xs)}
+        .clasif-new{color:#1E40AF;font-weight:700;font-size:var(--text-xs)}
+        #clasif-body .form-control{padding:6px 8px;font-size:var(--text-xs)}
+        .check-row{display:flex;align-items:center;gap:8px;font-size:var(--text-sm);cursor:pointer}
+        .check-row input{width:16px;height:16px;accent-color:var(--brand-primary)}
+        .login-note{font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-4)}
 
         .form-group{display:flex;flex-direction:column;gap:5px}
         .form-group label{font-size:var(--text-xs);font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.04em}
@@ -679,20 +696,43 @@
         <p class="login-subtitle">Dashboard Operativo</p>
         <div id="login-error"></div>
         <form id="login-form" style="display:flex;flex-direction:column;gap:var(--space-4)">
-            <div class="form-group" style="text-align:left"><label>Perfil</label>
-                <select id="user-select" class="form-control" required>
-                    <option value="" disabled selected>Seleccioná tu perfil...</option>
-                    <option value="Soledad">Soledad</option>
-                    <option value="Gabriel">Gabriel</option>
-                </select>
-            </div>
-            <div class="form-group" style="text-align:left"><label>Contraseña</label>
-                <input type="password" id="password-input" class="form-control" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn-primary" style="width:100%;justify-content:center">
-                <i data-lucide="log-in" size="16"></i> Ingresar
+            <button type="submit" class="btn-primary" id="btn-google-login" style="width:100%;justify-content:center" disabled>
+                <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#fff" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/></svg>
+                <span id="btn-google-login-label">Verificando sesión…</span>
             </button>
         </form>
+        <p class="login-note">Acceso solo para las cuentas autorizadas de Talento Impulsa.</p>
+    </div>
+</div>
+
+<!-- MODAL PENDIENTE -->
+<div id="modal-pendiente" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-title" id="pend-modal-title">Nuevo pendiente</span>
+            <button class="btn-icon" id="btn-close-pend-modal"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-pendiente" class="form-grid form-grid-2">
+                <input type="hidden" id="pend-id">
+                <div class="form-group" style="grid-column:1/-1"><label>Proyecto *</label>
+                    <select id="pend-project" class="form-control" required></select>
+                    <div id="pend-area-hint" style="font-size:var(--text-xs);color:var(--text-dim);margin-top:4px">Área: —</div>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>Pendiente *</label>
+                    <textarea id="pend-detail" class="form-control" rows="3" placeholder="¿Qué hay que hacer?" required></textarea>
+                </div>
+                <div class="form-group"><label>Estado</label>
+                    <select id="pend-status" class="form-control"><option value="pending">Pendiente</option><option value="in-progress">En curso</option><option value="blocked">Bloqueado</option><option value="done">Hecho</option></select>
+                </div>
+                <div class="form-group"><label>Prioridad</label>
+                    <select id="pend-priority" class="form-control"><option value="alta">Alta</option><option value="media" selected>Media</option><option value="baja">Baja</option></select>
+                </div>
+                <div class="form-group"><label>Fecha</label><input type="date" id="pend-date" class="form-control" required></div>
+                <div class="form-group"><label>Fecha límite</label><input type="date" id="pend-due" class="form-control"></div>
+                <div class="form-footer" style="grid-column:1/-1"><button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar</button></div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -761,9 +801,13 @@
                         </select>
                     </div>
                     <div class="form-group"><label>Progreso (%)</label><input type="number" id="proj-progress" class="form-control" value="0" min="0" max="100"></div>
-                    <div class="form-group"><label>Cliente</label>
-                        <select id="proj-client" class="form-control"><option value="">— Talento (sin cliente) —</option></select>
+                    <div class="form-group"><label>Área *</label>
+                        <select id="proj-area" class="form-control" required></select>
                     </div>
+                    <div class="form-group" id="proj-client-group" style="display:none"><label>Cliente *</label>
+                        <select id="proj-client" class="form-control"><option value="">Elegí un cliente…</option></select>
+                    </div>
+                    <div class="form-group" style="justify-content:flex-end"><label class="check-row"><input type="checkbox" id="proj-lab"> Laboratorio / Portfolio</label></div>
                     <div class="form-group"><label>Kickoff</label><input type="date" id="proj-kickoff" class="form-control"></div>
                     <div class="form-group"><label>Entrega</label><input type="date" id="proj-delivery" class="form-control"></div>
                     <div class="form-group" style="grid-column:1/-1"><label>Descripción</label><textarea id="proj-desc" class="form-control"></textarea></div>
@@ -1154,12 +1198,17 @@
                     <select id="edit-proj-status" class="form-control">
                         <option value="active">En progreso</option><option value="pending">Pendiente</option>
                         <option value="done">Completado</option><option value="paused">Pausado</option>
+                        <option value="archived">Archivado</option>
                     </select>
                 </div>
                 <div class="form-group"><label>Progreso (%)</label><input type="number" id="edit-proj-progress" class="form-control" min="0" max="100"></div>
-                <div class="form-group"><label>Cliente</label>
-                    <select id="edit-proj-client" class="form-control"><option value="">— Sin cliente (Talento) —</option></select>
+                <div class="form-group"><label>Área *</label>
+                    <select id="edit-proj-area" class="form-control" required></select>
                 </div>
+                <div class="form-group" id="edit-proj-client-group" style="display:none"><label>Cliente *</label>
+                    <select id="edit-proj-client" class="form-control"><option value="">Elegí un cliente…</option></select>
+                </div>
+                <div class="form-group" style="justify-content:flex-end"><label class="check-row"><input type="checkbox" id="edit-proj-lab"> Laboratorio / Portfolio</label></div>
                 <div class="form-group"><label>Kickoff</label><input type="date" id="edit-proj-kickoff" class="form-control"></div>
                 <div class="form-group"><label>Entrega</label><input type="date" id="edit-proj-delivery" class="form-control"></div>
                 <div class="form-group" style="grid-column:1/-1"><label>Descripción / Notas</label><textarea id="edit-proj-desc" class="form-control" rows="3"></textarea></div>
@@ -1357,6 +1406,10 @@
                 <i data-lucide="book-open" size="16"></i> Bitácora
                 <span class="nav-badge" id="nav-bit-badge" style="display:none">0</span>
             </div>
+            <div class="nav-item" data-view="view-pendientes">
+                <i data-lucide="list-checks" size="16"></i> Pendientes
+                <span class="nav-badge" id="nav-pend-badge" style="display:none">0</span>
+            </div>
             <div class="nav-section-label">Operaciones</div>
             <div class="nav-item" data-view="view-proyectos"><i data-lucide="folder-kanban" size="16"></i> Proyectos</div>
             <div class="nav-item" data-view="view-clientes"><i data-lucide="users" size="16"></i> Clientes</div>
@@ -1382,7 +1435,7 @@
             <div class="avatar" id="nav-avatar">S</div>
             <div style="flex-grow:1;overflow:hidden">
                 <div style="font-weight:600;font-size:var(--text-sm)" id="nav-username">Usuario</div>
-                <div style="font-size:0.7rem;color:var(--text-dim)">Talento Impulsa</div>
+                <div style="font-size:0.7rem;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="nav-user-email">Talento Impulsa</div>
             </div>
             <button class="btn-icon" id="btn-logout" title="Cerrar sesión"><i data-lucide="log-out" size="16"></i></button>
         </div>
@@ -1520,7 +1573,7 @@
                 </div>
                 <div style="overflow-x:auto">
                     <table class="data-table">
-                        <thead><tr><th>Proyecto</th><th>Estado</th><th>Progreso</th><th>Hs semana</th><th>Entrega</th><th></th></tr></thead>
+                        <thead><tr><th>Área · Cliente · Proyecto</th><th>Estado</th><th>Progreso</th><th>Hs semana</th><th>Entrega</th><th></th></tr></thead>
                         <tbody id="projects-table-inicio"></tbody>
                     </table>
                 </div>
@@ -1660,14 +1713,81 @@
                         <button id="toggle-semana" onclick="setPeriodo('semana')" style="padding:6px 14px;font-size:var(--text-xs);font-weight:600;background:var(--brand-primary);color:white;border:none;cursor:pointer;transition:all .2s;">Semana</button>
                         <button id="toggle-mes" onclick="setPeriodo('mes')" style="padding:6px 14px;font-size:var(--text-xs);font-weight:600;background:transparent;color:var(--text-muted);border:none;cursor:pointer;transition:all .2s;">Mes</button>
                     </div>
+                    <button class="btn-secondary" data-action="open-clasif"><i data-lucide="tags" size="16"></i> Clasificación inicial</button>
                     <button class="btn-primary" onclick="openNuevoModal('tab-proyecto')"><i data-lucide="folder-plus" size="16"></i> Nuevo proyecto</button>
                 </div>
             </div>
+            <div class="filtros-bar" style="margin-bottom:var(--space-4)">
+                <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
+                <input type="text" id="flt-proj-nombre" placeholder="Buscar proyecto…">
+                <select id="flt-proj-area"></select>
+                <select id="flt-proj-cliente"><option value="">Todos los clientes</option></select>
+                <select id="flt-proj-lab"><option value="">Laboratorio: todos</option><option value="si">Solo Laboratorio / Portfolio</option><option value="no">Sin Laboratorio</option></select>
+                <select id="flt-proj-estado"><option value="">Todos (sin archivados)</option><option value="active">En progreso</option><option value="pending">Pendiente</option><option value="paused">Pausado</option><option value="done">Completado</option><option value="archived">Archivados</option></select>
+                <button class="btn-secondary btn-sm" id="btn-clear-proj-filters"><i data-lucide="x" size="12"></i> Limpiar</button>
+            </div>
             <div class="card" style="overflow-x:auto">
                 <table class="data-table">
-                    <thead><tr><th>Proyecto</th><th>Estado</th><th>Progreso</th><th id="th-hs-periodo">Hs semana</th><th>Entrega</th><th></th></tr></thead>
+                    <thead><tr><th>Área · Cliente · Proyecto</th><th>Estado</th><th>Progreso</th><th id="th-hs-periodo">Hs semana</th><th>Entrega</th><th></th></tr></thead>
                     <tbody id="projects-table-full"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <!-- PENDIENTES -->
+        <section id="view-pendientes" class="view">
+            <div class="view-header">
+                <div class="view-title">Pendientes</div>
+                <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+                    <button class="btn-secondary" id="btn-export-pend"><i data-lucide="sheet" size="16"></i> Exportar ahora</button>
+                    <button class="btn-primary" id="btn-open-pend-modal"><i data-lucide="plus" size="16"></i> Nuevo pendiente</button>
+                </div>
+            </div>
+            <div class="strip-semana">
+                <div><div class="sv" id="pend-strip-abiertos">—</div><div class="sl">abiertos</div></div>
+                <div class="strip-sep"></div>
+                <div><div class="sv" id="pend-strip-alta">—</div><div class="sl">prioridad alta</div></div>
+                <div class="strip-sep"></div>
+                <div><div class="sv" id="pend-strip-vencidos">—</div><div class="sl">vencidos</div></div>
+                <div class="strip-sep"></div>
+                <div><div class="sv" id="pend-strip-bloqueados">—</div><div class="sl">bloqueados</div></div>
+            </div>
+            <div class="filtros-bar" style="margin-bottom:var(--space-4)">
+                <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
+                <select id="flt-pend-area"></select>
+                <select id="flt-pend-proyecto" style="min-width:170px"></select>
+                <select id="flt-pend-estado"><option value="abiertos">Abiertos</option><option value="">Todos</option><option value="pending">Pendiente</option><option value="in-progress">En curso</option><option value="blocked">Bloqueado</option><option value="done">Hecho</option></select>
+                <select id="flt-pend-prioridad"><option value="">Todas las prioridades</option><option value="alta">Alta</option><option value="media">Media</option><option value="baja">Baja</option></select>
+                <button class="btn-secondary btn-sm" id="btn-clear-pend-filters"><i data-lucide="x" size="12"></i> Limpiar</button>
+            </div>
+            <div class="card" style="overflow-x:auto">
+                <table class="data-table">
+                    <thead><tr><th>Fecha</th><th>Área</th><th>Proyecto</th><th>Pendiente</th><th>Estado</th><th>Prioridad</th><th>Fecha límite</th><th></th></tr></thead>
+                    <tbody id="pend-table"></tbody>
+                </table>
+            </div>
+            <div id="pend-export-info" style="font-size:var(--text-xs);color:var(--text-muted);margin-top:var(--space-3)">La Central lee estos pendientes todos los domingos desde la hoja «Pendientes · Dashboard Operativo».</div>
+        </section>
+
+        <!-- CLASIFICACIÓN INICIAL -->
+        <section id="view-clasificacion" class="view">
+            <div class="view-header">
+                <div class="view-title">Clasificación inicial de proyectos</div>
+                <button class="btn-secondary" data-action="volver-proyectos"><i data-lucide="arrow-left" size="16"></i> Proyectos</button>
+            </div>
+            <div class="card" style="margin-bottom:var(--space-4);font-size:var(--text-sm);color:var(--text-dim);line-height:1.6">
+                Tabla aprobada en la Central el 13/10/2026. Revisá cada fila y tocá <b>Aplicar clasificación</b>. Solo se actualizan Área, Cliente, Laboratorio, los 3 renombres y el archivo de «Concurso VLMVL»; los IDs no cambian, así que la bitácora queda intacta. Se puede aplicar más de una vez sin duplicar nada.
+                <div id="clasif-faltantes" style="display:none;margin-top:var(--space-3);color:#B45309"></div>
+            </div>
+            <div class="card" style="overflow-x:auto">
+                <table class="data-table">
+                    <thead><tr><th>Proyecto en el Dashboard</th><th>Nombre final</th><th>Área</th><th>Cliente</th><th>Lab</th><th>Acción</th><th>Estado</th></tr></thead>
+                    <tbody id="clasif-body"></tbody>
+                </table>
+            </div>
+            <div style="display:flex;justify-content:flex-end;align-items:center;gap:var(--space-4);margin-top:var(--space-4);flex-wrap:wrap">
+                <span id="clasif-resumen" style="font-size:var(--text-xs);color:var(--text-dim)"></span>
+                <button class="btn-primary" id="btn-clasif-apply">Aplicar clasificación</button>
             </div>
         </section>
 
@@ -1825,12 +1945,12 @@ function clientDisplayName(c){return c.name||c.company||"Sin nombre"}
 function clientPhone(c){return c.phone||c.contact||c.whatsapp||""}
 function clientEmail(c){return c.email||""}
 function clientWeb(c){return c.web||""}
-function stLabel(s){return{in_progress:"En progreso","in-progress":"En progreso",done:"Completado",pending:"Pendiente",blocked:"Bloqueado",active:"Activo",lead:"Lead",paused:"Pausado"}[s]||s}
+function stLabel(s){return{in_progress:"En progreso","in-progress":"En progreso",done:"Completado",pending:"Pendiente",blocked:"Bloqueado",active:"Activo",lead:"Lead",paused:"Pausado",archived:"Archivado"}[s]||s}
 function stDot(s){return{"in-progress":"","in_progress":"",done:"done",pending:"pending",blocked:"blocked"}[s]||""}
 
 function showToast(msg,type="ok"){const t=document.getElementById("toast-notification");t.textContent=msg;t.style.background=type==="ok"?"#DCFCE7":"#FEE2E2";t.style.color=type==="ok"?"#166534":"#B91C1C";t.style.borderColor=type==="ok"?"#BADBCC":"#F5C2C7";t.style.transform="translateY(0)";t.style.opacity="1";setTimeout(()=>{t.style.transform="translateY(100px)";t.style.opacity="0"},3000)}
 
-function switchView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));document.getElementById(id)?.classList.add("active");document.querySelector(`[data-view="${id}"]`)?.classList.add("active");if(id==="view-bitacora")renderBitacoraFull();if(window.innerWidth<=1024)closeSidebar()}
+function switchView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));document.getElementById(id)?.classList.add("active");document.querySelector(`[data-view="${id}"]`)?.classList.add("active");if(id==="view-bitacora")renderBitacoraFull();if(id==="view-pendientes"){refreshPendFilters();renderPendientes()}if(id==="view-clasificacion")renderClasificacion();if(window.innerWidth<=1024)closeSidebar()}
 window.switchView=switchView;
 const toggleSidebar=()=>{document.getElementById("sidebar").classList.toggle("open");document.getElementById("sidebar-overlay").classList.toggle("active")};
 const closeSidebar=()=>{document.getElementById("sidebar").classList.remove("open");document.getElementById("sidebar-overlay").classList.remove("active")};
@@ -1968,8 +2088,9 @@ window.deleteItem=deleteItem;
 function startRealtimeListeners(){
     if(!firebaseUser||!db)return;
     function listen(n,setter,cb){return col(n).onSnapshot(snap=>{const arr=[];snap.forEach(d=>arr.push({id:d.id,...d.data()}));arr.sort((a,b)=>b.createdAt-a.createdAt);setter(arr);if(cb)cb(arr)},err=>console.error(n,err))}
-    unsubscribers.push(listen("proyectos",arr=>{allProjects=arr},()=>{renderProjectsTable();updateDropdowns();updateHoyStats();renderInicioProyectosActivos();}));
-    unsubscribers.push(listen("clientes",arr=>{allClients=arr},()=>{renderClientsList();updateDropdowns()}));
+    unsubscribers.push(listen("proyectos",arr=>{allProjects=arr},()=>{renderProjectsTable();updateDropdowns();updateHoyStats();renderInicioProyectosActivos();populateBitFilters();refreshPendFilters();renderPendientes();if(document.getElementById("view-clasificacion").classList.contains("active"))renderClasificacion();}));
+    unsubscribers.push(listen("clientes",arr=>{allClients=arr},()=>{renderClientsList();updateDropdowns();renderProjectsTable();if(document.getElementById("view-clasificacion").classList.contains("active"))renderClasificacion();}));
+    unsubscribers.push(listen("pendientes",arr=>{allPendientes=arr},renderPendientes));
     unsubscribers.push(listen("recursos_compartidos",arr=>{allLinks=arr},()=>{renderResourcesList();renderResourcesGrouped();if(currentProyectoId)renderPdRecursos(currentProyectoId);}));
     unsubscribers.push(listen("bitacoras",arr=>{allBitacoras=arr},()=>{updateHoyStats();renderHoursBars();renderInicioProyectosActivos();populateBitFilters();if(document.getElementById("view-bitacora").classList.contains("active"))renderBitacoraFull();if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdBitacora(currentProyectoId);}));
     unsubscribers.push(listen("activos_digitales",arr=>{allActivos=arr},()=>{
@@ -1991,8 +2112,8 @@ function updateHoyStats(){
     const today=getTodayStr(),ws=getWeekStart();
     const todayB=allBitacoras.filter(b=>(b.date||tsToDateStr(b.createdAt))===today);
     const weekB=allBitacoras.filter(b=>(b.date||tsToDateStr(b.createdAt))>=ws);
-    const pend=allBitacoras.filter(b=>b.status==="pending");
-    const bloq=allBitacoras.filter(b=>b.status==="blocked");
+    const pend=allBitacoras.filter(b=>b.status==="pending"&&!isArchivedId(b.projectId));
+    const bloq=allBitacoras.filter(b=>b.status==="blocked"&&!isArchivedId(b.projectId));
     const activeP=allProjects.filter(p=>p.status==="active");
     const hsH=todayB.reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
     const hsW=weekB.reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
@@ -2064,7 +2185,7 @@ function renderEntregasProximas(){
     const el=document.getElementById("entregas-list");if(!el)return;
     const today=getTodayStr();
     const proximas=allProjects
-        .filter(p=>{const d=p.deliveryDate||p.dates?.delivery;return d&&d>=today&&p.status!=="done"})
+        .filter(p=>{const d=p.deliveryDate||p.dates?.delivery;return d&&d>=today&&p.status!=="done"&&!isArchived(p)})
         .sort((a,b)=>{const da=a.deliveryDate||a.dates?.delivery||"",db2=b.deliveryDate||b.dates?.delivery||"";return da.localeCompare(db2)})
         .slice(0,4);
     if(proximas.length===0){el.innerHTML=`<div style="font-size:var(--text-sm);color:var(--text-muted)">Sin entregas próximas.</div>`;return}
@@ -2121,7 +2242,7 @@ function populateBitFilters(){
         const dflt=sid==="flt-project"?"Todos los proyectos":sid==="qa-project"?"Proyecto...":"";
         const dfltVal="";
         sel.innerHTML=`<option value="${dfltVal}" ${sid==="bit-project"?"disabled":""} >${dflt}</option>`;
-        allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;sel.appendChild(o)});
+        sortProjects(allProjects).forEach(p=>{if(sid!=="flt-project"&&isArchived(p)&&p.id!==cur)return;const o=document.createElement("option");o.value=p.id;o.textContent=p.name+(isArchived(p)?" (archivado)":"");sel.appendChild(o)});
         if(cur)sel.value=cur
     })
 }
@@ -2160,14 +2281,14 @@ function renderProjectsTable(){
     const wb=allBitacoras.filter(b=>(b.date||tsToDateStr(b.createdAt))>=cutoff);
     const hsP=pid=>wb.filter(b=>b.projectId===pid).reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
     const da=ds=>{if(!ds)return{cls:"",txt:"—"};const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds+"T00:00:00");const diff=Math.ceil((d-t)/86400000);if(diff<0)return{cls:"badge warn",txt:"Vencida"};if(diff<=7)return{cls:"badge warn",txt:`${diff}d`};const[y,m,dy]=ds.split("-");return{cls:"",txt:`${dy}/${m}`}};
-    const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
-    const row=p=>{const hs=hsP(p.id),d=da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
-        const clientLabel=p.clientId?allClients.find(c=>c.id===p.clientId)?.name||"":p.client||"";
-        return `<tr><td><div style="font-weight:600">${p.name}</div>${clientLabel?`<div style="font-size:var(--text-xs);color:var(--text-dim)">${clientLabel}</div>`:""}</td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px;align-items:center"><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
+    const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused",archived:"archived"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado",archived:"Archivado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
+    const row=p=>{const hs=hsP(p.id),d=isArchived(p)?{cls:"",txt:"—"}:da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
+        const meta=`<span class="area-chip">${p.area?esc(p.area):"Sin área"}</span> · ${esc(projCliente(p))}`;
+        return `<tr><td><div class="proj-meta">${meta}</div><div style="font-weight:600">${esc(p.name)}${p.laboratorio===true?'<span class="lab-badge">🧪 Lab</span>':""}</div></td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px;align-items:center"><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
     const bi=document.getElementById("projects-table-inicio"),bf=document.getElementById("projects-table-full");
-    if(bi)bi.innerHTML=allProjects.filter(p=>p.status==="active").map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos activos.</td></tr>`;
+    if(bi)bi.innerHTML=sortProjects(allProjects.filter(p=>p.status==="active")).map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos activos.</td></tr>`;
     populateProjClientFilter();
-    if(bf)bf.innerHTML=allProjects.map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos.</td></tr>`;
+    if(bf)bf.innerHTML=filteredProjects().map(row).join("")||`<tr><td colspan="6" class="empty-state">Sin proyectos con estos filtros.</td></tr>`;
     lucide.createIcons()
 }
 
@@ -2214,9 +2335,10 @@ function renderClientsList(){
 
 function updateDropdowns(){
     const ps=document.getElementById("proj-client"),ls=document.getElementById("lnk-project"),rs=document.getElementById("reu-proyecto");
-    if(ps){const c=ps.value;ps.innerHTML='<option value="">— Talento (sin cliente) —</option>';allClients.forEach(cl=>{const o=document.createElement("option");o.value=cl.id;o.textContent=clientDisplayName(cl);ps.appendChild(o)});if(c)ps.value=c}
-    if(ls){const c=ls.value;ls.innerHTML='<option value="">— General (Talento) —</option>';allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;ls.appendChild(o)});if(c)ls.value=c}
-    if(rs){const c=rs.value;rs.innerHTML='<option value="">— Sin proyecto —</option>';allProjects.forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;rs.appendChild(o)});allPotenciales.forEach(p=>{const o=document.createElement("option");o.value="pot_"+p.id;const fn=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"Potencial";o.textContent="Potencial: "+fn;rs.appendChild(o)});if(c)rs.value=c}
+    fillAreaSelect(document.getElementById("proj-area"));
+    if(ps)fillClientSelect(ps);
+    if(ls){const c=ls.value;ls.innerHTML='<option value="">— General (Talento) —</option>';sortProjects(allProjects).forEach(p=>{if(isArchived(p)&&p.id!==c)return;const o=document.createElement("option");o.value=p.id;o.textContent=p.name;ls.appendChild(o)});if(c)ls.value=c}
+    if(rs){const c=rs.value;rs.innerHTML='<option value="">— Sin proyecto —</option>';sortProjects(allProjects).filter(p=>!isArchived(p)||p.id===c).forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=p.name;rs.appendChild(o)});allPotenciales.forEach(p=>{const o=document.createElement("option");o.value="pot_"+p.id;const fn=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"Potencial";o.textContent="Potencial: "+fn;rs.appendChild(o)});if(c)rs.value=c}
 }
 
 function initGreeting(){
@@ -2280,10 +2402,10 @@ document.addEventListener("click",async e=>{
         document.getElementById("edit-proj-kickoff").value=p.kickoffDate||p.dates?.kickoff||"";
         document.getElementById("edit-proj-delivery").value=p.deliveryDate||p.dates?.delivery||"";
         document.getElementById("edit-proj-desc").value=p.description||p.notes||"";
-        const csel=document.getElementById("edit-proj-client");
-        csel.innerHTML='<option value="">— Sin cliente (Talento) —</option>';
-        allClients.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=clientDisplayName(c);csel.appendChild(o)});
-        csel.value=p.clientId||"";
+        const asel=document.getElementById("edit-proj-area");asel.value="";fillAreaSelect(asel);asel.value=p.area||"";
+        fillClientSelect(document.getElementById("edit-proj-client"),p.area===AREA_CLIENTES?(p.clientId||""):"");
+        document.getElementById("edit-proj-lab").checked=p.laboratorio===true;
+        toggleProjClient("edit-proj");
         document.getElementById("modal-edit-proyecto").classList.add("open");
     }
     if(ac==="edit-cliente"){
@@ -2378,8 +2500,11 @@ document.getElementById("btn-save-summary-bit").addEventListener("click",async()
 document.getElementById("summary-bit-detail").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();document.getElementById("btn-save-summary-bit").click()}});
 document.getElementById("form-add-project").addEventListener("submit",async e=>{
     e.preventDefault();
-    await col("proyectos").add({name:document.getElementById("proj-name").value.trim(),status:document.getElementById("proj-status").value,progress:parseInt(document.getElementById("proj-progress").value)||0,clientId:document.getElementById("proj-client").value||null,kickoffDate:document.getElementById("proj-kickoff").value||null,deliveryDate:document.getElementById("proj-delivery").value||null,description:document.getElementById("proj-desc").value.trim(),addedBy:localUser,createdAt:Date.now()});
-    document.getElementById("form-add-project").reset();document.getElementById("modal-nuevo").classList.remove("open");showToast("Proyecto creado ✓");
+    try{
+        const cls=readProjClassification("proj");
+        await col("proyectos").add({name:document.getElementById("proj-name").value.trim(),status:document.getElementById("proj-status").value,progress:parseInt(document.getElementById("proj-progress").value)||0,...cls,kickoffDate:document.getElementById("proj-kickoff").value||null,deliveryDate:document.getElementById("proj-delivery").value||null,description:document.getElementById("proj-desc").value.trim(),addedBy:localUser,createdAt:Date.now()});
+        document.getElementById("form-add-project").reset();toggleProjClient("proj");document.getElementById("modal-nuevo").classList.remove("open");showToast("Proyecto creado ✓");
+    }catch(err){showToast("Error: "+err.message,"err")}
 });
 document.getElementById("form-add-client").addEventListener("submit",async e=>{
     e.preventDefault();
@@ -2535,9 +2660,13 @@ document.getElementById("form-edit-bit")?.addEventListener("submit",async e=>{
 document.getElementById("btn-close-edit-proyecto")?.addEventListener("click",()=>document.getElementById("modal-edit-proyecto").classList.remove("open"));
 document.getElementById("modal-edit-proyecto")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-proyecto"))document.getElementById("modal-edit-proyecto").classList.remove("open")});
 document.getElementById("form-edit-proyecto")?.addEventListener("submit",async e=>{
-    e.preventDefault();const id=document.getElementById("edit-proj-id").value;
-    await col("proyectos").doc(id).update({name:document.getElementById("edit-proj-name").value.trim(),status:document.getElementById("edit-proj-status").value,progress:parseInt(document.getElementById("edit-proj-progress").value)||0,clientId:document.getElementById("edit-proj-client").value||null,kickoffDate:document.getElementById("edit-proj-kickoff").value||null,deliveryDate:document.getElementById("edit-proj-delivery").value||null,description:document.getElementById("edit-proj-desc").value.trim(),updatedAt:Date.now()});
-    document.getElementById("modal-edit-proyecto").classList.remove("open");showToast("Proyecto actualizado ✓");
+    e.preventDefault();
+    try{
+        const id=document.getElementById("edit-proj-id").value;
+        const cls=readProjClassification("edit-proj");
+        await col("proyectos").doc(id).update({name:document.getElementById("edit-proj-name").value.trim(),status:document.getElementById("edit-proj-status").value,progress:parseInt(document.getElementById("edit-proj-progress").value)||0,...cls,kickoffDate:document.getElementById("edit-proj-kickoff").value||null,deliveryDate:document.getElementById("edit-proj-delivery").value||null,description:document.getElementById("edit-proj-desc").value.trim(),updatedAt:Date.now()});
+        document.getElementById("modal-edit-proyecto").classList.remove("open");showToast("Proyecto actualizado ✓");
+    }catch(err){showToast("Error: "+err.message,"err")}
 });
 document.getElementById("btn-close-edit-cliente")?.addEventListener("click",()=>document.getElementById("modal-edit-cliente").classList.remove("open"));
 document.getElementById("modal-edit-cliente")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-edit-cliente"))document.getElementById("modal-edit-cliente").classList.remove("open")});
@@ -2561,7 +2690,7 @@ document.querySelectorAll(".nav-item").forEach(item=>{item.addEventListener("cli
 document.getElementById("btn-open-sidebar").addEventListener("click",toggleSidebar);
 document.getElementById("btn-close-sidebar").addEventListener("click",closeSidebar);
 document.getElementById("sidebar-overlay").addEventListener("click",closeSidebar);
-document.getElementById("btn-logout").addEventListener("click",()=>{if(confirm("¿Cerrar sesión?"))location.reload()});
+document.getElementById("btn-logout").addEventListener("click",async()=>{if(!confirm("¿Cerrar sesión?"))return;try{unsubscribers.forEach(u=>{try{u()}catch(_){}});unsubscribers=[];await auth.signOut()}catch(_){}location.reload()});
 
 // DROPDOWN ESTADO REUNIÓN
 document.addEventListener("change",async e=>{
@@ -2679,18 +2808,7 @@ document.getElementById("form-edit-nota")?.addEventListener("submit",async e=>{
     }catch(err){showToast("Error: "+err.message,"err");}
 });
 
-// LOGIN
-const credentials={Soledad:"sole123",Gabriel:"gaby123"};
-document.getElementById("login-form").addEventListener("submit",async e=>{
-    e.preventDefault();
-    const user=document.getElementById("user-select").value,pass=document.getElementById("password-input").value,err=document.getElementById("login-error");
-    if(credentials[user]!==pass){err.textContent="❌ Contraseña incorrecta.";err.style.display="block";return}
-    err.style.display="none";
-    try{await auth.signInAnonymously();}catch(ex){err.textContent="⚠️ Error de conexión: "+ex.message;err.style.display="block";return}
-    localUser=user;
-    const ov=document.getElementById("login-overlay");ov.style.opacity="0";
-    setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(firebaseUser)startRealtimeListeners();},300);
-});
+// LOGIN → ver módulo F1 (Google) al final del script
 
 // ══════════════════════════════════════════════════════════════
 // VISTA DETALLE PROYECTO
@@ -3157,29 +3275,22 @@ function renderReuniones(){
 // ══════════════════════════════════════════════════════════════
 
 // ── Filtros Proyectos ─────────────────────────────────────────
-function applyProjFilters(){
-    const nombre=(document.getElementById("flt-proj-nombre")?.value||"").toLowerCase();
-    const estado=document.getElementById("flt-proj-estado")?.value||"";
-    const clienteId=document.getElementById("flt-proj-cliente")?.value||"";
-    let filtered=[...allProjects];
-    if(nombre)filtered=filtered.filter(p=>p.name.toLowerCase().includes(nombre));
-    if(estado)filtered=filtered.filter(p=>p.status===estado);
-    if(clienteId)filtered=filtered.filter(p=>p.clientId===clienteId);
-    renderProjectsToTable("projects-table-full",filtered);
-}
+function applyProjFilters(){renderProjectsTable()}
 function populateProjClientFilter(){
     const sel=document.getElementById("flt-proj-cliente");if(!sel)return;
     const cur=sel.value;
     sel.innerHTML='<option value="">Todos los clientes</option>';
-    allClients.forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=clientDisplayName(c);sel.appendChild(o)});
+    [...new Set(allProjects.map(projCliente).filter(Boolean))].sort((a,b)=>a===CLIENTE_TI?-1:b===CLIENTE_TI?1:a.localeCompare(b,"es")).forEach(n=>{const o=document.createElement("option");o.value=n;o.textContent=n;sel.appendChild(o)});
     if(cur)sel.value=cur;
+    const asel=document.getElementById("flt-proj-area");
+    if(asel&&!asel.options.length){fillAreaSelect(asel,"Todas las áreas");const o=document.createElement("option");o.value="sin";o.textContent="Sin área";asel.appendChild(o)}
 }
-["flt-proj-nombre","flt-proj-estado","flt-proj-cliente"].forEach(id=>{
+["flt-proj-nombre","flt-proj-area","flt-proj-estado","flt-proj-cliente","flt-proj-lab"].forEach(id=>{
     document.getElementById(id)?.addEventListener("input",applyProjFilters);
     document.getElementById(id)?.addEventListener("change",applyProjFilters);
 });
 document.getElementById("btn-clear-proj-filters")?.addEventListener("click",()=>{
-    ["flt-proj-nombre","flt-proj-estado","flt-proj-cliente"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+    ["flt-proj-nombre","flt-proj-area","flt-proj-estado","flt-proj-cliente","flt-proj-lab"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
     applyProjFilters();
 });
 
@@ -3314,7 +3425,424 @@ function renderResourcesGroupedFiltered(links){
     }).join("");
     lucide.createIcons();
 }
-auth.onAuthStateChanged(user=>{firebaseUser=user;if(user&&localUser)startRealtimeListeners()});
+
+// ══════════════════════════════════════════════════════════════
+// F1 · LOGIN GOOGLE + CLASIFICACIÓN + PENDIENTES + EXPORT
+// ══════════════════════════════════════════════════════════════
+// Cuentas habilitadas (la seguridad real llega en F2 con las reglas de Firestore)
+const ALLOWED_EMAILS=["msoledadvila@gmail.com","hola@talentoimpulsa.com.ar"];
+const USER_NAME="Soledad";
+// URL del Apps Script publicado como aplicación web (se completa en F3)
+const EXPORT_URL="";
+
+const AREAS=[
+    {id:"01",label:"Estrategia Comercial"},
+    {id:"02",label:"Contenido"},
+    {id:"03",label:"Desarrollo"},
+    {id:"04",label:"Brainstorming"},
+    {id:"05",label:"Asistente Personal"},
+    {id:"06",label:"Servicios a Clientes"}
+];
+const AREA_CLIENTES="06";
+const CLIENTE_TI="Talento Impulsa";
+const PRIORIDADES=[{id:"alta",label:"Alta"},{id:"media",label:"Media"},{id:"baja",label:"Baja"}];
+const PEND_ESTADOS=[{id:"pending",label:"Pendiente"},{id:"in-progress",label:"En curso"},{id:"blocked",label:"Bloqueado"},{id:"done",label:"Hecho"}];
+let allPendientes=[];
+let listenersStarted=false;
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function normName(s){return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function areaLabel(id){const a=AREAS.find(x=>x.id===id);return a?a.id+" "+a.label:"Sin área"}
+function isArchived(p){return !!p&&p.status==="archived"}
+function isArchivedId(pid){return isArchived(allProjects.find(x=>x.id===pid))}
+function projCliente(p){
+    if(!p)return "";
+    if(p.clientId){const c=allClients.find(x=>x.id===p.clientId);if(c)return clientDisplayName(c)}
+    return p.client||CLIENTE_TI;
+}
+function sortProjects(arr){return [...arr].sort((a,b)=>(a.area||"99").localeCompare(b.area||"99")||projCliente(a).localeCompare(projCliente(b),"es")||String(a.name||"").localeCompare(String(b.name||""),"es"))}
+function fillAreaSelect(sel,placeholder){
+    if(!sel)return;const cur=sel.value;
+    sel.innerHTML="";
+    const o0=document.createElement("option");o0.value="";o0.textContent=placeholder||"Elegí un área…";sel.appendChild(o0);
+    AREAS.forEach(a=>{const o=document.createElement("option");o.value=a.id;o.textContent=a.id+" · "+a.label;sel.appendChild(o)});
+    if(cur)sel.value=cur;
+}
+// Selector de proyectos agrupado por Área (excluye archivados salvo el valor actual)
+function fillProjectSelect(sel,{placeholder="Elegí un proyecto…",keep="",includeArchived=false,disabledPlaceholder=true}={}){
+    if(!sel)return;const cur=keep||sel.value;
+    sel.innerHTML="";
+    const o0=document.createElement("option");o0.value="";o0.textContent=placeholder;if(disabledPlaceholder)o0.disabled=true;o0.selected=true;sel.appendChild(o0);
+    const groups={};
+    sortProjects(allProjects).forEach(p=>{
+        if(isArchived(p)&&!includeArchived&&p.id!==cur)return;
+        const k=p.area||"zz";(groups[k]=groups[k]||[]).push(p);
+    });
+    Object.keys(groups).sort().forEach(k=>{
+        const og=document.createElement("optgroup");og.label=k==="zz"?"Sin área":areaLabel(k);
+        groups[k].forEach(p=>{const o=document.createElement("option");o.value=p.id;o.textContent=(p.area===AREA_CLIENTES?projCliente(p)+" · ":"")+p.name+(isArchived(p)?" (archivado)":"");og.appendChild(o)});
+        sel.appendChild(og);
+    });
+    if(cur)sel.value=cur;
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+function showLoginError(msg){const err=document.getElementById("login-error");if(!err)return;err.textContent=msg;err.style.display=msg?"block":"none"}
+function setLoginBusy(busy,label){const b=document.getElementById("btn-google-login");if(!b)return;b.disabled=busy;document.getElementById("btn-google-login-label").textContent=label||"Ingresar con Google"}
+function enterApp(){
+    const ov=document.getElementById("login-overlay");ov.style.opacity="0";
+    setTimeout(()=>{ov.style.display="none";document.getElementById("app-layout").style.display="block";initGreeting();if(!listenersStarted){listenersStarted=true;startRealtimeListeners()}},300);
+}
+document.getElementById("login-form").addEventListener("submit",async e=>{
+    e.preventDefault();
+    showLoginError("");setLoginBusy(true,"Abriendo Google…");
+    try{
+        const provider=new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({prompt:"select_account"});
+        await auth.signInWithPopup(provider);
+    }catch(ex){
+        const map={"auth/popup-closed-by-user":"Cerraste la ventana de Google antes de terminar.","auth/popup-blocked":"El navegador bloqueó la ventana de Google. Permití ventanas emergentes para este sitio.","auth/unauthorized-domain":"Este dominio no está autorizado en Firebase Authentication.","auth/operation-not-allowed":"El ingreso con Google no está activado en Firebase Authentication."};
+        showLoginError("⚠️ "+(map[ex.code]||ex.message));
+        setLoginBusy(false);
+        showToast("No se pudo ingresar","err");
+    }
+});
+auth.onAuthStateChanged(async user=>{
+    if(user&&!user.isAnonymous){
+        const email=(user.email||"").toLowerCase();
+        if(!ALLOWED_EMAILS.includes(email)){
+            await auth.signOut();
+            showLoginError("❌ La cuenta "+email+" no tiene acceso a este Dashboard.");
+            setLoginBusy(false);return;
+        }
+        firebaseUser=user;localUser=USER_NAME;
+        document.getElementById("nav-user-email").textContent=email;
+        enterApp();
+        return;
+    }
+    firebaseUser=null;
+    if(user&&user.isAnonymous){try{await auth.signOut()}catch(_){}}
+    setLoginBusy(false);
+});
+
+// ── PROYECTOS: campos Área / Cliente / Laboratorio ────────────
+function toggleProjClient(prefix){
+    const area=document.getElementById(prefix+"-area").value;
+    const grp=document.getElementById(prefix+"-client-group"),sel=document.getElementById(prefix+"-client");
+    const show=area===AREA_CLIENTES;
+    grp.style.display=show?"":"none";
+    sel.required=show;
+    if(!show)sel.value="";
+}
+function fillClientSelect(sel,keep){
+    if(!sel)return;const cur=keep!==undefined?keep:sel.value;
+    sel.innerHTML='<option value="">Elegí un cliente…</option>';
+    [...allClients].sort((a,b)=>clientDisplayName(a).localeCompare(clientDisplayName(b),"es")).forEach(cl=>{const o=document.createElement("option");o.value=cl.id;o.textContent=clientDisplayName(cl);sel.appendChild(o)});
+    if(cur)sel.value=cur;
+}
+function readProjClassification(prefix){
+    const area=document.getElementById(prefix+"-area").value;
+    if(!area)throw new Error("Elegí el Área del proyecto.");
+    let clientId=null,client=CLIENTE_TI;
+    if(area===AREA_CLIENTES){
+        clientId=document.getElementById(prefix+"-client").value||null;
+        if(!clientId)throw new Error("Elegí el Cliente: es obligatorio en el Área 06.");
+        const c=allClients.find(x=>x.id===clientId);
+        client=c?clientDisplayName(c):"";
+    }
+    return {area,clientId,client,laboratorio:document.getElementById(prefix+"-lab").checked};
+}
+["proj","edit-proj"].forEach(prefix=>{
+    document.getElementById(prefix+"-area")?.addEventListener("change",()=>toggleProjClient(prefix));
+});
+
+// ── FILTROS PROYECTOS (Área · Cliente · Laboratorio · Estado) ─
+function filteredProjects(){
+    const nombre=normName(document.getElementById("flt-proj-nombre")?.value||"");
+    const area=document.getElementById("flt-proj-area")?.value||"";
+    const cliente=document.getElementById("flt-proj-cliente")?.value||"";
+    const lab=document.getElementById("flt-proj-lab")?.value||"";
+    const estado=document.getElementById("flt-proj-estado")?.value||"";
+    let arr=[...allProjects];
+    if(estado==="archived")arr=arr.filter(isArchived);
+    else{arr=arr.filter(p=>!isArchived(p));if(estado)arr=arr.filter(p=>p.status===estado)}
+    if(nombre)arr=arr.filter(p=>normName(p.name).includes(nombre));
+    if(area)arr=arr.filter(p=>(p.area||"sin")===area);
+    if(cliente)arr=arr.filter(p=>projCliente(p)===cliente);
+    if(lab==="si")arr=arr.filter(p=>p.laboratorio===true);
+    if(lab==="no")arr=arr.filter(p=>p.laboratorio!==true);
+    return sortProjects(arr);
+}
+
+// ── PENDIENTES ────────────────────────────────────────────────
+function pendArea(pd){const p=allProjects.find(x=>x.id===pd.projectId);return p&&p.area?p.area:""}
+function prioRank(p){return {alta:0,media:1,baja:2}[p]??3}
+function isVencido(pd){return pd.dueDate&&pd.status!=="done"&&pd.dueDate<getTodayStr()}
+function fmtFecha(ds){if(!ds)return "—";const[y,m,d]=ds.split("-");return d+"/"+m+"/"+y}
+function renderPendientes(){
+    const tb=document.getElementById("pend-table");if(!tb)return;
+    const fa=document.getElementById("flt-pend-area")?.value||"",fp=document.getElementById("flt-pend-proyecto")?.value||"",fe=document.getElementById("flt-pend-estado")?.value||"abiertos",fr=document.getElementById("flt-pend-prioridad")?.value||"";
+    let arr=allPendientes.filter(pd=>!isArchivedId(pd.projectId));
+    if(fa)arr=arr.filter(pd=>(pendArea(pd)||"sin")===fa);
+    if(fp)arr=arr.filter(pd=>pd.projectId===fp);
+    if(fe==="abiertos")arr=arr.filter(pd=>pd.status!=="done");else if(fe)arr=arr.filter(pd=>pd.status===fe);
+    if(fr)arr=arr.filter(pd=>pd.priority===fr);
+    arr.sort((a,b)=>prioRank(a.priority)-prioRank(b.priority)||(a.dueDate||"9999").localeCompare(b.dueDate||"9999")||(a.date||"").localeCompare(b.date||""));
+    // métricas
+    const abiertos=allPendientes.filter(pd=>pd.status!=="done"&&!isArchivedId(pd.projectId));
+    const venc=abiertos.filter(isVencido),bloq=abiertos.filter(pd=>pd.status==="blocked"),alta=abiertos.filter(pd=>pd.priority==="alta");
+    const setTxt=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+    setTxt("pend-strip-abiertos",abiertos.length);setTxt("pend-strip-alta",alta.length);setTxt("pend-strip-vencidos",venc.length);setTxt("pend-strip-bloqueados",bloq.length);
+    const badge=document.getElementById("nav-pend-badge");
+    if(badge){const n=venc.length+bloq.length;badge.textContent=n;badge.style.display=n>0?"inline":"none"}
+    if(!arr.length){tb.innerHTML='<tr><td colspan="8" class="empty-state">Sin pendientes con estos filtros.</td></tr>';lucide.createIcons();return}
+    tb.innerHTML=arr.map(pd=>{
+        const p=allProjects.find(x=>x.id===pd.projectId);
+        const stOpts=PEND_ESTADOS.map(s=>'<option value="'+s.id+'"'+(pd.status===s.id?" selected":"")+'>'+s.label+'</option>').join("");
+        const pr=PRIORIDADES.find(x=>x.id===pd.priority);
+        const venceCls=isVencido(pd)?' style="color:#B91C1C;font-weight:700"':"";
+        return '<tr>'+
+            '<td style="white-space:nowrap">'+fmtFecha(pd.date)+'</td>'+
+            '<td style="white-space:nowrap;font-size:var(--text-xs);color:var(--text-dim)">'+esc(areaLabel(pendArea(pd)))+'</td>'+
+            '<td><div style="font-weight:600">'+esc(p?p.name:"(proyecto eliminado)")+'</div>'+(p&&p.area===AREA_CLIENTES?'<div class="proj-meta">'+esc(projCliente(p))+'</div>':"")+'</td>'+
+            '<td style="min-width:220px">'+esc(pd.detail)+'</td>'+
+            '<td><select class="pend-status-select" data-action="pend-status" data-id="'+pd.id+'">'+stOpts+'</select></td>'+
+            '<td><span class="prio '+esc(pd.priority||"")+'">'+(pr?pr.label:"—")+'</span></td>'+
+            '<td style="white-space:nowrap"'+venceCls+'>'+(isVencido(pd)?"⚠️ ":"")+fmtFecha(pd.dueDate)+'</td>'+
+            '<td style="white-space:nowrap"><button class="btn-icon" data-action="edit-pend" data-id="'+pd.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-pend" data-id="'+pd.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td>'+
+        '</tr>';
+    }).join("");
+    lucide.createIcons();
+}
+function refreshPendFilters(){
+    fillAreaSelect(document.getElementById("flt-pend-area"),"Todas las áreas");
+    const fa=document.getElementById("flt-pend-area");if(fa&&!fa.querySelector('option[value="sin"]')){const o=document.createElement("option");o.value="sin";o.textContent="Sin área";fa.appendChild(o)}
+    fillProjectSelect(document.getElementById("flt-pend-proyecto"),{placeholder:"Todos los proyectos",disabledPlaceholder:false});
+}
+function updatePendAreaHint(){
+    const p=allProjects.find(x=>x.id===document.getElementById("pend-project").value);
+    document.getElementById("pend-area-hint").textContent="Área: "+(p?areaLabel(p.area)+(p.area===AREA_CLIENTES?" · Cliente: "+projCliente(p):""):"—")+(p&&!p.area?" (clasificá el proyecto para que el pendiente tenga Área)":"");
+}
+function openPendModal(pd){
+    const f=document.getElementById("form-pendiente");f.reset();
+    document.getElementById("pend-id").value=pd?pd.id:"";
+    document.getElementById("pend-modal-title").textContent=pd?"Editar pendiente":"Nuevo pendiente";
+    fillProjectSelect(document.getElementById("pend-project"),{keep:pd?pd.projectId:(document.getElementById("flt-pend-proyecto")?.value||"")});
+    document.getElementById("pend-detail").value=pd?pd.detail||"":"";
+    document.getElementById("pend-status").value=pd?pd.status||"pending":"pending";
+    document.getElementById("pend-priority").value=pd?pd.priority||"media":"media";
+    document.getElementById("pend-date").value=pd?pd.date||getTodayStr():getTodayStr();
+    document.getElementById("pend-due").value=pd?pd.dueDate||"":"";
+    updatePendAreaHint();
+    document.getElementById("modal-pendiente").classList.add("open");
+}
+document.getElementById("btn-open-pend-modal")?.addEventListener("click",()=>openPendModal(null));
+document.getElementById("btn-close-pend-modal")?.addEventListener("click",()=>document.getElementById("modal-pendiente").classList.remove("open"));
+document.getElementById("modal-pendiente")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-pendiente"))document.getElementById("modal-pendiente").classList.remove("open")});
+document.getElementById("pend-project")?.addEventListener("change",updatePendAreaHint);
+document.getElementById("form-pendiente")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    try{
+        const id=document.getElementById("pend-id").value;
+        const projectId=document.getElementById("pend-project").value,detail=document.getElementById("pend-detail").value.trim();
+        if(!projectId)throw new Error("Elegí el proyecto.");
+        if(!detail)throw new Error("Escribí el pendiente.");
+        const data={projectId,detail,status:document.getElementById("pend-status").value,priority:document.getElementById("pend-priority").value,date:document.getElementById("pend-date").value||getTodayStr(),dueDate:document.getElementById("pend-due").value||null,updatedAt:Date.now()};
+        if(id)await col("pendientes").doc(id).update(data);
+        else await col("pendientes").add({...data,addedBy:localUser,createdAt:Date.now()});
+        document.getElementById("modal-pendiente").classList.remove("open");
+        showToast(id?"Pendiente actualizado ✓":"Pendiente creado ✓");
+    }catch(err){showToast("Error: "+err.message,"err")}
+});
+["flt-pend-area","flt-pend-proyecto","flt-pend-estado","flt-pend-prioridad"].forEach(id=>document.getElementById(id)?.addEventListener("change",renderPendientes));
+document.getElementById("btn-clear-pend-filters")?.addEventListener("click",()=>{["flt-pend-area","flt-pend-proyecto","flt-pend-prioridad"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});document.getElementById("flt-pend-estado").value="abiertos";renderPendientes()});
+
+// Delegación de cambios (selects dentro de tablas)
+document.addEventListener("change",async e=>{
+    const el=e.target.closest('[data-action="pend-status"]');if(!el)return;
+    try{await col("pendientes").doc(el.dataset.id).update({status:el.value,updatedAt:Date.now()});showToast("Estado actualizado ✓")}
+    catch(err){showToast("Error: "+err.message,"err")}
+});
+// Delegación de clicks del módulo F1
+document.addEventListener("click",async e=>{
+    const btn=e.target.closest("[data-action]");if(!btn)return;
+    const ac=btn.dataset.action,id=btn.dataset.id;
+    if(ac==="edit-pend"){const pd=allPendientes.find(x=>x.id===id);if(pd)openPendModal(pd)}
+    if(ac==="delete-pend"&&confirm("¿Eliminar este pendiente?")){try{await deleteItem("pendientes",id);showToast("Pendiente eliminado")}catch(err){showToast("Error: "+err.message,"err")}}
+    if(ac==="open-clasif")switchView("view-clasificacion");
+    if(ac==="volver-proyectos")switchView("view-proyectos");
+});
+
+// ── EXPORTAR AHORA ────────────────────────────────────────────
+document.getElementById("btn-export-pend")?.addEventListener("click",async()=>{
+    const btn=document.getElementById("btn-export-pend");
+    if(!EXPORT_URL){showToast("El export todavía no está conectado: se activa en la F3 (Apps Script).","err");return}
+    if(!firebaseUser){showToast("Iniciá sesión para exportar.","err");return}
+    btn.disabled=true;const prev=btn.innerHTML;btn.textContent="Exportando…";
+    try{
+        const idToken=await firebaseUser.getIdToken(true);
+        const r=await fetch(EXPORT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({idToken,origen:"dashboard"})});
+        const j=await r.json();
+        if(!j.ok)throw new Error(j.error||"respuesta inválida");
+        document.getElementById("pend-export-info").textContent="Último export: "+new Date().toLocaleString("es-AR")+" · "+j.filas+" filas en «Pendientes · Dashboard Operativo».";
+        showToast("Export listo ✓ "+j.filas+" filas");
+    }catch(err){showToast("No se pudo exportar: "+err.message,"err")}
+    finally{btn.disabled=false;btn.innerHTML=prev;lucide.createIcons()}
+});
+
+// ══════════════════════════════════════════════════════════════
+// CLASIFICACIÓN INICIAL (tabla aprobada en la Central el 13/10/2026)
+// Solo actualiza area, client, clientId, laboratorio, name (renombres) y status (archivar).
+// No toca IDs: la bitácora sigue vinculada por projectId. Se puede correr más de una vez.
+// ══════════════════════════════════════════════════════════════
+const CLASIF_PLAN=[
+    {keys:["Estrategia Talento Impulsa & Marca personal"],area:"01"},
+    {keys:["Base de datos de contactos"],area:"01"},
+    {keys:["Academia Nodo PCA"],area:"01"},
+    {keys:["Curso On line Método PCA","Cohortes Nodo PCA · Municipios y cooperadoras"],rename:"Cohortes Nodo PCA · Municipios y cooperadoras",area:"01"},
+    {keys:["Contenido Talento Impulsa & Sole Vila"],create:true,area:"02"},
+    {keys:["Sitio web TI & Vide Voder","Sitio web TI & Vibe Coder"],rename:"Sitio web TI & Vibe Coder",area:"03"},
+    {keys:["Chatbot PCA","Diagnóstico PCA™"],rename:"Diagnóstico PCA™",area:"03"},
+    {keys:["Dashboard Talento Impulsa"],area:"03"},
+    {keys:["Hub Núcleo PCA"],area:"03"},
+    {keys:["Prompt Studio PCA"],area:"03"},
+    {keys:["Dashboard Hub RRHH"],area:"03"},
+    {keys:["English HUB PCA"],area:"03",lab:true},
+    {keys:["Gastos con amor"],area:"03",lab:true},
+    {keys:["GruProde"],area:"03",lab:true},
+    {keys:["Celeste Vila web"],area:"06",cliente:"Celeste Vila"},
+    {keys:["Dashboard Contadora"],area:"06",cliente:"Celeste Vila"},
+    {keys:["Identidad digital Matias Arnaudo Bienes raices"],area:"06",cliente:"Matías Arnaudo"},
+    {keys:["Workshop IA aplicativa para mandos medios — Sector Bingos y Slots"],area:"06",cliente:"Pablo G. Madrid"},
+    {keys:["UADE- Liderazgo Estratégico e IA"],area:"06",cliente:"Pablo G. Madrid"},
+    {keys:["Zyntra Armado de identidad digital y estrategia de contenido"],area:"06",cliente:"Zyntra"},
+    {keys:["Nirvana Redes sociales + identidad digital"],area:"06",cliente:"Nirvana"},
+    {keys:["Dashboard de alertas para mantenimiento de aeronaves"],area:"06",cliente:"Roberto Agüero"},
+    {keys:["Sistema Integral de Gestión de estudio contable"],area:"06",cliente:"Pablo Marun"},
+    {keys:["Concurso VLMVL"],archive:true}
+];
+function planFor(p){const n=normName(p.name);return CLASIF_PLAN.find(r=>r.keys.some(k=>normName(k)===n))||null}
+function findClientByName(name){
+    const n=normName(name);if(!n)return null;
+    return allClients.find(c=>normName(clientDisplayName(c))===n)||allClients.find(c=>{const m=normName(clientDisplayName(c));return m&&(m.includes(n)||n.includes(m))})||null;
+}
+function clasifTargets(){
+    // Una fila por proyecto existente + filas de creación que todavía no existen
+    const rows=sortProjects(allProjects).map(p=>{
+        const plan=planFor(p);
+        const t={pid:p.id,actual:p.name,plan,name:plan&&plan.rename?plan.rename:p.name,area:plan?(plan.area||p.area||""):(p.area||""),lab:plan?!!plan.lab:p.laboratorio===true,archive:plan?!!plan.archive:isArchived(p),clientVal:""};
+        if(t.area===AREA_CLIENTES){
+            if(plan&&plan.cliente){const c=findClientByName(plan.cliente);t.clientVal=c?c.id:"new:"+plan.cliente}
+            else if(p.clientId)t.clientVal=p.clientId;
+        }
+        return t;
+    });
+    CLASIF_PLAN.filter(r=>r.create).forEach(r=>{
+        if(!allProjects.some(p=>r.keys.some(k=>normName(k)===normName(p.name))))rows.push({pid:null,actual:"(nuevo)",plan:r,name:r.keys[0],area:r.area,lab:!!r.lab,archive:false,clientVal:""});
+    });
+    return rows;
+}
+function rowApplied(t){
+    if(!t.pid)return false;const p=allProjects.find(x=>x.id===t.pid);if(!p)return false;
+    if(t.archive)return isArchived(p);
+    const clientOk=t.area===AREA_CLIENTES?(p.clientId&&p.clientId===t.clientVal):(!p.clientId&&p.client===CLIENTE_TI);
+    return p.area===t.area&&clientOk&&(p.laboratorio===true)===t.lab&&p.name===t.name;
+}
+function renderClasificacion(){
+    const tb=document.getElementById("clasif-body");if(!tb)return;
+    const rows=clasifTargets();
+    const faltan=CLASIF_PLAN.filter(r=>!r.create&&!allProjects.some(p=>r.keys.some(k=>normName(k)===normName(p.name))));
+    const warn=document.getElementById("clasif-faltantes");
+    warn.innerHTML=faltan.length?'<b>No encontré en el Dashboard:</b> '+faltan.map(r=>esc(r.keys[0])).join(" · "):"";
+    warn.style.display=faltan.length?"block":"none";
+    const clientOpts=(val,extra)=>{
+        let h='<option value="">Elegí un cliente…</option>';
+        [...allClients].sort((a,b)=>clientDisplayName(a).localeCompare(clientDisplayName(b),"es")).forEach(c=>{h+='<option value="'+c.id+'"'+(val===c.id?" selected":"")+'>'+esc(clientDisplayName(c))+'</option>'});
+        const news=new Set(extra.filter(Boolean));if(val&&val.startsWith("new:"))news.add(val.slice(4));
+        news.forEach(n=>{if(!findClientByName(n))h+='<option value="new:'+esc(n)+'"'+(val==="new:"+n?" selected":"")+'>➕ Crear cliente «'+esc(n)+'»</option>'});
+        return h;
+    };
+    const candidatos=[...new Set(CLASIF_PLAN.flatMap(r=>[r.cliente,...(r.candidatos||[])]).filter(Boolean))];
+    let pendientes=0,aplicados=0;
+    tb.innerHTML=rows.map((t,i)=>{
+        const applied=rowApplied(t);if(applied)aplicados++;
+        const incompleto=!t.archive&&(!t.area||(t.area===AREA_CLIENTES&&!t.clientVal));
+        if(!applied)pendientes++;
+        let estado;
+        if(applied)estado='<span class="clasif-ok">✓ Aplicado</span>';
+        else if(!t.plan)estado='<span class="clasif-warn">Sin datos en la tabla · completá</span>';
+        else if(incompleto)estado='<span class="clasif-warn">Falta elegir cliente</span>';
+        else if(!t.pid)estado='<span class="clasif-new">Se crea</span>';
+        else estado='<span class="clasif-pend">Listo para aplicar</span>';
+        const areaOpts='<option value="">—</option>'+AREAS.map(a=>'<option value="'+a.id+'"'+(t.area===a.id?" selected":"")+'>'+a.id+' '+esc(a.label)+'</option>').join("");
+        return '<tr class="'+(incompleto||!t.plan?"clasif-row-warn":"")+'" data-row="'+i+'" data-pid="'+(t.pid||"")+'">'+
+            '<td><div style="font-weight:600">'+esc(t.actual)+'</div></td>'+
+            '<td><input class="form-control clasif-name" value="'+esc(t.name)+'" style="min-width:200px"></td>'+
+            '<td><select class="form-control clasif-area"'+(t.archive?" disabled":"")+'>'+areaOpts+'</select></td>'+
+            '<td><select class="form-control clasif-client"'+(t.area===AREA_CLIENTES&&!t.archive?"":" disabled")+'>'+clientOpts(t.clientVal,t.area===AREA_CLIENTES?candidatos:[])+'</select></td>'+
+            '<td style="text-align:center"><input type="checkbox" class="clasif-lab"'+(t.lab?" checked":"")+(t.archive?" disabled":"")+'></td>'+
+            '<td><select class="form-control clasif-accion"'+(t.pid?"":" disabled")+'><option value="clasificar"'+(t.archive?"":" selected")+'>Clasificar</option><option value="archivar"'+(t.archive?" selected":"")+'>Archivar</option></select></td>'+
+            '<td style="white-space:nowrap">'+estado+'</td>'+
+        '</tr>';
+    }).join("");
+    document.getElementById("clasif-resumen").textContent=rows.length+" filas · "+aplicados+" ya aplicadas · "+pendientes+" por aplicar";
+}
+// Cambios dentro de la tabla de clasificación
+document.getElementById("clasif-body")?.addEventListener("change",e=>{
+    const tr=e.target.closest("tr[data-row]");if(!tr)return;
+    const area=tr.querySelector(".clasif-area"),cli=tr.querySelector(".clasif-client"),acc=tr.querySelector(".clasif-accion"),lab=tr.querySelector(".clasif-lab");
+    const arch=acc.value==="archivar";
+    area.disabled=arch;lab.disabled=arch;
+    cli.disabled=arch||area.value!==AREA_CLIENTES;
+    if(area.value!==AREA_CLIENTES)cli.value="";
+});
+document.getElementById("btn-clasif-apply")?.addEventListener("click",async()=>{
+    const btn=document.getElementById("btn-clasif-apply");
+    try{
+        const trs=[...document.querySelectorAll("#clasif-body tr[data-row]")];
+        const items=trs.map(tr=>({pid:tr.dataset.pid||null,actual:tr.cells[0].textContent.trim(),name:tr.querySelector(".clasif-name").value.trim(),area:tr.querySelector(".clasif-area").value,clientVal:tr.querySelector(".clasif-client").value,lab:tr.querySelector(".clasif-lab").checked,archive:tr.querySelector(".clasif-accion").value==="archivar"}));
+        const errores=items.filter(it=>!it.name||(!it.archive&&(!it.area||(it.area===AREA_CLIENTES&&!it.clientVal))));
+        if(errores.length)throw new Error("Completá Área/Cliente en: "+errores.map(x=>x.pid?x.actual:x.name).join(", "));
+        if(!confirm("Se van a actualizar "+items.filter(x=>x.pid).length+" proyectos"+(items.some(x=>!x.pid)?" y crear "+items.filter(x=>!x.pid).length:"")+". La bitácora no se modifica. ¿Aplicar?"))return;
+        btn.disabled=true;btn.textContent="Aplicando…";
+        // 1) Clientes nuevos (una sola vez por nombre)
+        const nuevos=[...new Set(items.filter(it=>!it.archive&&it.area===AREA_CLIENTES&&it.clientVal.startsWith("new:")).map(it=>it.clientVal.slice(4)))];
+        const creados={};
+        for(const n of nuevos){
+            const existente=findClientByName(n);
+            if(existente){creados[n]=existente;continue}
+            const ref=await col("clientes").add({name:n,status:"active",notes:"Creado por la clasificación inicial (13/10/2026)",addedBy:localUser,createdAt:Date.now()});
+            creados[n]={id:ref.id,name:n};
+        }
+        const resolveClient=v=>{if(!v)return null;if(v.startsWith("new:")){const c=creados[v.slice(4)];return c?{id:c.id,name:clientDisplayName(c)}:null}const c=allClients.find(x=>x.id===v);return c?{id:c.id,name:clientDisplayName(c)}:null};
+        // 2) Proyectos (batch)
+        const batch=db.batch();let upd=0,nuevosP=0;
+        for(const it of items){
+            if(it.pid){
+                const data={updatedAt:Date.now(),clasificadoAt:Date.now()};
+                const p=allProjects.find(x=>x.id===it.pid);
+                if(it.name&&p&&it.name!==p.name)data.name=it.name;
+                if(it.archive){data.status="archived"}
+                else{
+                    data.area=it.area;data.laboratorio=it.lab;
+                    if(it.area===AREA_CLIENTES){const c=resolveClient(it.clientVal);if(!c)throw new Error("No pude resolver el cliente de "+it.actual);data.clientId=c.id;data.client=c.name}
+                    else{data.clientId=null;data.client=CLIENTE_TI}
+                }
+                batch.update(col("proyectos").doc(it.pid),data);upd++;
+            }else{
+                if(allProjects.some(p=>normName(p.name)===normName(it.name)))continue;
+                const data={name:it.name,status:"active",progress:0,area:it.area,laboratorio:it.lab,kickoffDate:null,deliveryDate:null,description:"",addedBy:localUser,createdAt:Date.now(),clasificadoAt:Date.now()};
+                if(it.area===AREA_CLIENTES){const c=resolveClient(it.clientVal);data.clientId=c?c.id:null;data.client=c?c.name:""}else{data.clientId=null;data.client=CLIENTE_TI}
+                batch.set(col("proyectos").doc(),data);nuevosP++;
+            }
+        }
+        await batch.commit();
+        showToast("Clasificación aplicada ✓ "+upd+" actualizados"+(nuevosP?" · "+nuevosP+" creado":""));
+    }catch(err){showToast("Error: "+err.message,"err")}
+    finally{btn.disabled=false;btn.textContent="Aplicar clasificación"}
+});
+
+fillAreaSelect(document.getElementById("proj-area"));
 lucide.createIcons();
 </script>
 </body>
