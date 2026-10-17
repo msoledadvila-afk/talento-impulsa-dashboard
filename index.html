@@ -386,6 +386,55 @@
         .mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-4)}
         .mkt-tipo-badge{font-size:var(--text-xs);font-weight:600;padding:2px 8px;border-radius:var(--radius-pill);background:var(--brand-primary-glow);color:var(--brand-primary)}
 
+
+        /* ── HORAS POR DÍA ─────────────────────────────── */
+        .hd-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4) var(--space-5);margin:var(--space-4) 0}
+        .hd-head{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-3)}
+        .hd-title{font-weight:700;font-size:var(--text-sm);color:var(--text)}
+        .hd-sub{font-size:var(--text-xs);color:var(--text-dim);margin-top:2px}
+        .hd-nav{display:flex;align-items:center;gap:6px}
+        .hd-nav .lbl{font-size:var(--text-xs);font-weight:600;color:var(--text);min-width:120px;text-align:center}
+        .hd-chart{display:grid;grid-template-columns:repeat(7,1fr);gap:var(--space-2);align-items:end;height:170px;padding-top:var(--space-2)}
+        .hd-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;cursor:pointer;border-radius:var(--radius-sm);padding:2px 0}
+        .hd-col:hover{background:var(--brand-primary-glow)}
+        .hd-col:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+        .hd-val{font-size:var(--text-xs);font-weight:700;color:var(--text);margin-bottom:4px;font-variant-numeric:tabular-nums}
+        .hd-bar{width:min(36px,70%);background:var(--brand-primary);border-radius:4px 4px 0 0;min-height:2px;transition:height .25s}
+        .hd-col.today .hd-bar{background:var(--brand-gold)}
+        .hd-col.sel .hd-bar{outline:2px solid var(--brand-gold);outline-offset:1px}
+        .hd-col.zero .hd-bar{background:var(--border-light)}
+        .hd-day{font-size:var(--text-xs);color:var(--text-dim);margin-top:6px;text-align:center;line-height:1.25}
+        .hd-day b{display:block;color:var(--text);font-weight:600}
+        .hd-foot{display:flex;gap:var(--space-5);flex-wrap:wrap;font-size:var(--text-xs);color:var(--text-dim);margin-top:var(--space-3);border-top:1px solid var(--border-light);padding-top:var(--space-2)}
+        .hd-foot b{color:var(--text)}
+        @media(max-width:600px){.hd-chart{height:140px;gap:4px}.hd-nav .lbl{min-width:90px}}
+
+        /* ── CONTENIDO SEMANAL ─────────────────────────── */
+        .cs-weekbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)}
+        .cs-weeklbl{font-family:var(--font-display);font-weight:800;font-size:var(--text-lg);color:var(--text)}
+        .cs-progress{font-size:var(--text-xs);color:var(--text-dim)}
+        .cs-day{margin-bottom:var(--space-5)}
+        .cs-dayhead{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--brand-primary);margin-bottom:var(--space-2);display:flex;gap:8px;align-items:center}
+        .cs-dayhead.today{color:var(--brand-gold)}
+        .cs-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:var(--text-xs);color:var(--text-dim);margin-top:4px}
+        .cs-hora{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+        .cs-file{font-family:ui-monospace,monospace;font-size:11px;background:var(--bg);border:1px solid var(--border-light);border-radius:4px;padding:1px 6px}
+        #view-marketing .mkt-copy{max-height:240px;overflow:auto}
+        .mkt-card.done{opacity:.6}
+        .mkt-card.done .mkt-card-title{text-decoration:line-through}
+        .cs-notas summary{font-size:var(--text-xs);color:var(--text-dim);cursor:pointer;margin-top:var(--space-2)}
+        .cs-notas div{font-size:var(--text-xs);color:var(--text-dim);white-space:pre-wrap;margin-top:6px;line-height:1.5}
+        .cs-pub{display:inline-flex;align-items:center;gap:6px;font-size:var(--text-xs);font-weight:600;cursor:pointer;color:var(--text)}
+        .imp-row{border:1px solid var(--border-light);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-3);display:grid;grid-template-columns:minmax(0,150px) minmax(0,110px) minmax(0,1fr);gap:var(--space-2)}
+        .imp-row>*{min-width:0}.imp-row .form-control{width:100%;box-sizing:border-box}
+        .imp-row .imp-canal{grid-column:1/-1;display:flex;gap:6px}
+        .imp-row .imp-canal .form-control{flex:1}
+        #imp-preview{max-width:100%;overflow-x:hidden}
+        .imp-row textarea{grid-column:1/-1}
+        .imp-row .imp-del{justify-self:end}
+        .imp-warn{font-size:var(--text-xs);color:#854D0E;background:#FEF9C3;border-radius:var(--radius-sm);padding:6px 10px;margin-bottom:var(--space-3)}
+        @media(max-width:600px){.imp-row{grid-template-columns:1fr 1fr}.imp-row [data-f="nombre"]{grid-column:1/-1}}
+
         /* ── CLIENTE FICHA EXPANDIDA ────────────────────── */
         .cli-contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-2);margin-bottom:var(--space-3)}
         .cli-contact-item{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--text-dim)}
@@ -1116,6 +1165,8 @@
                     </select>
                 </div>
                 <div class="form-group"><label>Fecha programada</label><input type="date" id="mkt-fecha" class="form-control"></div>
+                <div class="form-group"><label>Hora</label><input type="time" id="mkt-hora" class="form-control"></div>
+                <div class="form-group"><label>Canal</label><input type="text" id="mkt-canal" class="form-control" placeholder="IG Talento, LinkedIn Sole…"></div>
                 <div class="form-group" style="grid-column:1/-1"><label>Texto del post / copy</label>
                     <textarea id="mkt-copy" class="form-control" rows="4" placeholder="Escribí o pegá el texto del post..."></textarea>
                 </div>
@@ -1124,6 +1175,33 @@
                     <button type="submit" class="btn-primary" id="btn-mkt-submit"><i data-lucide="save" size="16"></i> Guardar pieza</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL IMPORTAR SEMANA 02 -->
+<div id="modal-import" class="modal-overlay">
+    <div class="modal-box" style="max-width:820px">
+        <div class="modal-header">
+            <span class="modal-title">Importar semana de 02</span>
+            <button class="btn-icon" id="btn-close-import"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <div id="imp-step1">
+                <p style="font-size:var(--text-sm);color:var(--text-dim);margin-bottom:var(--space-3)">Subí el archivo <b>textos_semana_….md</b> que entrega 02 o pegá su contenido. La app arma las piezas con día, hora, canal y texto; antes de guardar las revisás.</p>
+                <div class="form-group"><label>Archivo .md</label><input type="file" id="imp-file" accept=".md,.txt,text/markdown,text/plain" class="form-control"></div>
+                <div class="form-group"><label>…o pegá el texto</label><textarea id="imp-text" class="form-control" rows="8" placeholder="# Semana 19–25/10 · Textos finales …"></textarea></div>
+                <div class="form-footer"><button class="btn-primary" id="btn-imp-parse"><i data-lucide="scan-text" size="16"></i> Leer piezas</button></div>
+            </div>
+            <div id="imp-step2" style="display:none">
+                <div id="imp-summary" style="font-size:var(--text-sm);margin-bottom:var(--space-3)"></div>
+                <div id="imp-warns"></div>
+                <div id="imp-preview"></div>
+                <div class="form-footer" style="display:flex;gap:var(--space-2);justify-content:flex-end">
+                    <button class="btn-secondary" id="btn-imp-back">Volver</button>
+                    <button class="btn-primary" id="btn-imp-save"><i data-lucide="save" size="16"></i> Guardar piezas</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1691,6 +1769,19 @@
                 <div class="strip-sep"></div>
                 <div><div class="sv" id="bit-strip-count">—</div><div class="sl">registros totales</div></div>
             </div>
+            <div class="hd-card" id="hd-card">
+                <div class="hd-head">
+                    <div><div class="hd-title">Horas por día</div><div class="hd-sub">Tocá un día para ver solo sus registros</div></div>
+                    <div class="hd-nav">
+                        <button class="btn-secondary btn-sm" id="hd-prev" aria-label="Semana anterior"><i data-lucide="chevron-left" size="14"></i></button>
+                        <span class="lbl" id="hd-lbl">—</span>
+                        <button class="btn-secondary btn-sm" id="hd-next" aria-label="Semana siguiente"><i data-lucide="chevron-right" size="14"></i></button>
+                        <button class="btn-secondary btn-sm" id="hd-hoy">Esta semana</button>
+                    </div>
+                </div>
+                <div class="hd-chart" id="hd-chart" role="list"></div>
+                <div class="hd-foot" id="hd-foot"></div>
+            </div>
             <div class="filtros-bar">
                 <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
                 <select id="flt-project" style="min-width:150px"><option value="">Todos los proyectos</option></select>
@@ -1854,18 +1945,35 @@
             </div>
         </section>
 
-        <!-- MARKETING TALENTO -->
+        <!-- MARKETING TALENTO · CONTENIDO SEMANAL -->
         <section id="view-marketing" class="view">
             <div class="view-header">
                 <div>
-                    <div class="view-title">Marketing · Talento Impulsa</div>
-                    <p style="font-size:var(--text-sm);color:var(--text-dim);margin-top:4px">Piezas y contenido de la marca propia</p>
+                    <div class="view-title">Contenido semanal</div>
+                    <p style="font-size:var(--text-sm);color:var(--text-dim);margin-top:4px">Publicaciones de la semana que arma 02, listas para copiar y publicar</p>
                 </div>
-                <button class="btn-primary" id="btn-open-mkt-modal"><i data-lucide="plus" size="16"></i> Nueva pieza</button>
+                <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+                    <button class="btn-secondary" id="btn-open-mkt-modal"><i data-lucide="plus" size="16"></i> Pieza suelta</button>
+                    <button class="btn-primary" id="btn-open-import"><i data-lucide="upload" size="16"></i> Importar semana de 02</button>
+                </div>
             </div>
-            <!-- Filtro rápido por estado -->
+            <div class="cs-weekbar">
+                <div>
+                    <div class="cs-weeklbl" id="cs-lbl">—</div>
+                    <div class="cs-progress" id="cs-progress"></div>
+                </div>
+                <div class="hd-nav">
+                    <button class="btn-secondary btn-sm" id="cs-prev" aria-label="Semana anterior"><i data-lucide="chevron-left" size="14"></i></button>
+                    <button class="btn-secondary btn-sm" id="cs-hoy">Esta semana</button>
+                    <button class="btn-secondary btn-sm" id="cs-next" aria-label="Semana siguiente"><i data-lucide="chevron-right" size="14"></i></button>
+                </div>
+            </div>
             <div class="filtros-bar">
                 <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
+                <select id="flt-mkt-vista">
+                    <option value="semana">Vista: semana</option>
+                    <option value="archivo">Archivo (piezas anteriores)</option>
+                </select>
                 <select id="flt-mkt-estado">
                     <option value="">Todos los estados</option>
                     <option value="pendiente">Pendiente</option>
@@ -1874,8 +1982,8 @@
                 </select>
                 <select id="flt-mkt-tipo">
                     <option value="">Todos los tipos</option>
-                    <option value="feed">Feed Instagram</option>
-                    <option value="story">Story</option>
+                    <option value="feed">Feed / Carrusel</option>
+                    <option value="story">Historia</option>
                     <option value="reel">Reel</option>
                     <option value="linkedin">LinkedIn</option>
                     <option value="email">Email / Newsletter</option>
@@ -1884,8 +1992,8 @@
                 </select>
                 <button class="btn-secondary btn-sm" id="btn-clear-mkt-filters"><i data-lucide="x" size="12"></i> Limpiar</button>
             </div>
-            <div class="mkt-grid" id="marketing-list">
-                <div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas de marketing aún.</div>
+            <div id="marketing-list">
+                <div class="empty-state"><i data-lucide="megaphone" size="32"></i>Sin piezas aún.</div>
             </div>
         </section>
 
@@ -1950,7 +2058,7 @@ function stDot(s){return{"in-progress":"","in_progress":"",done:"done",pending:"
 
 function showToast(msg,type="ok"){const t=document.getElementById("toast-notification");t.textContent=msg;t.style.background=type==="ok"?"#DCFCE7":"#FEE2E2";t.style.color=type==="ok"?"#166534":"#B91C1C";t.style.borderColor=type==="ok"?"#BADBCC":"#F5C2C7";t.style.transform="translateY(0)";t.style.opacity="1";setTimeout(()=>{t.style.transform="translateY(100px)";t.style.opacity="0"},3000)}
 
-function switchView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));document.getElementById(id)?.classList.add("active");document.querySelector(`[data-view="${id}"]`)?.classList.add("active");if(id==="view-bitacora")renderBitacoraFull();if(id==="view-pendientes"){refreshPendFilters();renderPendientes()}if(id==="view-clasificacion")renderClasificacion();if(window.innerWidth<=1024)closeSidebar()}
+function switchView(id){document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));document.querySelectorAll(".nav-item").forEach(i=>i.classList.remove("active"));document.getElementById(id)?.classList.add("active");document.querySelector(`[data-view="${id}"]`)?.classList.add("active");if(id==="view-bitacora"){renderHorasDia();renderBitacoraFull()}if(id==="view-pendientes"){refreshPendFilters();renderPendientes()}if(id==="view-clasificacion")renderClasificacion();if(window.innerWidth<=1024)closeSidebar()}
 window.switchView=switchView;
 const toggleSidebar=()=>{document.getElementById("sidebar").classList.toggle("open");document.getElementById("sidebar-overlay").classList.toggle("active")};
 const closeSidebar=()=>{document.getElementById("sidebar").classList.remove("open");document.getElementById("sidebar-overlay").classList.remove("active")};
@@ -2092,7 +2200,7 @@ function startRealtimeListeners(){
     unsubscribers.push(listen("clientes",arr=>{allClients=arr},()=>{renderClientsList();updateDropdowns();renderProjectsTable();if(document.getElementById("view-clasificacion").classList.contains("active"))renderClasificacion();}));
     unsubscribers.push(listen("pendientes",arr=>{allPendientes=arr},renderPendientes));
     unsubscribers.push(listen("recursos_compartidos",arr=>{allLinks=arr},()=>{renderResourcesList();renderResourcesGrouped();if(currentProyectoId)renderPdRecursos(currentProyectoId);}));
-    unsubscribers.push(listen("bitacoras",arr=>{allBitacoras=arr},()=>{updateHoyStats();renderHoursBars();renderInicioProyectosActivos();populateBitFilters();if(document.getElementById("view-bitacora").classList.contains("active"))renderBitacoraFull();if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdBitacora(currentProyectoId);}));
+    unsubscribers.push(listen("bitacoras",arr=>{allBitacoras=arr},()=>{updateHoyStats();renderHoursBars();renderHorasDia();renderInicioProyectosActivos();populateBitFilters();if(document.getElementById("view-bitacora").classList.contains("active"))renderBitacoraFull();if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdBitacora(currentProyectoId);}));
     unsubscribers.push(listen("activos_digitales",arr=>{allActivos=arr},()=>{
         const pid=document.getElementById("summary-bit-detail").dataset.projectId;
         if(pid&&document.getElementById("modal-summary").classList.contains("open"))renderActivosPanel(pid);
@@ -2422,7 +2530,7 @@ document.addEventListener("click",async e=>{
         document.getElementById("edit-cli-notes").value=c.notes||"";
         document.getElementById("modal-edit-cliente").classList.add("open");
     }
-    if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||m.title||"";document.getElementById("mkt-tipo").value=m.tipo||m.type||"feed";let est=m.estado||"pendiente";if(!m.estado){if(m.published===true)est="publicada";else if(m.designed===true)est="disenada";}document.getElementById("mkt-estado").value=est;document.getElementById("mkt-fecha").value=m.fecha||m.date||"";document.getElementById("mkt-copy").value=m.copy||m.detail||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("modal-mkt").classList.add("open");}
+    if(ac==="edit-mkt"){const m=allMarketing.find(x=>x.id===id);if(!m)return;document.getElementById("mkt-edit-id").value=m.id;document.getElementById("mkt-modal-title").textContent="Editar Pieza";document.getElementById("mkt-nombre").value=m.nombre||m.title||"";document.getElementById("mkt-tipo").value=m.tipo||m.type||"feed";let est=m.estado||"pendiente";if(!m.estado){if(m.published===true)est="publicada";else if(m.designed===true)est="disenada";}document.getElementById("mkt-estado").value=est;document.getElementById("mkt-fecha").value=m.fecha||m.date||"";document.getElementById("mkt-copy").value=m.copy||m.detail||"";document.getElementById("mkt-url").value=m.url||"";document.getElementById("mkt-hora").value=m.hora||"";document.getElementById("mkt-canal").value=m.canal||"";document.getElementById("modal-mkt").classList.add("open");}
     if(ac==="delete-mkt"&&confirm("¿Eliminar esta pieza?")){await deleteItem("marketing",id);showToast("Pieza eliminada")}
     if(ac==="edit-acceso"){const a=allAccesos.find(x=>x.id===id);if(!a)return;document.getElementById("acceso-edit-id").value=a.id;document.getElementById("acceso-modal-title").textContent="Editar Enlace";document.getElementById("acc-titulo").value=a.title||a.titulo||"";document.getElementById("acc-tipo").value=a.type||a.tipo||"web";document.getElementById("acc-url").value=a.url||"";document.getElementById("acc-desc").value=a.desc||"";document.getElementById("modal-acceso").classList.add("open");}
     if(ac==="delete-acceso"&&confirm("¿Eliminar este enlace?")){await deleteItem("enlaces_internos",id);showToast("Enlace eliminado")}
@@ -2557,8 +2665,11 @@ document.getElementById("form-add-mkt")?.addEventListener("submit",async e=>{
         copy:document.getElementById("mkt-copy").value.trim(),
         detail:document.getElementById("mkt-copy").value.trim(),
         url:document.getElementById("mkt-url").value.trim(),
+        hora:document.getElementById("mkt-hora").value,
+        canal:document.getElementById("mkt-canal").value.trim(),
         addedBy:localUser,updatedAt:Date.now()
     };
+    if(data.fecha)data.semana=weekStartOf(data.fecha);
     try{
         if(editId){await col("marketing").doc(editId).update(data);}
         else{data.createdAt=Date.now();await col("marketing").add(data);}
@@ -3080,46 +3191,224 @@ function renderAccesos(){
 
 // ── MARKETING (colección: marketing) ─────────────────────────
 // Campos: title, type, designed(bool), published(bool), detail, date
+// ── FECHAS (semanas lunes a domingo, fechas locales "YYYY-MM-DD") ──
+function dsToDate(ds){const[y,m,d]=String(ds).split("-").map(Number);return new Date(y,(m||1)-1,d||1)}
+function dateToDs(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function addDaysDs(ds,n){const d=dsToDate(ds);d.setDate(d.getDate()+n);return dateToDs(d)}
+function weekStartOf(ds){const d=dsToDate(ds),day=d.getDay();d.setDate(d.getDate()-(day===0?6:day-1));return dateToDs(d)}
+const DIAS_CORTO=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+function weekLabel(ws){const we=addDaysDs(ws,6),a=dsToDate(ws),b=dsToDate(we);const f=x=>`${x.getDate()}/${x.getMonth()+1}`;return `${f(a)} al ${f(b)}`}
+function fmtHs(n){const v=Math.round((n||0)*100)/100;return (Number.isInteger(v)?String(v):v.toFixed(2).replace(/0$/,"").replace(".",","))+" h"}
+
+// ── HORAS POR DÍA (vista Bitácora) ────────────────────────────
+let hdWeek=null,hdSel=null;
+function renderHorasDia(){
+    const chart=document.getElementById("hd-chart");if(!chart)return;
+    if(!hdWeek)hdWeek=weekStartOf(getTodayStr());
+    const today=getTodayStr(),days=[...Array(7)].map((_,i)=>addDaysDs(hdWeek,i));
+    const tot={};days.forEach(d=>tot[d]=0);
+    allBitacoras.forEach(b=>{const d=b.date||tsToDateStr(b.createdAt);if(d in tot)tot[d]+=parseFloat(b.hours)||0});
+    const vals=days.map(d=>tot[d]),max=Math.max(...vals,1),sum=vals.reduce((s,v)=>s+v,0);
+    const worked=vals.filter(v=>v>0).length;
+    document.getElementById("hd-lbl").textContent=weekLabel(hdWeek);document.getElementById("hd-hoy").disabled=hdWeek===weekStartOf(today);
+    document.getElementById("hd-next").disabled=hdWeek>=weekStartOf(today);
+    chart.innerHTML=days.map((d,i)=>{
+        const v=vals[i],h=Math.round(v/max*100),dd=dsToDate(d);
+        const cls=["hd-col",d===today?"today":"",d===hdSel?"sel":"",v===0?"zero":""].join(" ");
+        return `<div class="${cls}" role="listitem" tabindex="0" data-hd="${d}" aria-label="${DIAS_CORTO[i]} ${dd.getDate()}/${dd.getMonth()+1}: ${fmtHs(v)}"><div class="hd-val">${v?fmtHs(v):""}</div><div class="hd-bar" style="height:${v?Math.max(h,3):1}%"></div><div class="hd-day"><b>${DIAS_CORTO[i]}</b>${dd.getDate()}/${dd.getMonth()+1}</div></div>`
+    }).join("");
+    const best=vals.indexOf(Math.max(...vals));
+    document.getElementById("hd-foot").innerHTML=`<span>Total: <b>${fmtHs(sum)}</b></span><span>Promedio por día trabajado: <b>${worked?fmtHs(sum/worked):"—"}</b></span><span>Día con más horas: <b>${sum?DIAS_CORTO[best]+" ("+fmtHs(vals[best])+")":"—"}</b></span>`+(hdSel?`<span><a href="#" id="hd-clear" style="color:var(--brand-primary);font-weight:600">Ver todos los días</a></span>`:"");
+}
+function hdPick(d){
+    const fd=document.getElementById("flt-desde"),fh=document.getElementById("flt-hasta");
+    if(hdSel===d){hdSel=null;fd.value="";fh.value=""}else{hdSel=d;fd.value=d;fh.value=d}
+    renderHorasDia();renderBitacoraFull();
+}
+document.getElementById("hd-chart")?.addEventListener("click",e=>{const c=e.target.closest("[data-hd]");if(c)hdPick(c.dataset.hd)});
+document.getElementById("hd-chart")?.addEventListener("keydown",e=>{const c=e.target.closest("[data-hd]");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();hdPick(c.dataset.hd)}});
+document.getElementById("hd-foot")?.addEventListener("click",e=>{if(e.target.id==="hd-clear"){e.preventDefault();hdSel=null;document.getElementById("flt-desde").value="";document.getElementById("flt-hasta").value="";renderHorasDia();renderBitacoraFull()}});
+document.getElementById("hd-prev")?.addEventListener("click",()=>{hdWeek=addDaysDs(hdWeek,-7);renderHorasDia()});
+document.getElementById("hd-next")?.addEventListener("click",()=>{hdWeek=addDaysDs(hdWeek,7);renderHorasDia()});
+document.getElementById("hd-hoy")?.addEventListener("click",()=>{hdWeek=weekStartOf(getTodayStr());renderHorasDia()});
+document.getElementById("btn-clear-filters")?.addEventListener("click",()=>{hdSel=null;renderHorasDia()});
+
+// ── CONTENIDO SEMANAL (colección: marketing) ──────────────────
+// Piezas con campo "semana" = contenido semanal; sin "semana" = archivo (captions anteriores).
+let csWeek=null;
+function mktEstado(m){let e=m.estado||"pendiente";if(!m.estado){if(m.published===true)e="publicada";else if(m.designed===true)e="disenada"}return e}
 function renderMarketing(){
     const el=document.getElementById("marketing-list");if(!el)return;
+    if(!csWeek)csWeek=weekStartOf(getTodayStr());
+    const vista=document.getElementById("flt-mkt-vista")?.value||"semana";
     const fltEstado=document.getElementById("flt-mkt-estado")?.value||"";
     const fltTipo=document.getElementById("flt-mkt-tipo")?.value||"";
-    let items=[...allMarketing];
-    items.sort((a,b)=>(b.date||b.createdAt||0)-(a.date?new Date(a.date).getTime():a.createdAt||0));
-
-    if(fltEstado){items=items.filter(m=>{
-        let est=m.estado||"pendiente";
-        if(!m.estado){if(m.published===true)est="publicada";else if(m.designed===true)est="disenada";}
-        return est===fltEstado;
-    });}
-    if(fltTipo)items=items.filter(m=>(m.tipo||m.type||"")===fltTipo);
-
-    if(!items.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="megaphone" size="32"></i>Sin piezas'+((fltEstado||fltTipo)?" con esos filtros":"")+'.</div>';lucide.createIcons();return;}
-
-    const tipoLabel={feed:"Feed IG",story:"Story",reel:"Reel",Reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
+    const isArchivo=vista==="archivo";
+    document.querySelector(".cs-weekbar").style.display=isArchivo?"none":"";
+    const tipoLabel={feed:"Feed / Carrusel",story:"Historia",reel:"Reel",Reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
     const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",publicada:"Publicada"};
-
-    el.innerHTML=items.map(m=>{
-        const mtitulo=m.nombre||m.title||"Sin título";
-        const mcopy=m.copy||m.detail||"";
-        const mtipo=m.tipo||m.type||"otro";
-        let mestado=m.estado||"pendiente";
-        if(!m.estado){if(m.published===true)mestado="publicada";else if(m.designed===true)mestado="disenada";}
-        const mfecha=m.fecha||m.date||"";
-        const editBtn='<button class="btn-icon" data-action="edit-mkt" data-id="'+m.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="14"></i></button>';
-        const delBtn='<button class="btn-icon" data-action="delete-mkt" data-id="'+m.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button>';
-        const copyBtn=mcopy?'<button class="btn-icon" data-action="copy-text" data-copy="'+encodeURIComponent(mcopy)+'" title="Copiar"><i data-lucide="copy" size="14"></i></button>':"";
-        const openBtn=m.url?'<a href="'+m.url+'" target="_blank" class="btn-secondary btn-sm">Diseño →</a>':"";
-        const copyBlock=mcopy?'<div class="mkt-copy">'+mcopy+'</div>':"";
-        return '<div class="mkt-card"><div class="mkt-card-header"><div><div class="mkt-card-title">'+mtitulo+'</div><div class="mkt-card-sub"><span class="mkt-tipo-badge">'+(tipoLabel[mtipo]||mtipo)+'</span><span class="mkt-estado '+mestado+'">'+(estadoLabel[mestado]||mestado)+'</span>'+(mfecha?'<span style="font-size:var(--text-xs);color:var(--text-muted)">'+mfecha+'</span>':"")+'</div></div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0">'+openBtn+copyBtn+editBtn+delBtn+'</div></div>'+copyBlock+'</div>';
-    }).join("");
+    let items=allMarketing.filter(m=>isArchivo?!m.semana:m.semana===csWeek);
+    const weekAll=items.slice();
+    if(fltEstado)items=items.filter(m=>mktEstado(m)===fltEstado);
+    if(fltTipo)items=items.filter(m=>(m.tipo||m.type||"")===fltTipo);
+    if(!isArchivo){
+        const today=getTodayStr();
+        document.getElementById("cs-lbl").textContent=(csWeek===weekStartOf(today)?"Esta semana · ":"Semana del ")+weekLabel(csWeek);
+        const pub=weekAll.filter(m=>mktEstado(m)==="publicada").length;
+        document.getElementById("cs-progress").textContent=weekAll.length?`${pub} de ${weekAll.length} piezas publicadas`:"Sin piezas cargadas para esta semana";
+    }
+    if(!items.length){el.innerHTML=`<div class="empty-state"><i data-lucide="megaphone" size="32"></i>${isArchivo?"El archivo está vacío.":(fltEstado||fltTipo)?"Sin piezas con esos filtros.":"Sin piezas esta semana. Usá «Importar semana de 02»."}</div>`;lucide.createIcons();return}
+    function card(m){
+        const est=mktEstado(m),mtipo=m.tipo||m.type||"otro",mcopy=m.copy||m.detail||"",done=est==="publicada";
+        const btns=(m.url?`<a href="${esc(m.url)}" target="_blank" rel="noopener" class="btn-secondary btn-sm">Diseño →</a>`:"")+
+            (mcopy?`<button class="btn-icon" data-action="copy-text" data-copy="${encodeURIComponent(mcopy)}" title="Copiar texto"><i data-lucide="copy" size="14"></i></button>`:"")+
+            `<button class="btn-icon" data-action="edit-mkt" data-id="${m.id}" style="color:var(--brand-primary)" title="Editar"><i data-lucide="pencil" size="14"></i></button>`+
+            `<button class="btn-icon" data-action="delete-mkt" data-id="${m.id}" style="color:var(--text-muted)" title="Eliminar"><i data-lucide="trash-2" size="14"></i></button>`;
+        const meta=[m.hora?`<span class="cs-hora">${esc(m.hora)}</span>`:"",m.canal?`<span>${esc(m.canal)}</span>`:"",`<span class="mkt-tipo-badge">${esc(tipoLabel[mtipo]||mtipo)}</span>`,`<span class="mkt-estado ${est}">${estadoLabel[est]||est}</span>`,m.archivo?`<span class="cs-file">${esc(m.archivo)}</span>`:"",m.publicacion?`<span>· ${esc(m.publicacion)}</span>`:"",isArchivo&&(m.fecha||m.date)?`<span>${esc(m.fecha||m.date)}</span>`:""].join("");
+        const pubToggle=isArchivo?"":`<label class="cs-pub"><input type="checkbox" data-mkt-pub="${m.id}" ${done?"checked":""}> Publicada</label>`;
+        return `<div class="mkt-card${done&&!isArchivo?" done":""}"><div class="mkt-card-header"><div><div class="mkt-card-title">${esc(m.nombre||m.title||"Sin título")}</div><div class="cs-meta">${meta}</div></div><div style="display:flex;gap:4px;align-items:center;flex-shrink:0">${btns}</div></div>${mcopy?`<div class="mkt-copy">${esc(mcopy)}</div>`:""}${m.notas?`<details class="cs-notas"><summary>Indicaciones de 02</summary><div>${esc(m.notas)}</div></details>`:""}${pubToggle?`<div style="margin-top:var(--space-2)">${pubToggle}</div>`:""}</div>`
+    }
+    if(isArchivo){
+        items.sort((a,b)=>String(b.fecha||b.date||"").localeCompare(String(a.fecha||a.date||""))||(b.createdAt||0)-(a.createdAt||0));
+        el.innerHTML=`<div class="mkt-grid">${items.map(card).join("")}</div>`;
+    }else{
+        items.sort((a,b)=>String(a.fecha||"").localeCompare(String(b.fecha||""))||String(a.hora||"99").localeCompare(String(b.hora||"99"))||(a.orden||0)-(b.orden||0));
+        const groups={};items.forEach(m=>{const k=m.todaSemana?"toda":(m.fecha||"sin");(groups[k]=groups[k]||[]).push(m)});
+        const today=getTodayStr();
+        const keys=Object.keys(groups).sort((a,b)=>a==="toda"?1:b==="toda"?-1:a.localeCompare(b));
+        el.innerHTML=keys.map(k=>{
+            let head;if(k==="toda")head="Toda la semana";else if(k==="sin")head="Sin fecha";else{const d=dsToDate(k),i=(d.getDay()+6)%7;head=`${DIAS_CORTO[i]} ${d.getDate()}/${d.getMonth()+1}`+(k===today?" · hoy":"")}
+            return `<div class="cs-day"><div class="cs-dayhead${k===today?" today":""}">${head}</div><div class="mkt-grid">${groups[k].map(card).join("")}</div></div>`
+        }).join("");
+    }
     lucide.createIcons();
 }
-document.getElementById("flt-mkt-estado")?.addEventListener("change",renderMarketing);
-document.getElementById("flt-mkt-tipo")?.addEventListener("change",renderMarketing);
+document.getElementById("marketing-list")?.addEventListener("change",async e=>{
+    const id=e.target?.dataset?.mktPub;if(!id)return;
+    if(!db||!firebaseUser){showToast("Sin conexión","err");e.target.checked=!e.target.checked;return}
+    try{await col("marketing").doc(id).update({estado:e.target.checked?"publicada":"pendiente",updatedAt:Date.now()});showToast(e.target.checked?"Marcada como publicada ✓":"Vuelve a pendiente")}
+    catch(err){console.error(err);e.target.checked=!e.target.checked;showToast("No se pudo actualizar: "+err.message,"err")}
+});
+["flt-mkt-vista","flt-mkt-estado","flt-mkt-tipo"].forEach(id=>document.getElementById(id)?.addEventListener("change",renderMarketing));
 document.getElementById("btn-clear-mkt-filters")?.addEventListener("click",()=>{
     ["flt-mkt-estado","flt-mkt-tipo"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
-    renderMarketing();
+    document.getElementById("flt-mkt-vista").value="semana";renderMarketing();
+});
+document.getElementById("cs-prev")?.addEventListener("click",()=>{csWeek=addDaysDs(csWeek,-7);renderMarketing()});
+document.getElementById("cs-next")?.addEventListener("click",()=>{csWeek=addDaysDs(csWeek,7);renderMarketing()});
+document.getElementById("cs-hoy")?.addEventListener("click",()=>{csWeek=weekStartOf(getTodayStr());renderMarketing()});
+
+// ── IMPORTAR SEMANA DE 02 (textos_semana_….md) ────────────────
+const DIA_IDX={lun:0,mar:1,"mié":2,mie:2,jue:3,vie:4,"sáb":5,sab:5,dom:6};
+function parseSemana02(md,hoyDs){
+    const warns=[],src=String(md||"").replace(/\r/g,"");
+    const tm=src.match(/^#\s+Semana\s+(\d{1,2})(?:\/(\d{1,2}))?\s*[–\-]\s*(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/im);
+    if(!tm)throw new Error("No encontré el título «# Semana DD–DD/MM». ¿Es el archivo de textos de 02?");
+    const hoy=dsToDate(hoyDs);let y=tm[5]?Number(tm[5].length===2?"20"+tm[5]:tm[5]):hoy.getFullYear();
+    const dEnd=Number(tm[3]),mEnd=Number(tm[4]);let mStart=tm[2]?Number(tm[2]):mEnd;const dStart=Number(tm[1]);
+    if(!tm[2]&&dStart>dEnd)mStart=mEnd-1;
+    let start=new Date(y,mStart-1,dStart);
+    if(!tm[5]&&(start-hoy)/864e5<-180){y++;start=new Date(y,mStart-1,dStart)}
+    const ws=weekStartOf(dateToDs(start));
+    if(ws!==dateToDs(start))warns.push("La semana del archivo no empieza en lunes; la ubiqué en la semana del "+weekLabel(ws)+".");
+    const days=[...Array(7)].map((_,i)=>addDaysDs(ws,i));
+    function fechaDe(txt){
+        const m=String(txt).toLowerCase().match(/\b(lun|mar|mi[eé]|jue|vie|s[aá]b|dom)\w*\.?\s*(\d{1,2})\b/);
+        if(m){const dn=Number(m[2]);const hit=days.find(d=>dsToDate(d).getDate()===dn);if(hit)return hit;const k=m[1].normalize("NFD").replace(/[̀-ͯ]/g,"");const idx=DIA_IDX[k];if(idx!=null)return days[idx]}
+        const n=String(txt).match(/\b(\d{1,2})\/(\d{1,2})\b/);if(n){const hit=days.find(d=>{const x=dsToDate(d);return x.getDate()===Number(n[1])&&x.getMonth()+1===Number(n[2])});if(hit)return hit}
+        return null
+    }
+    const horaDe=txt=>{const m=String(txt).match(/\b(\d{1,2})[:.](\d{2})\b/);return m?`${m[1].padStart(2,"0")}:${m[2]}`:""};
+    const clean=s=>String(s||"").replace(/`/g,"").replace(/\*\*/g,"").trim();
+    // tabla de agenda
+    const lines=src.split("\n");let hdr=-1;
+    for(let i=0;i<lines.length;i++){if(/^\s*\|/.test(lines[i])&&/d[ií]a/i.test(lines[i])&&/canal/i.test(lines[i])){hdr=i;break}}
+    if(hdr<0)throw new Error("No encontré la tabla de agenda (columnas Día · Canal · Pieza…).");
+    const cols=lines[hdr].split("|").slice(1,-1).map(c=>c.trim().toLowerCase());
+    const ci=n=>cols.findIndex(c=>c.startsWith(n));
+    const cDia=ci("d"),cCanal=ci("canal"),cPieza=ci("pieza"),cArch=ci("archivo"),cPub=ci("public");
+    const rows=[];
+    for(let i=hdr+2;i<lines.length&&/^\s*\|/.test(lines[i]);i++){
+        const c=lines[i].split("|").slice(1,-1).map(clean);if(!c.length)continue;
+        const dia=c[cDia]||"",toda=/toda la semana/i.test(dia);
+        rows.push({diaTxt:dia,fecha:toda?ws:fechaDe(dia),hora:horaDe(dia),todaSemana:toda,canal:c[cCanal]||"",nombre:c[cPieza]||"",archivo:cArch>=0?c[cArch]:"",publicacion:cPub>=0?c[cPub]:""});
+    }
+    // secciones "## N · …"
+    const secs=[];const re=/^##\s+(.+)$/gm;let m,marks=[];
+    while((m=re.exec(src)))marks.push({i:m.index,end:re.lastIndex,h:m[1].trim()});
+    marks.forEach((mk,k)=>{const body=src.slice(mk.end,k+1<marks.length?marks[k+1].i:src.length).replace(/\n-{3,}\s*$/,"").trim();secs.push({h:mk.h,body,used:false})});
+    const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+    const STOP=new Set(["de","del","la","el","los","las","con","a","y","o","en","por","para","un","una","al","ig","talento","sole","semana"]);
+    const words=s=>norm(s).split(/[^a-z0-9#]+/).filter(w=>w.length>2&&!STOP.has(w));
+    function tipoDe(r){const s=norm(r.nombre+" "+r.canal+" "+r.archivo);if(/linkedin/.test(s))return"linkedin";if(/reel/.test(s))return"reel";if(/carrusel|feed|post/.test(s))return"feed";if(/historia|story|encuesta|stories/.test(s))return"story";if(/whatsapp|estado/.test(s))return"whatsapp";if(/mail|newsletter/.test(s))return"email";return"otro"}
+    rows.forEach(r=>{
+        let best=null,score=0;const rw=words(r.nombre+" "+r.canal);
+        secs.forEach(s=>{const h=norm(s.h);let sc=s.used?-1:0;
+            const refs=(s.h.toLowerCase().match(/\b(?:lun|mar|mi[eé]|jue|vie|s[aá]b|dom)\w*\.?\s*\d{1,2}\b/g)||[]).map(fechaDe);
+            if(r.fecha&&!r.todaSemana&&refs.includes(r.fecha))sc+=3;
+            if(r.todaSemana&&/toda la semana|estandar|respuesta/.test(h))sc+=2;
+            rw.forEach(w=>{if(h.includes(w))sc+=1});
+            if(sc>score){score=sc;best=s}});
+        if(best&&score>=2){best.used=true;
+            const quote=best.body.split("\n").filter(l=>/^\s*>/.test(l)).map(l=>l.replace(/^\s*>\s?/,"")).join("\n").trim();
+            r.copy=quote;r.notas=quote?best.body.split("\n").filter(l=>!/^\s*>/.test(l)).join("\n").replace(/\n{3,}/g,"\n\n").trim():best.body;r.seccion=best.h;
+        }else{r.copy="";r.notas="";}
+        r.tipo=tipoDe(r);
+        if(!r.fecha)warns.push(`No pude ubicar el día de «${r.nombre}» (${r.diaTxt}); revisá la fecha.`);
+    });
+    const libres=secs.filter(s=>!s.used&&!/^(no tocar|resumen|notas?)\b/i.test(s.h));
+    if(libres.length)warns.push("Secciones sin pieza asignada: "+libres.map(s=>"«"+s.h+"»").join(", ")+". Podés pegar su texto a mano en la pieza que corresponda.");
+    const noTocar=src.match(/^No tocar:.*$/im);if(noTocar)warns.unshift(noTocar[0]);
+    return {semana:ws,rows,warns};
+}
+let impData=null;
+function impOpen(){document.getElementById("imp-step1").style.display="";document.getElementById("imp-step2").style.display="none";document.getElementById("imp-text").value="";document.getElementById("imp-file").value="";document.getElementById("modal-import").classList.add("open")}
+function impRender(){
+    const {semana,rows,warns}=impData;
+    const exist=allMarketing.filter(m=>m.semana===semana).length;
+    document.getElementById("imp-summary").innerHTML=`<b>${rows.length} piezas</b> para la semana del <b>${weekLabel(semana)}</b>.`+(exist?` Ya hay ${exist} piezas cargadas en esa semana: las que tengan el mismo nombre y día se actualizan, no se duplican.`:"");
+    document.getElementById("imp-warns").innerHTML=warns.map(w=>`<div class="imp-warn">${esc(w)}</div>`).join("");
+    const tipos=[["feed","Feed / Carrusel"],["story","Historia"],["reel","Reel"],["linkedin","LinkedIn"],["whatsapp","WhatsApp"],["email","Email"],["otro","Otro"]];
+    document.getElementById("imp-preview").innerHTML=rows.map((r,i)=>`<div class="imp-row" data-imp="${i}">
+        <input type="date" class="form-control" data-f="fecha" value="${esc(r.fecha||"")}">
+        <input type="time" class="form-control" data-f="hora" value="${esc(r.hora||"")}">
+        <input type="text" class="form-control" data-f="nombre" value="${esc(r.nombre)}" placeholder="Pieza">
+        <div class="imp-canal"><input type="text" class="form-control" data-f="canal" value="${esc(r.canal)}" placeholder="Canal"><select class="form-control" data-f="tipo">${tipos.map(([v,l])=>`<option value="${v}"${v===r.tipo?" selected":""}>${l}</option>`).join("")}</select><button class="btn-icon imp-del" data-imp-del="${i}" title="Quitar"><i data-lucide="x" size="14"></i></button></div>
+        <textarea class="form-control" rows="${r.copy?5:2}" data-f="copy" placeholder="Texto para publicar (vacío si es solo imagen)">${esc(r.copy||"")}</textarea>
+        <div style="grid-column:1/-1;font-size:var(--text-xs);color:var(--text-dim)">${r.archivo?`<span class="cs-file">${esc(r.archivo)}</span> `:""}${esc(r.publicacion||"")}${r.seccion?` · texto tomado de «${esc(r.seccion)}»`:" · sin texto asociado"}</div>
+    </div>`).join("");
+    lucide.createIcons();
+}
+document.getElementById("btn-open-import")?.addEventListener("click",impOpen);
+document.getElementById("btn-close-import")?.addEventListener("click",()=>document.getElementById("modal-import").classList.remove("open"));
+document.getElementById("imp-file")?.addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;document.getElementById("imp-text").value=await f.text()});
+document.getElementById("btn-imp-parse")?.addEventListener("click",()=>{
+    try{impData=parseSemana02(document.getElementById("imp-text").value,getTodayStr());if(!impData.rows.length)throw new Error("La tabla de agenda está vacía.");
+        document.getElementById("imp-step1").style.display="none";document.getElementById("imp-step2").style.display="";impRender()}
+    catch(err){showToast(err.message,"err")}
+});
+document.getElementById("btn-imp-back")?.addEventListener("click",()=>{document.getElementById("imp-step1").style.display="";document.getElementById("imp-step2").style.display="none"});
+document.getElementById("imp-preview")?.addEventListener("input",e=>{const row=e.target.closest("[data-imp]"),f=e.target.dataset.f;if(row&&f)impData.rows[Number(row.dataset.imp)][f]=e.target.value});
+document.getElementById("imp-preview")?.addEventListener("change",e=>{const row=e.target.closest("[data-imp]"),f=e.target.dataset.f;if(row&&f)impData.rows[Number(row.dataset.imp)][f]=e.target.value});
+document.getElementById("imp-preview")?.addEventListener("click",e=>{const b=e.target.closest("[data-imp-del]");if(!b)return;e.preventDefault();impData.rows.splice(Number(b.dataset.impDel),1);impRender()});
+document.getElementById("btn-imp-save")?.addEventListener("click",async()=>{
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return}
+    const {semana,rows}=impData;const btn=document.getElementById("btn-imp-save");btn.disabled=true;
+    try{
+        const batch=db.batch();let nuevos=0,act=0;
+        rows.forEach((r,i)=>{
+            const fecha=r.fecha||semana;
+            const data={nombre:r.nombre,title:r.nombre,tipo:r.tipo,type:r.tipo,canal:r.canal,fecha,date:fecha,hora:r.hora||"",copy:(r.copy||"").trim(),detail:(r.copy||"").trim(),notas:r.notas||"",archivo:r.archivo||"",publicacion:r.publicacion||"",todaSemana:!!r.todaSemana,semana,orden:i,origen:"02",url:"",addedBy:localUser,updatedAt:Date.now()};
+            const prev=allMarketing.find(m=>m.semana===semana&&(m.nombre||"")===r.nombre&&(m.fecha||"")===fecha);
+            if(prev){batch.update(col("marketing").doc(prev.id),data);act++}
+            else{data.estado="pendiente";data.createdAt=Date.now()+i;batch.set(col("marketing").doc(),data);nuevos++}
+        });
+        await batch.commit();
+        document.getElementById("modal-import").classList.remove("open");
+        csWeek=semana;document.getElementById("flt-mkt-vista").value="semana";renderMarketing();
+        showToast(`Semana importada ✓ (${nuevos} nuevas${act?`, ${act} actualizadas`:""})`);
+    }catch(err){console.error(err);showToast("Error al guardar: "+err.message,"err")}
+    finally{btn.disabled=false}
 });
 
 // ── GASTOS (colección: gastos) ────────────────────────────────
