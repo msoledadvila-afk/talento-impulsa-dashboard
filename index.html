@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Talento Impulsa · Dashboard Operativo</title>
+    <link rel="icon" type="image/png" href="assets/logo-icon.png">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --brand-primary:#D85A30; --brand-primary-deep:#c04e26; --brand-primary-glow:rgba(216,90,48,0.08);
-            --brand-gold:#BA7517; --brand-green:#0F6E56;
-            --bg:#F6F4EE; --bg-card:#FFFFFF;
-            --text:#1A1814; --text-dim:#6B6560; --text-muted:#9A9590;
-            --border-light:#E8E4DC; --border:#D4CEC4;
+            --brand-primary:#9A7B3D; --brand-primary-deep:#75582A; --brand-primary-glow:rgba(154,123,61,0.10);
+            --brand-gold:#75582A; --brand-charcoal:#1A1814; --brand-soft:#B8995A; --brand-green:#0F6E56;
+            --bg:#EFE9DB; --bg-card:#FFFFFF;
+            --text:#1A1814; --text-dim:#6E6859; --text-muted:#8A8374;
+            --border-light:#DDD8D4; --border:#C8C0B5;
             --shadow-sm:0 1px 3px rgba(26,24,20,0.06); --shadow-md:0 4px 12px rgba(26,24,20,0.08); --shadow-lg:0 8px 24px rgba(26,24,20,0.12);
             --radius-sm:6px; --radius-md:10px; --radius-lg:16px; --radius-pill:999px;
-            --font-display:'Syne',sans-serif; --font-body:'Outfit',sans-serif;
+            --font-display:'Outfit',sans-serif; --font-serif:'Cormorant Garamond',serif; --font-body:'Outfit',sans-serif;
             --text-xs:0.72rem; --text-sm:0.85rem; --text-base:1rem; --text-md:1.05rem;
             --text-lg:1.2rem; --text-xl:1.4rem; --text-2xl:1.7rem;
             --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
@@ -91,7 +92,13 @@
         .sidebar-overlay.active{display:block;opacity:1}
         .sidebar{width:240px;background:var(--bg-card);border-right:1px solid var(--border-light);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:50;transition:transform .3s var(--ease-std)}
         .sidebar-header{padding:var(--space-5);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
-        .logo{font-family:var(--font-display);font-size:var(--text-md);font-weight:800;color:var(--brand-primary);display:flex;align-items:center;gap:var(--space-2)}
+        .logo{display:flex;align-items:center;gap:10px;color:var(--text)}
+        .logo-mark{width:40px;height:40px;border-radius:10px;background:#3B3730;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+        .logo-mark img{width:30px;height:auto;display:block}
+        .logo-mark.lg{width:72px;height:72px;border-radius:16px}.logo-mark.lg img{width:54px}
+        .logo-txt{display:flex;flex-direction:column;line-height:1}
+        .logo-t1{font-family:var(--font-body);font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:var(--text)}
+        .logo-t2{font-family:var(--font-serif);font-style:italic;font-weight:600;font-size:20px;color:var(--brand-primary);margin-top:1px}
         .btn-close-sidebar{display:none}
         .nav-section-label{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);padding:var(--space-5) var(--space-5) var(--space-2)}
         .nav-menu{padding:var(--space-2) 0;flex-grow:1;overflow-y:auto}
@@ -325,7 +332,7 @@
         /* Meeting cards */
         .meeting-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:var(--space-4);display:flex;gap:var(--space-4);align-items:flex-start;transition:box-shadow .15s}
         .meeting-card:hover{box-shadow:var(--shadow-md)}
-        .meeting-date-block{flex-shrink:0;width:52px;text-align:center;background:var(--brand-primary-glow);border-radius:var(--radius-md);padding:var(--space-2) var(--space-1);border:1px solid rgba(216,90,48,.15)}
+        .meeting-date-block{flex-shrink:0;width:52px;text-align:center;background:var(--brand-primary-glow);border-radius:var(--radius-md);padding:var(--space-2) var(--space-1);border:1px solid rgba(154,123,61,.2)}
         .meeting-date-day{font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--brand-primary);line-height:1}
         .meeting-date-mon{font-size:0.65rem;font-weight:700;text-transform:uppercase;color:var(--brand-primary);letter-spacing:.06em;opacity:.8}
         .meeting-body{flex:1;min-width:0}
@@ -733,6 +740,12 @@
         .gasto-tipo-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700}
         .gasto-tipo-tag.ingreso{background:#DCFCE7;color:#166534}
         .gasto-tipo-tag.egreso{background:#FEE2E2;color:#B91C1C}
+            .view-title{letter-spacing:-.01em}
+        .login-logo{display:flex;flex-direction:column;align-items:center;gap:10px}
+        .login-logo .logo-t1{font-size:14px}.login-logo .logo-t2{font-size:28px}
+        .login-subtitle{font-family:var(--font-serif);font-style:italic;font-size:17px}
+        .hd-col.today .hd-bar{background:var(--brand-charcoal)}
+        .cs-dayhead.today{color:var(--brand-charcoal)}
     </style>
 </head>
 <body>
@@ -741,7 +754,7 @@
 <!-- LOGIN -->
 <div id="login-overlay" class="overlay-fullscreen">
     <div class="login-card">
-        <div class="login-logo"><i data-lucide="sparkles" size="22"></i> Talento Impulsa</div>
+        <div class="login-logo"><span class="logo-mark lg"><img src="assets/logo-icon.png" alt="" width="54" height="47"></span><span class="logo-txt"><span class="logo-t1">Talento</span><span class="logo-t2">Impulsa</span></span></div>
         <p class="login-subtitle">Dashboard Operativo</p>
         <div id="login-error"></div>
         <form id="login-form" style="display:flex;flex-direction:column;gap:var(--space-4)">
@@ -1474,7 +1487,7 @@
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="logo"><i data-lucide="sparkles" size="18"></i> Talento</div>
+            <div class="logo"><span class="logo-mark"><img src="assets/logo-icon.png" alt="" width="30" height="26"></span><span class="logo-txt"><span class="logo-t1">Talento</span><span class="logo-t2">Impulsa</span></span></div>
             <button class="btn-icon btn-close-sidebar" id="btn-close-sidebar"><i data-lucide="x" size="18"></i></button>
         </div>
         <nav class="nav-menu">
