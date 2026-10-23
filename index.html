@@ -375,6 +375,19 @@
         .pipeline-etapa.propuesta{background:#FEF9C3;color:#854D0E}
         .pipeline-etapa.negociacion{background:#FFEDD5;color:#9A3412}
         .pipeline-etapa.perdido{background:#FEE2E2;color:#B91C1C}
+        .pipeline-etapa.por_contactar{background:#EFE9DB;color:#75582A}
+        .pipeline-etapa.otra{background:#F1F5F9;color:#475569}
+        .pot-prio{font-size:var(--text-xs);font-weight:700;padding:2px 8px;border-radius:var(--radius-pill);letter-spacing:.02em}
+        .pot-prio.p1{background:#FEE2E2;color:#B91C1C}
+        .pot-prio.p2{background:#FEF9C3;color:#854D0E}
+        .pot-prio.p3{background:#F1F5F9;color:#475569}
+        .pot-prio.espera{background:#EFE9DB;color:#75582A}
+        .pot-chips{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0}
+        .pot-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--radius-pill);border:1px solid var(--border);background:var(--bg-card);color:var(--text-dim);font-family:var(--font-body);font-size:var(--text-xs);font-weight:600;cursor:pointer;transition:all .15s}
+        .pot-chip:hover{border-color:var(--brand-primary);color:var(--brand-primary)}
+        .pot-chip.active{background:var(--brand-primary);border-color:var(--brand-primary);color:#fff}
+        .pot-chip-n{font-weight:800}
+        .pot-resumen{font-size:var(--text-xs);color:var(--text-dim);margin:var(--space-3) 0 var(--space-2)}
         .btn-convertir{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700;background:linear-gradient(135deg,var(--brand-green) 0%,#0a5a46 100%);color:white;border:none;cursor:pointer;transition:opacity .2s}
         .btn-convertir:hover{opacity:.9}
         .pipeline-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-4)}
@@ -1059,7 +1072,7 @@
 <div id="modal-potencial" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-header">
-            <span class="modal-title">Nuevo Potencial</span>
+            <span class="modal-title" id="pot-modal-title">Nuevo potencial</span>
             <button class="btn-icon" id="btn-close-potencial-modal"><i data-lucide="x" size="20"></i></button>
         </div>
         <div class="modal-body">
@@ -1069,10 +1082,12 @@
                 <div class="form-group"><label>Rubro / Industria</label><input type="text" id="pot-rubro" class="form-control" placeholder="Ej: Gastronomía, Tech..."></div>
                 <div class="form-group"><label>Etapa del pipeline</label>
                     <select id="pot-etapa" class="form-control">
+                        <option value="por_contactar">Por contactar</option>
                         <option value="contacto">Primer contacto</option>
                         <option value="reunion">Reunión agendada</option>
                         <option value="propuesta">Propuesta enviada</option>
                         <option value="negociacion">En negociación</option>
+                        <option value="perdido">Perdido</option>
                     </select>
                 </div>
                 <div class="form-group"><label>Servicio de interés</label><input type="text" id="pot-servicio" class="form-control" placeholder="Ej: Vibe Coder, Consultoría PCA..."></div>
@@ -1084,7 +1099,17 @@
                         <option value="linkedin">LinkedIn</option>
                         <option value="whatsapp">WhatsApp grupo</option>
                         <option value="web">Web / Portfolio</option>
+                        <option value="google">Investigación Google</option>
                         <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Prioridad</label>
+                    <select id="pot-prioridad" class="form-control">
+                        <option value="">— Sin prioridad —</option>
+                        <option value="p1">P1 · Alta</option>
+                        <option value="p2">P2 · Media</option>
+                        <option value="p3">P3 · Baja</option>
+                        <option value="espera">En espera</option>
                     </select>
                 </div>
                 <div class="form-group" style="grid-column:1/-1"><label>Notas</label><textarea id="pot-notas" class="form-control" rows="3" placeholder="Qué necesita, qué se habló, próximos pasos..."></textarea></div>
@@ -2014,8 +2039,21 @@
         <section id="view-potenciales" class="view">
             <div class="view-header">
                 <div class="view-title">Pipeline de Potenciales</div>
-                <button class="btn-primary" id="btn-open-potencial-modal"><i data-lucide="user-plus" size="16"></i> Agregar potencial</button>
+                <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap">
+                    <!-- TEMPORAL: migración fuente Google. Se oculta sola cuando no quedan docs pendientes. Quitar en el próximo deploy. -->
+                    <button class="btn-secondary" id="btn-migrar-google" data-action="pot-migrar-google" style="display:none"><i data-lucide="database" size="16"></i> <span id="btn-migrar-google-lbl">Migrar fuente Google</span></button>
+                    <button class="btn-primary" id="btn-open-potencial-modal"><i data-lucide="user-plus" size="16"></i> Agregar potencial</button>
+                </div>
             </div>
+            <div class="pot-chips" id="pot-etapa-chips" role="group" aria-label="Contador por etapa"></div>
+            <div class="filtros-bar">
+                <i data-lucide="filter" size="15" style="color:var(--text-dim)"></i>
+                <select id="flt-pot-origen" aria-label="Filtrar por origen"></select>
+                <select id="flt-pot-etapa" aria-label="Filtrar por etapa"></select>
+                <select id="flt-pot-prioridad" aria-label="Filtrar por prioridad"></select>
+                <button class="btn-secondary btn-sm" id="btn-clear-pot-filters"><i data-lucide="x" size="12"></i> Limpiar</button>
+            </div>
+            <div class="pot-resumen" id="pot-count-label"></div>
             <div class="pipeline-grid" id="potenciales-list">
                 <div class="empty-state" style="grid-column:1/-1"><i data-lucide="users" size="32"></i>Sin potenciales cargados aún.</div>
             </div>
@@ -2499,17 +2537,13 @@ document.addEventListener("click",async e=>{
     if(ac==="delete-potencial"&&confirm("¿Eliminar este potencial?")){await deleteItem("potenciales",id);showToast("Potencial eliminado")}
     if(ac==="edit-potencial"){
         const p=allPotenciales.find(x=>x.id===id);if(!p)return;
-        const fullN=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"";
-        document.getElementById("pot-nombre").value=fullN;
-        document.getElementById("pot-contacto").value=p.phone||p.contacto||p.contact||"";
-        document.getElementById("pot-rubro").value=p.rubro||"";
-        document.getElementById("pot-etapa").value=p.etapa||"contacto";
-        document.getElementById("pot-servicio").value=p.servicio||"";
-        document.getElementById("pot-origen").value=p.canal||p.origen||"";
-        document.getElementById("pot-notas").value=p.notas||p.notes||"";
-        document.getElementById("form-add-potencial").dataset.editId=p.id;
-        document.getElementById("modal-potencial").classList.add("open");
+        openPotencialEdit(p);
     }
+    if(ac==="pot-filter-etapa"){
+        const sel=document.getElementById("flt-pot-etapa");
+        if(sel){sel.value=(sel.value===btn.dataset.etapa)?"":btn.dataset.etapa;renderPotenciales();}
+    }
+    if(ac==="pot-migrar-google"){await migrarPotencialesGoogle();}
     if(ac==="delete-reunion"&&confirm("¿Eliminar esta reunión?")){await deleteItem("eventos",id);showToast("Reunión eliminada")}
     if(ac==="delete-idea"&&confirm("¿Eliminar esta idea?")){await deleteItem("ideas",id);showToast("Idea eliminada")}
     if(ac==="edit-idea"){const i=allIdeas.find(x=>x.id===id);if(!i)return;document.getElementById("edit-idea-id").value=i.id;document.getElementById("edit-idea-titulo").value=i.titulo||i.text||"";document.getElementById("edit-idea-categoria").value=i.categoria||"producto";document.getElementById("edit-idea-cuerpo").value=i.cuerpo||"";document.getElementById("modal-edit-idea").classList.add("open");}
@@ -2576,10 +2610,12 @@ document.addEventListener("click",async e=>{
     }
     if(ac==="convertir-potencial"){
         if(!confirm('¿Convertir "'+btn.dataset.nombre+'" a cliente activo?'))return;
-        await col("clientes").add({name:btn.dataset.nombre,contact:btn.dataset.contacto||"",phone:btn.dataset.contacto||"",rubro:btn.dataset.rubro||"",status:"active",notes:"Convertido desde potenciales",addedBy:localUser,createdAt:Date.now()});
-        await deleteItem("potenciales",id);
-        showToast("✓ Convertido a cliente.");
-        switchView("view-clientes");
+        try{
+            await col("clientes").add({name:btn.dataset.nombre,contact:btn.dataset.contacto||"",phone:btn.dataset.contacto||"",rubro:btn.dataset.rubro||"",status:"active",notes:"Convertido desde potenciales",addedBy:localUser,createdAt:Date.now()});
+            await deleteItem("potenciales",id);
+            showToast("✓ Convertido a cliente.");
+            switchView("view-clientes");
+        }catch(err){console.error(err);showToast("Error al convertir: "+err.message,"err");}
     }
 });
 
@@ -2642,24 +2678,22 @@ document.getElementById("form-add-link").addEventListener("submit",async e=>{
 document.getElementById("form-add-potencial")?.addEventListener("submit",async e=>{
     e.preventDefault();
     if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
-    const editId=document.getElementById("form-add-potencial").dataset.editId||"";
-    const data={
-        nombre:document.getElementById("pot-nombre").value.trim(),
-        contacto:document.getElementById("pot-contacto").value.trim(),
-        phone:document.getElementById("pot-contacto").value.trim(),
-        rubro:document.getElementById("pot-rubro").value.trim(),
-        etapa:document.getElementById("pot-etapa").value,
-        servicio:document.getElementById("pot-servicio").value.trim(),
-        origen:document.getElementById("pot-origen").value,
-        notas:document.getElementById("pot-notas").value.trim(),
-        addedBy:localUser,updatedAt:Date.now()
-    };
+    const form=document.getElementById("form-add-potencial");
+    const editId=form.dataset.editId||"";
+    const cur=readPotencialForm();
     try{
-        if(editId){await col("potenciales").doc(editId).update(data);document.getElementById("form-add-potencial").dataset.editId="";}
-        else{data.createdAt=Date.now();await col("potenciales").add(data);}
-        document.getElementById("form-add-potencial").reset();
+        if(editId){
+            // Solo se escriben los campos que el usuario cambió: lo que no está en el form (canal, email…) queda intacto.
+            const data=buildPotencialDiff(potEditSnapshot||{},cur);
+            if(!Object.keys(data).length){showToast("Sin cambios");}
+            else{data.updatedAt=Date.now();await col("potenciales").doc(editId).update(data);showToast("Potencial actualizado ✓");}
+        }else{
+            const data={nombre:cur.nombre,contacto:cur.contacto,phone:cur.contacto,rubro:cur.rubro,etapa:cur.etapa,servicio:cur.servicio,origen:cur.origen,prioridad:cur.prioridad,notas:cur.notas,addedBy:localUser,createdAt:Date.now(),updatedAt:Date.now()};
+            await col("potenciales").add(data);
+            showToast("Potencial guardado ✓");
+        }
+        resetPotencialForm();
         document.getElementById("modal-potencial").classList.remove("open");
-        showToast(editId?"Potencial actualizado ✓":"Potencial guardado ✓");
     }catch(err){console.error(err);showToast("Error al guardar: "+err.message,"err");}
 });
 
@@ -2892,10 +2926,11 @@ document.getElementById("btn-close-mkt-modal")?.addEventListener("click",()=>doc
 document.getElementById("modal-mkt")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-mkt"))document.getElementById("modal-mkt").classList.remove("open")});
 
 document.getElementById("btn-open-potencial-modal")?.addEventListener("click",()=>{
-    document.getElementById("form-add-potencial").reset();
-    document.getElementById("form-add-potencial").dataset.editId="";
+    resetPotencialForm();
     document.getElementById("modal-potencial").classList.add("open");
 });
+["flt-pot-origen","flt-pot-etapa","flt-pot-prioridad"].forEach(id=>document.getElementById(id)?.addEventListener("change",renderPotenciales));
+document.getElementById("btn-clear-pot-filters")?.addEventListener("click",()=>{["flt-pot-origen","flt-pot-etapa","flt-pot-prioridad"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});renderPotenciales()});
 document.getElementById("btn-close-potencial-modal")?.addEventListener("click",()=>document.getElementById("modal-potencial").classList.remove("open"));
 document.getElementById("modal-potencial")?.addEventListener("click",e=>{if(e.target===document.getElementById("modal-potencial"))document.getElementById("modal-potencial").classList.remove("open")});
 // EDIT RECURSO FORM
@@ -3518,24 +3553,259 @@ function renderIdeas(){
 
 // ── POTENCIALES (colección: potenciales) ──────────────────────
 // Campos legacy: nombre, apellido, canal, email, phone
+// Campos del form: contacto, rubro, etapa, servicio, origen, notas · nuevo: prioridad (p1/p2/p3/espera)
+const POT_ETAPAS=[
+    ["por_contactar","Por contactar"],["contacto","Primer contacto"],["reunion","Reunión agendada"],
+    ["propuesta","Propuesta enviada"],["negociacion","En negociación"],["perdido","Perdido"]
+];
+const POT_ETAPA_LABEL=Object.fromEntries(POT_ETAPAS);
+const POT_ORIGENES=[
+    ["referido","Referido"],["instagram","Instagram"],["linkedin","LinkedIn"],["whatsapp","WhatsApp grupo"],
+    ["web","Web / Portfolio"],["google","Investigación Google"],["otro","Otro"]
+];
+const POT_ORIGEN_LABEL=Object.fromEntries(POT_ORIGENES);
+const POT_PRIORIDADES=[["p1","P1"],["p2","P2"],["p3","P3"],["espera","En espera"]];
+const POT_PRIORIDAD_LABEL=Object.fromEntries(POT_PRIORIDADES);
+let potEditSnapshot=null;
+
+// Lee el prefijo "[Fuente: Google · P1]" de las notas → "p1" | "p2" | "p3" | "espera" | "cerrado" | ""
+function potPrefijoNotas(notas){
+    const m=String(notas||"").match(/\[\s*Fuente\s*:[^\]]*?(P\s*[123]|En\s+espera|Cerrado)\s*\]/i);
+    if(!m)return "";
+    const t=m[1].toLowerCase().replace(/\s+/g," ");
+    if(t.charAt(0)==="p")return "p"+t.replace(/\D/g,"");
+    if(t==="en espera")return "espera";
+    if(t==="cerrado")return "cerrado";
+    return "";
+}
+// Deduce un origen del campo legacy "canal"
+function potOrigenDesdeCanal(canal){
+    const c=String(canal||"").toLowerCase();
+    if(!c)return "";
+    if(c.includes("google"))return "google";
+    if(c.includes("instagram"))return "instagram";
+    if(c.includes("linkedin"))return "linkedin";
+    if(c.includes("whatsapp"))return "whatsapp";
+    if(c.includes("referid"))return "referido";
+    if(c.includes("web")||c.includes("portfolio"))return "web";
+    return "";
+}
+function potNotas(p){return p.notas||p.notes||""}
+// Origen normalizado: el guardado manda, salvo "otro"/vacío cuando el canal legacy dice algo más preciso
+function potOrigen(p){
+    const o=p.origen||"";
+    if(o&&o!=="otro")return o;
+    return potOrigenDesdeCanal(p.canal)||o;
+}
+function potEtapa(p){return p.etapa||"contacto"}
+function potPrioridad(p){
+    if(p.prioridad)return p.prioridad;
+    const t=potPrefijoNotas(potNotas(p));
+    return t==="cerrado"?"":t;
+}
+
+// Fija el valor de un <select> sin perderlo: si no existe como opción, agrega una opción temporal "(valor actual)"
+function potSetSelect(sel,value){
+    if(!sel)return;
+    sel.querySelectorAll("option[data-temp]").forEach(o=>o.remove());
+    const v=value||"";
+    if(v&&!Array.from(sel.options).some(o=>o.value===v)){
+        const o=document.createElement("option");o.value=v;o.textContent=v+" (valor actual)";o.dataset.temp="1";sel.appendChild(o);
+    }
+    sel.value=v;
+}
+function readPotencialForm(){
+    const g=id=>document.getElementById(id);
+    return{
+        nombre:g("pot-nombre").value.trim(),contacto:g("pot-contacto").value.trim(),rubro:g("pot-rubro").value.trim(),
+        etapa:g("pot-etapa").value,servicio:g("pot-servicio").value.trim(),origen:g("pot-origen").value,
+        prioridad:g("pot-prioridad").value,notas:g("pot-notas").value.trim()
+    };
+}
+// Diferencias entre lo cargado y lo editado → solo esos campos se escriben
+function buildPotencialDiff(snap,cur){
+    const d={};
+    if(cur.nombre!==snap.nombre){d.nombre=cur.nombre;if(snap.tieneApellido)d.apellido="";}
+    if(cur.contacto!==snap.contacto){d.contacto=cur.contacto;d.phone=cur.contacto;}
+    ["rubro","etapa","servicio","origen","prioridad","notas"].forEach(k=>{if(cur[k]!==snap[k])d[k]=cur[k]});
+    return d;
+}
+function resetPotencialForm(){
+    const f=document.getElementById("form-add-potencial");if(!f)return;
+    f.reset();f.dataset.editId="";potEditSnapshot=null;
+    f.querySelectorAll("option[data-temp]").forEach(o=>o.remove());
+    const t=document.getElementById("pot-modal-title");if(t)t.textContent="Nuevo potencial";
+}
+function openPotencialEdit(p){
+    resetPotencialForm();
+    const g=id=>document.getElementById(id);
+    // El nombre se edita como "nombre + apellido" en un solo campo; si cambia, se guarda todo en nombre y apellido queda vacío
+    const fullN=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||"";
+    const contacto=p.phone||p.contacto||p.contact||"";
+    const notas=potNotas(p);
+    const origenForm=p.origen||potOrigenDesdeCanal(p.canal)||"";
+    g("pot-nombre").value=fullN;
+    g("pot-contacto").value=contacto;
+    g("pot-rubro").value=p.rubro||"";
+    potSetSelect(g("pot-etapa"),potEtapa(p));
+    g("pot-servicio").value=p.servicio||"";
+    potSetSelect(g("pot-origen"),origenForm);
+    potSetSelect(g("pot-prioridad"),potPrioridad(p));
+    g("pot-notas").value=notas;
+    // Snapshot de lo cargado. prioridad usa el valor GUARDADO: si viene del prefijo de notas, al guardar se completa el campo.
+    potEditSnapshot={nombre:fullN,tieneApellido:!!p.apellido,contacto,rubro:p.rubro||"",etapa:potEtapa(p),servicio:p.servicio||"",
+        origen:origenForm,prioridad:p.prioridad||"",notas};
+    g("form-add-potencial").dataset.editId=p.id;
+    const t=g("pot-modal-title");if(t)t.textContent="Editar potencial";
+    g("modal-potencial").classList.add("open");
+}
+
+function potFillFilter(id,first,items,extra){
+    const sel=document.getElementById(id);if(!sel)return;
+    const cur=sel.value;
+    sel.innerHTML="";
+    const add=(v,l)=>{const o=document.createElement("option");o.value=v;o.textContent=l;sel.appendChild(o)};
+    add("",first);items.forEach(([v,l])=>add(v,l));
+    (extra||[]).forEach(([v,l])=>add(v,l));
+    sel.value=Array.from(sel.options).some(o=>o.value===cur)?cur:"";
+}
+function potMatches(p,fo,fe,fp){
+    if(fo){const o=potOrigen(p);if(fo==="__none"?!!o:o!==fo)return false;}
+    if(fe&&potEtapa(p)!==fe)return false;
+    if(fp){const pr=potPrioridad(p);if(fp==="__none"?!!pr:pr!==fp)return false;}
+    return true;
+}
+function potEl(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+function potIcon(name,size){const i=document.createElement("i");i.setAttribute("data-lucide",name);i.setAttribute("size",String(size||12));return i}
+
+// Docs a migrar: canal "Investigación Google" (los 36 de la carga). Devuelve [{p,cambios}]
+function potPendientesMigracion(){
+    return allPotenciales.map(p=>{
+        if(!/investigaci[oó]n\s+google/i.test(String(p.canal||"")))return null;
+        const c={};
+        if(p.origen!=="google")c.origen="google";
+        const t=potPrefijoNotas(potNotas(p));
+        if(!p.prioridad&&(t==="p1"||t==="p2"||t==="p3"||t==="espera"))c.prioridad=t;
+        const etapaSinAvance=!p.etapa||p.etapa==="contacto";
+        if(t==="cerrado"){if(etapaSinAvance)c.etapa="perdido";}
+        else if(etapaSinAvance&&p.etapa!=="por_contactar")c.etapa="por_contactar";
+        return Object.keys(c).length?{p,cambios:c}:null;
+    }).filter(Boolean);
+}
+function potActualizarBotonMigracion(){
+    const b=document.getElementById("btn-migrar-google");if(!b)return;
+    const n=potPendientesMigracion().length;
+    b.style.display=n?"":"none";
+    const l=document.getElementById("btn-migrar-google-lbl");if(l)l.textContent="Migrar fuente Google ("+n+")";
+}
+async function migrarPotencialesGoogle(){
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
+    const pend=potPendientesMigracion();
+    if(!pend.length){showToast("No hay potenciales pendientes de migrar");return;}
+    const cnt={origen:0,p1:0,p2:0,p3:0,espera:0,por_contactar:0,perdido:0};
+    pend.forEach(({cambios})=>{
+        if(cambios.origen)cnt.origen++;
+        if(cambios.prioridad)cnt[cambios.prioridad]++;
+        if(cambios.etapa)cnt[cambios.etapa]++;
+    });
+    const msg="Migración fuente Google · "+pend.length+" potenciales\n\n"+
+        "• Origen → Investigación Google: "+cnt.origen+"\n"+
+        "• Prioridad desde notas: P1 "+cnt.p1+" · P2 "+cnt.p2+" · P3 "+cnt.p3+" · En espera "+cnt.espera+"\n"+
+        "• Etapa → Por contactar: "+cnt.por_contactar+"\n"+
+        "• Etapa → Perdido (Cerrado): "+cnt.perdido+"\n\n"+
+        "El campo canal y las notas no se modifican. ¿Confirmás?";
+    if(!confirm(msg))return;
+    try{
+        const now=Date.now();
+        for(let i=0;i<pend.length;i+=400){
+            const batch=db.batch();
+            pend.slice(i,i+400).forEach(({p,cambios})=>batch.update(col("potenciales").doc(p.id),Object.assign({},cambios,{updatedAt:now})));
+            await batch.commit();
+        }
+        showToast("✓ "+pend.length+" potenciales migrados");
+    }catch(err){console.error(err);showToast("Error en la migración: "+err.message,"err");}
+}
+
 function renderPotenciales(){
     const el=document.getElementById("potenciales-list");if(!el)return;
-    if(!allPotenciales.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1"><i data-lucide="users" size="32"></i>Sin potenciales cargados.</div>';lucide.createIcons();return}
-    const etapaLabel={contacto:"Primer contacto",reunion:"Reunión agendada",propuesta:"Propuesta enviada",negociacion:"En negociación",perdido:"Perdido"};
-    el.innerHTML=allPotenciales.map(p=>{
+    // Filtros (se arman una vez y conservan la selección)
+    potFillFilter("flt-pot-origen","Todos los orígenes",POT_ORIGENES,[["__none","Sin especificar"]]);
+    potFillFilter("flt-pot-etapa","Todas las etapas",POT_ETAPAS);
+    potFillFilter("flt-pot-prioridad","Todas las prioridades",POT_PRIORIDADES,[["__none","Sin prioridad"]]);
+    const fo=document.getElementById("flt-pot-origen")?.value||"",fe=document.getElementById("flt-pot-etapa")?.value||"",fp=document.getElementById("flt-pot-prioridad")?.value||"";
+
+    // Contador por etapa: respeta origen y prioridad, no la etapa (para ver el reparto del recorte actual)
+    const base=allPotenciales.filter(p=>potMatches(p,fo,"",fp));
+    const chips=document.getElementById("pot-etapa-chips");
+    if(chips){
+        chips.innerHTML="";
+        const counts={};base.forEach(p=>{const e=potEtapa(p);counts[e]=(counts[e]||0)+1});
+        const etapas=POT_ETAPAS.slice();
+        Object.keys(counts).forEach(k=>{if(!POT_ETAPA_LABEL[k])etapas.push([k,k])});
+        etapas.forEach(([k,l])=>{
+            const b=potEl("button","pot-chip"+(fe===k?" active":""));
+            b.type="button";b.dataset.action="pot-filter-etapa";b.dataset.etapa=k;
+            b.setAttribute("aria-pressed",fe===k?"true":"false");
+            b.appendChild(potEl("span","",l));b.appendChild(potEl("span","pot-chip-n",String(counts[k]||0)));
+            chips.appendChild(b);
+        });
+    }
+    potActualizarBotonMigracion();
+
+    const lista=allPotenciales.filter(p=>potMatches(p,fo,fe,fp));
+    const pc=document.getElementById("pot-count-label");
+    if(pc)pc.textContent=(fo||fe||fp)?("Mostrando "+lista.length+" de "+allPotenciales.length+" potenciales"):(allPotenciales.length+" potencial"+(allPotenciales.length!==1?"es":"")+" en pipeline");
+
+    el.innerHTML="";
+    if(!lista.length){
+        const em=potEl("div","empty-state");em.style.gridColumn="1/-1";em.appendChild(potIcon("users",32));
+        em.appendChild(document.createTextNode(allPotenciales.length?"Ningún potencial coincide con los filtros.":"Sin potenciales cargados."));
+        el.appendChild(em);lucide.createIcons();return;
+    }
+    const frag=document.createDocumentFragment();
+    lista.forEach(p=>{
         const fullName=[p.nombre,p.apellido].filter(Boolean).join(" ")||p.name||p.company||"Sin nombre";
         const phone=p.phone||p.contacto||p.contact||"";
         const email=p.email||"";
-        const canal=p.canal||p.origen||"";
-        const notas=p.notas||p.notes||"";
-        const contactParts=[];
-        if(phone)contactParts.push('<span class="cli-contact-item"><i data-lucide="message-circle" size="12"></i>'+phone+'</span>');
-        if(email)contactParts.push('<span class="cli-contact-item"><i data-lucide="mail" size="12"></i>'+email+'</span>');
-        if(canal)contactParts.push('<span class="cli-contact-item"><i data-lucide="share-2" size="12"></i>'+canal+'</span>');
-        const etapa=p.etapa||"contacto";
-        return '<div class="pipeline-card"><div class="pipeline-card-header"><div><div class="pipeline-card-name">'+fullName+'</div><div class="pipeline-card-sub">'+(p.rubro||"")+'</div></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><span class="pipeline-etapa '+etapa+'">'+(etapaLabel[etapa]||"Contacto")+'</span><div style="display:flex;gap:4px"><button class="btn-icon" data-action="edit-potencial" data-id="'+p.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button><button class="btn-icon" data-action="delete-potencial" data-id="'+p.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button></div></div></div>'+(contactParts.length?'<div class="cli-contact-grid" style="margin-bottom:8px">'+contactParts.join("")+'</div>':"")+(notas?'<div class="pipeline-card-notas">'+notas+'</div>':"")+'<div class="pipeline-card-footer">'+(p.servicio?'<span class="badge info">'+p.servicio+'</span>':"")+'<button class="btn-convertir" data-action="convertir-potencial" data-id="'+p.id+'" data-nombre="'+fullName+'" data-contacto="'+phone+'" data-rubro="'+(p.rubro||"")+'"><i data-lucide="user-check" size="12"></i> Convertir a Cliente</button></div></div>';
-    }).join("");
-    const pc=document.getElementById("pot-count-label");if(pc)pc.textContent=allPotenciales.length+" potencial"+(allPotenciales.length!==1?"es":"")+" en pipeline";
+        const oKey=potOrigen(p);
+        const oLbl=POT_ORIGEN_LABEL[oKey]||oKey;
+        const canalTxt=[oLbl,(p.canal&&p.canal!==oLbl)?p.canal:""].filter(Boolean).join(" · ");
+        const notas=potNotas(p);
+        const etapa=potEtapa(p);
+        const prio=potPrioridad(p);
+
+        const card=potEl("div","pipeline-card");
+        const head=potEl("div","pipeline-card-header");
+        const left=potEl("div");
+        left.appendChild(potEl("div","pipeline-card-name",fullName));
+        left.appendChild(potEl("div","pipeline-card-sub",p.rubro||""));
+        const right=potEl("div");right.style.cssText="display:flex;flex-direction:column;gap:4px;align-items:flex-end";
+        const tags=potEl("div");tags.style.cssText="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end";
+        if(prio)tags.appendChild(potEl("span","pot-prio "+(POT_PRIORIDAD_LABEL[prio]?prio:"p3"),POT_PRIORIDAD_LABEL[prio]||prio));
+        tags.appendChild(potEl("span","pipeline-etapa "+(POT_ETAPA_LABEL[etapa]?etapa:"otra"),POT_ETAPA_LABEL[etapa]||etapa));
+        right.appendChild(tags);
+        const acts=potEl("div");acts.style.cssText="display:flex;gap:4px";
+        const bEdit=potEl("button","btn-icon");bEdit.dataset.action="edit-potencial";bEdit.dataset.id=p.id;bEdit.style.color="var(--brand-primary)";bEdit.title="Editar";bEdit.appendChild(potIcon("pencil",13));
+        const bDel=potEl("button","btn-icon");bDel.dataset.action="delete-potencial";bDel.dataset.id=p.id;bDel.style.color="var(--text-muted)";bDel.title="Eliminar";bDel.appendChild(potIcon("trash-2",13));
+        acts.appendChild(bEdit);acts.appendChild(bDel);right.appendChild(acts);
+        head.appendChild(left);head.appendChild(right);card.appendChild(head);
+
+        const parts=[["message-circle",phone],["mail",email],["share-2",canalTxt]].filter(x=>x[1]);
+        if(parts.length){
+            const grid=potEl("div","cli-contact-grid");grid.style.marginBottom="8px";
+            parts.forEach(([ic,txt])=>{const s=potEl("span","cli-contact-item");s.appendChild(potIcon(ic,12));s.appendChild(document.createTextNode(txt));grid.appendChild(s)});
+            card.appendChild(grid);
+        }
+        if(notas)card.appendChild(potEl("div","pipeline-card-notas",notas));
+        const foot=potEl("div","pipeline-card-footer");
+        if(p.servicio)foot.appendChild(potEl("span","badge info",p.servicio));
+        const bConv=potEl("button","btn-convertir");
+        bConv.dataset.action="convertir-potencial";bConv.dataset.id=p.id;bConv.dataset.nombre=fullName;bConv.dataset.contacto=phone;bConv.dataset.rubro=p.rubro||"";
+        bConv.appendChild(potIcon("user-check",12));bConv.appendChild(document.createTextNode(" Convertir a Cliente"));
+        foot.appendChild(bConv);card.appendChild(foot);
+        frag.appendChild(card);
+    });
+    el.appendChild(frag);
     lucide.createIcons();
 }
 
