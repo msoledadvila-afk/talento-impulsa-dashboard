@@ -753,6 +753,21 @@
         .gasto-tipo-tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700}
         .gasto-tipo-tag.ingreso{background:#DCFCE7;color:#166534}
         .gasto-tipo-tag.egreso{background:#FEE2E2;color:#B91C1C}
+        /* ── SUSCRIPCIONES HABITUALES ──────────── */
+        .sus-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-3)}
+        .sus-title{font-family:var(--font-display);font-weight:800;font-size:var(--text-base);display:flex;align-items:center;gap:8px}
+        .sus-sub{font-size:var(--text-xs);color:var(--text-dim)}
+        .sus-row{display:flex;align-items:center;gap:var(--space-2);padding:8px 0;border-top:1px solid var(--border-light);flex-wrap:wrap}
+        .sus-row.inactiva{opacity:.5}
+        .sus-name{flex:1;min-width:140px;font-weight:600;font-size:var(--text-sm)}
+        .sus-meta{font-size:var(--text-xs);color:var(--text-dim)}
+        .sus-monto{font-weight:800;font-family:var(--font-display);color:var(--brand-primary);white-space:nowrap}
+        .sus-estado{font-size:var(--text-xs);font-weight:700;padding:2px 8px;border-radius:var(--radius-pill);white-space:nowrap}
+        .sus-estado.ok{background:#DCFCE7;color:#166534}
+        .sus-estado.pend{background:#FEF3C7;color:#92400E}
+        .sus-carga-row{display:grid;grid-template-columns:24px 1fr 120px 130px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--border-light)}
+        .sus-carga-row input[type=number],.sus-carga-row input[type=date]{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-md);font-family:var(--font-body);font-size:var(--text-sm);background:var(--bg)}
+        @media (max-width:600px){.sus-carga-row{grid-template-columns:24px 1fr;}.sus-carga-row input[type=number],.sus-carga-row input[type=date]{grid-column:2}}
             .view-title{letter-spacing:-.01em}
         .login-logo{display:flex;flex-direction:column;align-items:center;gap:10px}
         .login-logo .logo-t1{font-size:14px}.login-logo .logo-t2{font-size:28px}
@@ -1408,10 +1423,80 @@
                 </div>
                 <div class="form-group"><label>Fecha</label><input type="date" id="gasto-date" class="form-control" required></div>
                 <div class="form-group"><label>Notas</label><input type="text" id="gasto-notes" class="form-control" placeholder="Opcional..."></div>
+                <div class="form-group" style="grid-column:1/-1" id="gasto-sus-wrap">
+                    <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:500;cursor:pointer">
+                        <input type="checkbox" id="gasto-guardar-sus"> Guardar también como suscripción habitual (se repite todos los meses)
+                    </label>
+                </div>
                 <div class="form-footer" style="grid-column:1/-1">
                     <button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL SUSCRIPCIÓN HABITUAL -->
+<div id="modal-sus" class="modal-overlay">
+    <div class="modal-box" style="max-width:480px">
+        <div class="modal-header">
+            <span class="modal-title" id="sus-modal-title">Nueva suscripción habitual</span>
+            <button class="btn-icon" id="btn-close-sus-modal"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-sus" class="form-grid form-grid-2">
+                <input type="hidden" id="sus-edit-id">
+                <div class="form-group" style="grid-column:1/-1"><label>Concepto</label><input type="text" id="sus-concept" class="form-control" required placeholder="Ej: Claude Pro"></div>
+                <div class="form-group"><label>Categoría</label>
+                    <select id="sus-category" class="form-control">
+                        <option value="Suscripciones">Suscripciones</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Impuestos">Impuestos / Tasas</option>
+                        <option value="Honorarios">Honorarios</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Día de cobro</label><input type="number" id="sus-dia" class="form-control" min="1" max="31" value="1" required></div>
+                <div class="form-group"><label>Monto habitual</label><input type="number" id="sus-amount" class="form-control" required step="0.01" min="0" placeholder="0.00"></div>
+                <div class="form-group"><label>Moneda</label>
+                    <select id="sus-currency" class="form-control">
+                        <option value="ARS">ARS $</option>
+                        <option value="USD">USD u$s</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1"><label>Notas</label><input type="text" id="sus-notes" class="form-control" placeholder="Ej: tarjeta, plan anual, etc."></div>
+                <div class="form-group" style="grid-column:1/-1">
+                    <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;color:var(--text);font-weight:500;cursor:pointer">
+                        <input type="checkbox" id="sus-activa" checked> Activa (aparece al cargar el mes)
+                    </label>
+                </div>
+                <div class="form-footer" style="grid-column:1/-1">
+                    <button type="submit" class="btn-primary"><i data-lucide="save" size="16"></i> Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CARGAR SUSCRIPCIONES DEL MES -->
+<div id="modal-sus-carga" class="modal-overlay">
+    <div class="modal-box" style="max-width:560px">
+        <div class="modal-header">
+            <span class="modal-title" id="sus-carga-title">Cargar suscripciones del mes</span>
+            <button class="btn-icon" id="btn-close-sus-carga"><i data-lucide="x" size="20"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group" style="margin-bottom:var(--space-3)"><label>Mes</label><input type="month" id="sus-carga-mes" class="form-control"></div>
+            <p style="font-size:var(--text-xs);color:var(--text-dim);margin-bottom:var(--space-2)">Revisá los montos (si aumentó algo, cambialo acá) y destildá lo que no corresponda este mes.</p>
+            <div id="sus-carga-list"></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:var(--text-sm);margin-top:var(--space-3);cursor:pointer">
+                <input type="checkbox" id="sus-carga-actualizar" checked> Actualizar el monto habitual con los valores nuevos
+            </label>
+            <div class="form-footer" style="margin-top:var(--space-3);display:flex;align-items:center;justify-content:space-between;gap:var(--space-2)">
+                <span id="sus-carga-total" style="font-size:var(--text-sm);font-weight:700"></span>
+                <button type="button" class="btn-primary" id="btn-confirmar-sus-carga"><i data-lucide="check" size="16"></i> Registrar</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1965,6 +2050,20 @@
             <div class="gastos-resumen-grid" id="gastos-resumen"></div>
             <!-- Saldo neto -->
             <div class="gasto-saldo-row" id="gastos-saldo"></div>
+            <!-- Suscripciones habituales -->
+            <div class="card" id="sus-panel" style="margin-bottom:var(--space-4)">
+                <div class="sus-head">
+                    <div>
+                        <div class="sus-title"><i data-lucide="repeat" size="16"></i> Suscripciones habituales</div>
+                        <div class="sus-sub" id="sus-mes-label"></div>
+                    </div>
+                    <div style="display:flex;gap:var(--space-2);flex-wrap:wrap">
+                        <button class="btn-secondary btn-sm" id="btn-nueva-sus"><i data-lucide="plus" size="12"></i> Nueva</button>
+                        <button class="btn-primary btn-sm" id="btn-cargar-sus-mes"><i data-lucide="copy-plus" size="12"></i> Cargar las del mes</button>
+                    </div>
+                </div>
+                <div id="sus-list"></div>
+            </div>
             <!-- Lista -->
             <div class="card">
                 <div class="filtros-bar" style="margin-bottom:var(--space-4);padding:var(--space-2) 0;border:none">
@@ -2090,7 +2189,7 @@ const APP_ID="talento-impulsa-default";
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(),db=firebase.firestore();
 let firebaseUser=null,localUser=null,unsubscribers=[];
-let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[],allMarketing=[],allAccesos=[],allNotas=[],allGastos=[];
+let allProjects=[],allClients=[],allLinks=[],allBitacoras=[],allActivos=[],allPotenciales=[],allReuniones=[],allIdeas=[],allMarketing=[],allAccesos=[],allNotas=[],allGastos=[],allSuscripciones=[];
 const col=n=>db.collection(["artifacts",APP_ID,"public","data",n].join("/"));
 
 function getTodayStr(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
@@ -2262,7 +2361,8 @@ function startRealtimeListeners(){
     unsubscribers.push(listen("notas_compartidas",arr=>{allNotas=arr},()=>{
         if(currentProyectoId&&document.getElementById("view-proyecto-detalle").classList.contains("active"))renderPdNotas(currentProyectoId);
     }));
-    unsubscribers.push(listen("gastos",arr=>{allGastos=arr},renderGastos));
+    unsubscribers.push(listen("gastos",arr=>{allGastos=arr},()=>{renderGastos();renderSuscripciones();}));
+    unsubscribers.push(listen("suscripciones",arr=>{allSuscripciones=arr},renderSuscripciones));
     unsubscribers.push(listen("marketing",arr=>{allMarketing=arr},renderMarketing));
     unsubscribers.push(listen("enlaces_internos",arr=>{allAccesos=arr},renderAccesos));
 }
@@ -2596,6 +2696,8 @@ document.addEventListener("click",async e=>{
         document.getElementById("gasto-currency").value=g.currency||"ARS";
         document.getElementById("gasto-date").value=g.date||"";
         document.getElementById("gasto-notes").value=g.notes||"";
+        document.getElementById("gasto-guardar-sus").checked=false;
+        document.getElementById("gasto-sus-wrap").style.display="none";
         document.getElementById("modal-gasto").classList.add("open");
     }
     if(ac==="edit-nota"){
@@ -2793,6 +2895,11 @@ document.getElementById("form-add-gasto")?.addEventListener("submit",async e=>{
     try{
         if(editId){await col("gastos").doc(editId).update(data);}
         else{data.createdAt=Date.now();await col("gastos").add(data);}
+        if(document.getElementById("gasto-guardar-sus")?.checked&&data.tipo==="egreso"){
+            await col("suscripciones").add({concept:data.concept,category:data.category,amount:data.amount,currency:data.currency,
+                dia:parseInt((data.date||"").slice(8,10))||1,notes:data.notes,activa:true,addedBy:localUser,createdAt:Date.now(),updatedAt:Date.now()});
+            showToast("Guardado también como suscripción habitual ✓");
+        }
         document.getElementById("form-add-gasto").reset();
         document.getElementById("gasto-tipo-egreso").checked=true;
         document.getElementById("modal-gasto").classList.remove("open");
@@ -2902,6 +3009,7 @@ document.getElementById("btn-open-gasto-modal")?.addEventListener("click",()=>{
     document.getElementById("form-add-gasto").reset();
     document.getElementById("gasto-tipo-egreso").checked=true;
     document.getElementById("gasto-date").value=getTodayStr();
+    document.getElementById("gasto-sus-wrap").style.display="";
     document.getElementById("modal-gasto").classList.add("open");
 });
 document.getElementById("btn-close-gasto-modal")?.addEventListener("click",()=>document.getElementById("modal-gasto").classList.remove("open"));
@@ -3510,6 +3618,7 @@ function renderGastos(){
             const tipo=g.tipo||"egreso";
             const editBtn='<button class="btn-icon" data-action="edit-gasto" data-id="'+g.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button>';
             const delBtn='<button class="btn-icon" data-action="delete-gasto" data-id="'+g.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>';
+            const susBtn=tipo==="egreso"&&!g.suscripcionId?'<button class="btn-icon" data-sus-action="from-gasto" data-id="'+g.id+'" title="Guardar como suscripción habitual" style="color:var(--text-muted)"><i data-lucide="repeat" size="13"></i></button>':"";
             return '<tr><td style="font-size:var(--text-xs);color:var(--text-dim);white-space:nowrap">'+(g.date||"—")+'</td>'+
                 '<td><div style="font-weight:600;font-size:var(--text-sm)">'+(g.concept||g.description||"—")+'</div>'+(g.notes?'<div style="font-size:var(--text-xs);color:var(--text-dim)">'+g.notes+'</div>':"")+'</td>'+
                 '<td><span class="gasto-tipo-tag '+tipo+'">'+(tipo==="ingreso"?"Ingreso":"Egreso")+'</span></td>'+
@@ -3517,7 +3626,7 @@ function renderGastos(){
                 '<td style="text-align:right;font-weight:800;font-family:var(--font-display);color:'+(tipo==="ingreso"?"var(--brand-green)":"var(--brand-primary)")+'">'+
                     (g.currency==="USD"?"u$s":"$")+" "+parseFloat(g.amount||0).toLocaleString("es-AR",{minimumFractionDigits:2})+
                 '</td>'+
-                '<td style="display:flex;gap:2px">'+editBtn+delBtn+'</td></tr>';
+                '<td style="display:flex;gap:2px">'+susBtn+editBtn+delBtn+'</td></tr>';
         }).join("")+
     '</tbody></table>';
     lucide.createIcons();
@@ -3529,6 +3638,172 @@ document.getElementById("flt-gasto-mes")?.addEventListener("change",renderGastos
 document.getElementById("btn-clear-gastos-filter")?.addEventListener("click",()=>{
     ["flt-gasto-tipo","flt-gasto-cat","flt-gasto-mes"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
     renderGastos();
+});
+
+// ── SUSCRIPCIONES HABITUALES (colección: suscripciones) ───────
+// Campos: concept, category, amount, currency, dia, notes, activa
+// Los gastos generados guardan suscripcionId para saber qué ya se cargó en cada mes.
+function susMesActual(){return document.getElementById("flt-gasto-mes")?.value||getTodayStr().slice(0,7)}
+function susFechaEnMes(mes,dia){const[y,m]=mes.split("-").map(Number);const max=new Date(y,m,0).getDate();const d=Math.min(Math.max(parseInt(dia)||1,1),max);return mes+"-"+String(d).padStart(2,"0")}
+function susCargadaEnMes(s,mes){return allGastos.some(g=>g.suscripcionId===s.id&&(g.date||"").startsWith(mes))}
+function susFmt(n,cur){return (cur==="USD"?"u$s ":"$ ")+(parseFloat(n)||0).toLocaleString("es-AR",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function susMesNombre(mes){const[y,m]=mes.split("-").map(Number);return new Date(y,m-1,1).toLocaleDateString("es-AR",{month:"long",year:"numeric"})}
+
+function renderSuscripciones(){
+    const el=document.getElementById("sus-list");if(!el)return;
+    const mes=susMesActual();
+    const lbl=document.getElementById("sus-mes-label");
+    const activas=allSuscripciones.filter(s=>s.activa!==false);
+    const pend=activas.filter(s=>!susCargadaEnMes(s,mes));
+    if(lbl)lbl.textContent=allSuscripciones.length?("Estado de "+susMesNombre(mes)+": "+(activas.length-pend.length)+" de "+activas.length+" cargadas"):"";
+    const btn=document.getElementById("btn-cargar-sus-mes");if(btn)btn.disabled=!pend.length;
+    if(!allSuscripciones.length){
+        el.innerHTML='<div class="sus-meta" style="padding:8px 0">Todavía no hay suscripciones habituales. Creá una con <b>Nueva</b>, o tocá el ícono <i data-lucide="repeat" size="11"></i> en un egreso de la lista para reutilizarlo.</div>';
+        lucide.createIcons();return;
+    }
+    const items=[...allSuscripciones].sort((a,b)=>((a.activa===false)-(b.activa===false))||((parseInt(a.dia)||1)-(parseInt(b.dia)||1)));
+    el.innerHTML=items.map(s=>{
+        const ok=susCargadaEnMes(s,mes),inact=s.activa===false;
+        const estado=inact?'<span class="sus-estado" style="background:var(--bg);color:var(--text-muted)">Pausada</span>':(ok?'<span class="sus-estado ok">✓ Cargada</span>':'<span class="sus-estado pend">Pendiente</span>');
+        const cargar=!inact&&!ok?'<button class="btn-secondary btn-sm" data-sus-action="cargar-una" data-id="'+s.id+'" title="Registrar este mes con el monto habitual"><i data-lucide="plus" size="12"></i> Cargar</button>':"";
+        return '<div class="sus-row'+(inact?" inactiva":"")+'">'+
+            '<div class="sus-name">'+esc(s.concept||"—")+'<div class="sus-meta">Día '+(parseInt(s.dia)||1)+' · '+esc(s.category||"Suscripciones")+(s.notes?" · "+esc(s.notes):"")+'</div></div>'+
+            '<span class="sus-monto">'+susFmt(s.amount,s.currency)+'</span>'+estado+cargar+
+            '<button class="btn-icon" data-sus-action="edit" data-id="'+s.id+'" style="color:var(--brand-primary)"><i data-lucide="pencil" size="13"></i></button>'+
+            '<button class="btn-icon" data-sus-action="delete" data-id="'+s.id+'" style="color:var(--text-muted)"><i data-lucide="trash-2" size="13"></i></button>'+
+        '</div>';
+    }).join("");
+    lucide.createIcons();
+}
+
+function susGastoData(s,amount,date){
+    return {tipo:"egreso",concept:s.concept||"",category:s.category||"Suscripciones",amount:parseFloat(amount)||0,currency:s.currency||"ARS",
+        date,notes:s.notes||"",suscripcionId:s.id,addedBy:localUser,createdAt:Date.now(),updatedAt:Date.now(),order:-Date.now()};
+}
+
+function abrirSusModal(s){
+    document.getElementById("form-sus").reset();
+    document.getElementById("sus-edit-id").value=s&&s.id?s.id:"";
+    document.getElementById("sus-modal-title").textContent=s&&s.id?"Editar suscripción habitual":"Nueva suscripción habitual";
+    if(s){
+        document.getElementById("sus-concept").value=s.concept||"";
+        document.getElementById("sus-category").value=s.category||"Suscripciones";
+        document.getElementById("sus-dia").value=parseInt(s.dia)||1;
+        document.getElementById("sus-amount").value=s.amount||"";
+        document.getElementById("sus-currency").value=s.currency||"ARS";
+        document.getElementById("sus-notes").value=s.notes||"";
+        document.getElementById("sus-activa").checked=s.activa!==false;
+    }
+    document.getElementById("modal-sus").classList.add("open");
+}
+
+function renderSusCarga(){
+    const mes=document.getElementById("sus-carga-mes").value||susMesActual();
+    document.getElementById("sus-carga-title").textContent="Cargar suscripciones · "+susMesNombre(mes);
+    const pend=allSuscripciones.filter(s=>s.activa!==false&&!susCargadaEnMes(s,mes)).sort((a,b)=>(parseInt(a.dia)||1)-(parseInt(b.dia)||1));
+    const list=document.getElementById("sus-carga-list");
+    if(!pend.length){list.innerHTML='<div class="sus-meta" style="padding:8px 0">Todas las suscripciones activas ya están cargadas en este mes. 🎉</div>';}
+    else list.innerHTML=pend.map(s=>
+        '<div class="sus-carga-row" data-sid="'+s.id+'">'+
+            '<input type="checkbox" class="sus-c-check" checked>'+
+            '<div><div style="font-weight:600;font-size:var(--text-sm)">'+esc(s.concept||"—")+'</div><div class="sus-meta">'+(s.currency==="USD"?"USD":"ARS")+' · '+esc(s.category||"Suscripciones")+'</div></div>'+
+            '<input type="number" class="sus-c-monto" step="0.01" min="0" value="'+(parseFloat(s.amount)||0)+'">'+
+            '<input type="date" class="sus-c-fecha" value="'+susFechaEnMes(mes,s.dia)+'">'+
+        '</div>').join("");
+    document.getElementById("btn-confirmar-sus-carga").disabled=!pend.length;
+    susCargaTotal();
+}
+function susCargaTotal(){
+    let ars=0,usd=0,n=0;
+    document.querySelectorAll("#sus-carga-list .sus-carga-row").forEach(r=>{
+        if(!r.querySelector(".sus-c-check").checked)return;
+        const s=allSuscripciones.find(x=>x.id===r.dataset.sid);if(!s)return;
+        const v=parseFloat(r.querySelector(".sus-c-monto").value)||0;n++;
+        if(s.currency==="USD")usd+=v;else ars+=v;
+    });
+    document.getElementById("sus-carga-total").textContent=n?(n+" a registrar: "+susFmt(ars,"ARS")+(usd?" + "+susFmt(usd,"USD"):"")):"";
+}
+
+document.getElementById("btn-nueva-sus")?.addEventListener("click",()=>abrirSusModal(null));
+document.getElementById("btn-close-sus-modal")?.addEventListener("click",()=>document.getElementById("modal-sus").classList.remove("open"));
+document.getElementById("modal-sus")?.addEventListener("click",e=>{if(e.target.id==="modal-sus")e.target.classList.remove("open")});
+document.getElementById("btn-close-sus-carga")?.addEventListener("click",()=>document.getElementById("modal-sus-carga").classList.remove("open"));
+document.getElementById("modal-sus-carga")?.addEventListener("click",e=>{if(e.target.id==="modal-sus-carga")e.target.classList.remove("open")});
+document.getElementById("flt-gasto-mes")?.addEventListener("change",renderSuscripciones);
+document.getElementById("btn-clear-gastos-filter")?.addEventListener("click",renderSuscripciones);
+
+document.getElementById("form-sus")?.addEventListener("submit",async e=>{
+    e.preventDefault();
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
+    const id=document.getElementById("sus-edit-id").value;
+    const data={
+        concept:document.getElementById("sus-concept").value.trim(),
+        category:document.getElementById("sus-category").value,
+        dia:Math.min(Math.max(parseInt(document.getElementById("sus-dia").value)||1,1),31),
+        amount:parseFloat(document.getElementById("sus-amount").value)||0,
+        currency:document.getElementById("sus-currency").value,
+        notes:document.getElementById("sus-notes").value.trim(),
+        activa:document.getElementById("sus-activa").checked,
+        updatedAt:Date.now()
+    };
+    try{
+        if(id)await col("suscripciones").doc(id).update(data);
+        else{data.createdAt=Date.now();data.addedBy=localUser;await col("suscripciones").add(data);}
+        document.getElementById("modal-sus").classList.remove("open");
+        showToast(id?"Suscripción actualizada ✓":"Suscripción guardada ✓");
+    }catch(err){console.error(err);showToast("Error al guardar: "+err.message,"err");}
+});
+
+document.getElementById("btn-cargar-sus-mes")?.addEventListener("click",()=>{
+    document.getElementById("sus-carga-mes").value=susMesActual();
+    document.getElementById("sus-carga-actualizar").checked=true;
+    renderSusCarga();
+    document.getElementById("modal-sus-carga").classList.add("open");
+    lucide.createIcons();
+});
+document.getElementById("sus-carga-mes")?.addEventListener("change",renderSusCarga);
+document.getElementById("sus-carga-list")?.addEventListener("input",susCargaTotal);
+document.getElementById("sus-carga-list")?.addEventListener("change",susCargaTotal);
+
+document.getElementById("btn-confirmar-sus-carga")?.addEventListener("click",async()=>{
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
+    const actualizar=document.getElementById("sus-carga-actualizar").checked;
+    const batch=db.batch();let n=0;
+    document.querySelectorAll("#sus-carga-list .sus-carga-row").forEach(r=>{
+        if(!r.querySelector(".sus-c-check").checked)return;
+        const s=allSuscripciones.find(x=>x.id===r.dataset.sid);if(!s)return;
+        const monto=parseFloat(r.querySelector(".sus-c-monto").value)||0;
+        const fecha=r.querySelector(".sus-c-fecha").value||susFechaEnMes(susMesActual(),s.dia);
+        batch.set(col("gastos").doc(),susGastoData(s,monto,fecha));
+        if(actualizar&&monto!==(parseFloat(s.amount)||0))batch.update(col("suscripciones").doc(s.id),{amount:monto,updatedAt:Date.now()});
+        n++;
+    });
+    if(!n){showToast("No hay nada tildado","err");return;}
+    try{
+        await batch.commit();
+        document.getElementById("modal-sus-carga").classList.remove("open");
+        showToast(n+(n===1?" suscripción registrada ✓":" suscripciones registradas ✓"));
+    }catch(err){console.error(err);showToast("Error al registrar: "+err.message,"err");}
+});
+
+document.addEventListener("click",async e=>{
+    const b=e.target.closest("[data-sus-action]");if(!b)return;
+    const ac=b.dataset.susAction,id=b.dataset.id;
+    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
+    try{
+        if(ac==="edit"){const s=allSuscripciones.find(x=>x.id===id);if(s)abrirSusModal(s);}
+        if(ac==="delete"){const s=allSuscripciones.find(x=>x.id===id);if(s&&confirm("¿Eliminar la suscripción habitual \""+(s.concept||"")+"\"? Los gastos ya registrados no se borran.")){await deleteItem("suscripciones",id);showToast("Suscripción eliminada");}}
+        if(ac==="cargar-una"){
+            const s=allSuscripciones.find(x=>x.id===id);if(!s)return;
+            const mes=susMesActual();
+            await col("gastos").add(susGastoData(s,s.amount,susFechaEnMes(mes,s.dia)));
+            showToast((s.concept||"Suscripción")+" registrada en "+susMesNombre(mes)+" ✓");
+        }
+        if(ac==="from-gasto"){
+            const g=allGastos.find(x=>x.id===id);if(!g)return;
+            abrirSusModal({concept:g.concept||g.description||"",category:g.category||"Suscripciones",dia:parseInt((g.date||"").slice(8,10))||1,amount:g.amount,currency:g.currency||"ARS",notes:g.notes||"",activa:true});
+        }
+    }catch(err){console.error(err);showToast("Error: "+err.message,"err");}
 });
 
 // ── IDEAS (colección: ideas) ──────────────────────────────────
