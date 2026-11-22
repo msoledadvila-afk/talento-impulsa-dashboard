@@ -2140,7 +2140,6 @@
                 <div class="view-title">Pipeline de Potenciales</div>
                 <div style="display:flex;align-items:center;gap:var(--space-2);flex-wrap:wrap">
                     <!-- TEMPORAL: migración fuente Google. Se oculta sola cuando no quedan docs pendientes. Quitar en el próximo deploy. -->
-                    <button class="btn-secondary" id="btn-migrar-google" data-action="pot-migrar-google" style="display:none"><i data-lucide="database" size="16"></i> <span id="btn-migrar-google-lbl">Migrar fuente Google</span></button>
                     <button class="btn-primary" id="btn-open-potencial-modal"><i data-lucide="user-plus" size="16"></i> Agregar potencial</button>
                 </div>
             </div>
@@ -2541,7 +2540,7 @@ function renderProjectsTable(){
     const hsP=pid=>wb.filter(b=>b.projectId===pid).reduce((s,b)=>s+(parseFloat(b.hours)||0),0);
     const da=ds=>{if(!ds)return{cls:"",txt:"—"};const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds+"T00:00:00");const diff=Math.ceil((d-t)/86400000);if(diff<0)return{cls:"badge warn",txt:"Vencida"};if(diff<=7)return{cls:"badge warn",txt:`${diff}d`};const[y,m,dy]=ds.split("-");return{cls:"",txt:`${dy}/${m}`}};
     const sb=s=>{const ml={active:"active",pending:"pending",done:"done",paused:"paused",archived:"archived"},ll={active:"En curso",pending:"Pendiente",done:"Completado",paused:"Pausado",archived:"Archivado"};return `<span class="badge ${ml[s]||"info"}">${ll[s]||s}</span>`};
-    const row=p=>{const hs=hsP(p.id),d=isArchived(p)?{cls:"",txt:"—"}:da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
+    const row=p=>{const hs=hsP(p.id),d=(isArchived(p)||p.status==="done")?{cls:"",txt:"—"}:da(p.deliveryDate||p.dates?.delivery),pr=p.progress||0;
         const meta=`<span class="area-chip">${p.area?esc(p.area):"Sin área"}</span> · ${esc(projCliente(p))}`;
         return `<tr><td><div class="proj-meta">${meta}</div><div style="font-weight:600">${esc(p.name)}${p.laboratorio===true?'<span class="lab-badge">🧪 Lab</span>':""}</div></td><td>${sb(p.status)}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="progress-bar-sm"><div class="progress-bar-sm-fill" style="width:${pr}%"></div></div><span style="font-size:var(--text-xs);color:var(--text-dim)">${pr}%</span></div></td><td class="hs-semana-cell">${hs>0?hsLabel(hs):`<span style="color:var(--text-muted)">—</span>`}</td><td>${d.cls?`<span class="${d.cls}">${d.txt}</span>`:`<span style="font-size:var(--text-xs);color:var(--text-dim)">${d.txt}</span>`}</td><td style="display:flex;gap:4px;align-items:center"><button class="btn-primary btn-sm" data-action="abrir-proyecto" data-id="${p.id}">Abrir</button><button class="btn-icon" data-action="edit-proyecto" data-id="${p.id}"><i data-lucide="pencil" size="14"></i></button><button class="btn-icon" data-action="delete-project" data-id="${p.id}" style="color:var(--text-muted)"><i data-lucide="trash-2" size="14"></i></button></td></tr>`};
     const bi=document.getElementById("projects-table-inicio"),bf=document.getElementById("projects-table-full");
@@ -2643,7 +2642,6 @@ document.addEventListener("click",async e=>{
         const sel=document.getElementById("flt-pot-etapa");
         if(sel){sel.value=(sel.value===btn.dataset.etapa)?"":btn.dataset.etapa;renderPotenciales();}
     }
-    if(ac==="pot-migrar-google"){await migrarPotencialesGoogle();}
     if(ac==="delete-reunion"&&confirm("¿Eliminar esta reunión?")){await deleteItem("eventos",id);showToast("Reunión eliminada")}
     if(ac==="delete-idea"&&confirm("¿Eliminar esta idea?")){await deleteItem("ideas",id);showToast("Idea eliminada")}
     if(ac==="edit-idea"){const i=allIdeas.find(x=>x.id===id);if(!i)return;document.getElementById("edit-idea-id").value=i.id;document.getElementById("edit-idea-titulo").value=i.titulo||i.text||"";document.getElementById("edit-idea-categoria").value=i.categoria||"producto";document.getElementById("edit-idea-cuerpo").value=i.cuerpo||"";document.getElementById("modal-edit-idea").classList.add("open");}
@@ -3953,53 +3951,6 @@ function potMatches(p,fo,fe,fp){
 function potEl(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
 function potIcon(name,size){const i=document.createElement("i");i.setAttribute("data-lucide",name);i.setAttribute("size",String(size||12));return i}
 
-// Docs a migrar: canal "Investigación Google" (los 36 de la carga). Devuelve [{p,cambios}]
-function potPendientesMigracion(){
-    return allPotenciales.map(p=>{
-        if(!/investigaci[oó]n\s+google/i.test(String(p.canal||"")))return null;
-        const c={};
-        if(p.origen!=="google")c.origen="google";
-        const t=potPrefijoNotas(potNotas(p));
-        if(!p.prioridad&&(t==="p1"||t==="p2"||t==="p3"||t==="espera"))c.prioridad=t;
-        const etapaSinAvance=!p.etapa||p.etapa==="contacto";
-        if(t==="cerrado"){if(etapaSinAvance)c.etapa="perdido";}
-        else if(etapaSinAvance&&p.etapa!=="por_contactar")c.etapa="por_contactar";
-        return Object.keys(c).length?{p,cambios:c}:null;
-    }).filter(Boolean);
-}
-function potActualizarBotonMigracion(){
-    const b=document.getElementById("btn-migrar-google");if(!b)return;
-    const n=potPendientesMigracion().length;
-    b.style.display=n?"":"none";
-    const l=document.getElementById("btn-migrar-google-lbl");if(l)l.textContent="Migrar fuente Google ("+n+")";
-}
-async function migrarPotencialesGoogle(){
-    if(!db||!firebaseUser){showToast("Sin conexión","err");return;}
-    const pend=potPendientesMigracion();
-    if(!pend.length){showToast("No hay potenciales pendientes de migrar");return;}
-    const cnt={origen:0,p1:0,p2:0,p3:0,espera:0,por_contactar:0,perdido:0};
-    pend.forEach(({cambios})=>{
-        if(cambios.origen)cnt.origen++;
-        if(cambios.prioridad)cnt[cambios.prioridad]++;
-        if(cambios.etapa)cnt[cambios.etapa]++;
-    });
-    const msg="Migración fuente Google · "+pend.length+" potenciales\n\n"+
-        "• Origen → Investigación Google: "+cnt.origen+"\n"+
-        "• Prioridad desde notas: P1 "+cnt.p1+" · P2 "+cnt.p2+" · P3 "+cnt.p3+" · En espera "+cnt.espera+"\n"+
-        "• Etapa → Por contactar: "+cnt.por_contactar+"\n"+
-        "• Etapa → Perdido (Cerrado): "+cnt.perdido+"\n\n"+
-        "El campo canal y las notas no se modifican. ¿Confirmás?";
-    if(!confirm(msg))return;
-    try{
-        const now=Date.now();
-        for(let i=0;i<pend.length;i+=400){
-            const batch=db.batch();
-            pend.slice(i,i+400).forEach(({p,cambios})=>batch.update(col("potenciales").doc(p.id),Object.assign({},cambios,{updatedAt:now})));
-            await batch.commit();
-        }
-        showToast("✓ "+pend.length+" potenciales migrados");
-    }catch(err){console.error(err);showToast("Error en la migración: "+err.message,"err");}
-}
 
 function renderPotenciales(){
     const el=document.getElementById("potenciales-list");if(!el)return;
@@ -4025,7 +3976,6 @@ function renderPotenciales(){
             chips.appendChild(b);
         });
     }
-    potActualizarBotonMigracion();
 
     const lista=allPotenciales.filter(p=>potMatches(p,fo,fe,fp));
     const pc=document.getElementById("pot-count-label");
