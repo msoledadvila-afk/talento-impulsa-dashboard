@@ -401,6 +401,7 @@
         .mkt-copy{font-size:var(--text-sm);color:var(--text);line-height:1.6;background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:var(--space-3);margin-top:var(--space-2);white-space:pre-wrap;word-break:break-word}
         .mkt-estado{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--radius-pill);font-size:var(--text-xs);font-weight:700}
         .mkt-estado.disenada{background:#DBEAFE;color:#1E40AF}
+        .mkt-estado.programada{background:#FEF3C7;color:#92400E}
         .mkt-estado.publicada{background:#DCFCE7;color:#166534}
         .mkt-estado.pendiente{background:#F1F5F9;color:#475569}
         .mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-4)}
@@ -1214,6 +1215,7 @@
                     <select id="mkt-estado" class="form-control">
                         <option value="pendiente">Pendiente</option>
                         <option value="disenada">Pieza diseñada</option>
+                        <option value="programada">Programada en Meta/Metricool</option>
                         <option value="publicada">Publicada</option>
                     </select>
                 </div>
@@ -2115,6 +2117,7 @@
                     <option value="">Todos los estados</option>
                     <option value="pendiente">Pendiente</option>
                     <option value="disenada">Pieza diseñada</option>
+                    <option value="programada">Programada en Meta/Metricool</option>
                     <option value="publicada">Publicada</option>
                 </select>
                 <select id="flt-mkt-tipo">
@@ -3400,7 +3403,7 @@ function renderMarketing(){
     const isArchivo=vista==="archivo";
     document.querySelector(".cs-weekbar").style.display=isArchivo?"none":"";
     const tipoLabel={feed:"Feed / Carrusel",story:"Historia",reel:"Reel",Reel:"Reel",linkedin:"LinkedIn",email:"Email",whatsapp:"WhatsApp",otro:"Otro"};
-    const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",publicada:"Publicada"};
+    const estadoLabel={pendiente:"Pendiente",disenada:"Pieza diseñada",programada:"Programada en Meta/Metricool",publicada:"Publicada"};
     let items=allMarketing.filter(m=>isArchivo?!m.semana:m.semana===csWeek);
     const weekAll=items.slice();
     if(fltEstado)items=items.filter(m=>mktEstado(m)===fltEstado);
@@ -3409,7 +3412,8 @@ function renderMarketing(){
         const today=getTodayStr();
         document.getElementById("cs-lbl").textContent=(csWeek===weekStartOf(today)?"Esta semana · ":"Semana del ")+weekLabel(csWeek);
         const pub=weekAll.filter(m=>mktEstado(m)==="publicada").length;
-        document.getElementById("cs-progress").textContent=weekAll.length?`${pub} de ${weekAll.length} piezas publicadas`:"Sin piezas cargadas para esta semana";
+        const prog=weekAll.filter(m=>mktEstado(m)==="programada").length;
+        document.getElementById("cs-progress").textContent=weekAll.length?`${pub} de ${weekAll.length} piezas publicadas`+(prog?` · ${prog} programadas`:""):"Sin piezas cargadas para esta semana";
     }
     if(!items.length){el.innerHTML=`<div class="empty-state"><i data-lucide="megaphone" size="32"></i>${isArchivo?"El archivo está vacío.":(fltEstado||fltTipo)?"Sin piezas con esos filtros.":"Sin piezas esta semana. Usá «Importar semana de 02»."}</div>`;lucide.createIcons();return}
     function card(m){
